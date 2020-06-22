@@ -1,0 +1,63 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="1529312226" file="/Users/jfitzpat/src/BMC/Utilities/Matlab/ILDA Viewer/IldaViewer/ILDA Viewer.prj" location="/Users/jfitzpat/src/BMC/Utilities/Matlab/ILDA Viewer/IldaViewer" name="ILDA Viewer" target="target.mlapps" target-name="Package App">
+    <param.appname>ILDA Viewer</param.appname>
+    <param.authnamewatermark>Joe Fitzpatrick</param.authnamewatermark>
+    <param.email>jfitzpat@scrootchme.com</param.email>
+    <param.company>Scrootch.Me!</param.company>
+    <param.icon />
+    <param.icons />
+    <param.summary>Load and View ILDA files</param.summary>
+    <param.description>ILDA files are a format for exchanging laser projection graphic information. See ilda.com for more information.</param.description>
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.products.name />
+    <param.products.id />
+    <param.products.version />
+    <param.platforms />
+    <param.output>/Users/jfitzpat/src/BMC/Utilities/Matlab/ILDA Viewer</param.output>
+    <param.guid>e7e29301-4399-400c-a0ed-50fc9643f78f</param.guid>
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.screenshot />
+      <param.version />
+      <param.products.name />
+      <param.products.id />
+      <param.products.version />
+      <param.platforms />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}/ILDAViewer.mlapp</file>
+    </fileset.main>
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}/DrawIldaFrame.m</file>
+      <file>${PROJECT_ROOT}/FindIldaFrames.m</file>
+      <file>${PROJECT_ROOT}/ReadIldaFrame.m</file>
+    </fileset.depfun>
+    <fileset.resources />
+    <fileset.package />
+    <build-deliverables>
+      <file location="/Users/jfitzpat/src/BMC/Utilities/Matlab" name="ILDA Viewer" optional="false">/Users/jfitzpat/src/BMC/Utilities/Matlab/ILDA Viewer</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>/Applications/MATLAB_R2020a.app</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>true</unix>
+      <mac>true</mac>
+      <windows>false</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.15.5</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>maci64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>

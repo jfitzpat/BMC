@@ -1,0 +1,21 @@
+~*
+*.bak
+*-bak
+build/
+builds/
+Release/
+Debug/
+ipch/
+debug/
+dist/
+OldVersions/
+*.raw
+*.log
+*.plt
+*.lck
+.DS_Store
+._.DS_Store
+History/
+__Previews/
+Project Outputs*/
+Project Logs*/
