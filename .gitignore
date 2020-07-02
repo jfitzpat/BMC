@@ -1,6 +1,7 @@
 ~*
 *.bak
 *-bak
+Thumbs.db
 build/
 builds/
 Release/
