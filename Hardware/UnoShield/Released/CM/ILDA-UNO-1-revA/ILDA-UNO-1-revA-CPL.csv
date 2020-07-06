@@ -1,0 +1,61 @@
+Altium Designer Pick and Place Locations
+Z:\src\BMC\Hardware\UnoShield\Altium Designer\Project Outputs\Pick Place\Pick Place for UnoShield(SMT Only).csv
+
+========================================================================================================================
+File Design Information:
+
+Date:       06/07/20
+Time:       09:12
+Revision:   f735c5aa04a436523ca9e933aec842d2fa09d3fe
+Variant:    SMT Only
+Units used: mil
+
+"Designator","Comment","Layer","Footprint","Center-X(mil)","Center-Y(mil)","Rotation","Description"
+"C23",".1uF","TopLayer","C0603","1675.000","1950.000","360","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C22",".1uF","TopLayer","C0603","1550.000","2225.000","360","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"R17","10K","TopLayer","R0603","2450.000","2750.000","180","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R16","10K","TopLayer","R0603","2450.000","2650.000","180","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"U6","THVD1410DR","TopLayer","SOIC8","3143.701","2375.000","180","Transceiver 1ch Half RS485 8-SOIC"
+"U5","THVD1410DR","TopLayer","SOIC8","2743.701","2375.000","180","Transceiver 1ch Half RS485 8-SOIC"
+"R15","33","TopLayer","R0603","3050.000","2850.000","90","33 Ohms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R14","33","TopLayer","R0603","1750.000","2850.000","270","33 Ohms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R13","470","TopLayer","R0603","3250.000","2050.000","180","470 Ohms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"D2","SS16-E3/61T","TopLayer","SMA","2850.000","2800.000","180","Diode Schottky 60V 1A Surface Mount DO-214AC (SMA)"
+"D1","SS16-E3/61T","TopLayer","SMA","3250.000","2800.000","180","Diode Schottky 60V 1A Surface Mount DO-214AC (SMA)"
+"C21",".1uF","TopLayer","C0603","2950.000","2350.000","90","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C20",".1uF","TopLayer","C0603","2550.000","2350.000","90","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"U4","IXDN604SIA","TopLayer","SOIC8","2243.701","2675.000","180","Low-Side Gate Driver IC Non-Inverting 8-SOIC"
+"U3","TL072BCDR","TopLayer","SOIC8","1843.701","1475.000","180","J-FET Amplifier 2 Circuit  8-SOIC"
+"U1","DAC81408RHAT","TopLayer","RHA0040H_V","1925.000","2050.000","90","16 Bit Digital to Analog Converter 8 channel 40-VQFN (6x6)"
+"R12","10K","TopLayer","R0603","1600.000","1550.000","360","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R11","10K","TopLayer","R0603","1600.000","1500.000","360","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R10","10K","TopLayer","R0603","2100.000","1500.000","180","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R9","10K","TopLayer","R0603","2100.000","1450.000","180","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R8","10K","TopLayer","R0603","1600.000","1450.000","180","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R7","10K","TopLayer","R0603","2100.000","1400.000","360","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R6","33","TopLayer","R0603","2190.000","1950.000","180","33 Ohms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R5","10K","TopLayer","R0603","2000.000","2300.000","90","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R4","10K","TopLayer","R0603","2190.000","2000.000","360","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R3","10K","TopLayer","R0603","2200.000","1300.000","180","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R2","10K","TopLayer","R0603","2190.000","2100.000","360","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"R1","10K","TopLayer","R0603","2190.000","2150.000","0","10 kOhms ±1% 0.1W, 1/10W Chip Resistor 0603 (1608 Metric) Automotive AEC-Q200 Thick Film"
+"L1","742792651","TopLayer","R0603","1550.000","2000.000","0","600 Ohms @ 100MHz 1 Signal Line Ferrite Bead 0603 (1608 Metric) 1A 200mOhm"
+"C19",".1uF","TopLayer","C0603","1900.000","1650.000","360","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C18",".1uF","TopLayer","C0603","2020.000","2700.000","180","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C17",".1uF","TopLayer","C0603","1750.000","1300.000","180","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C16",".47uF","TopLayer","C0603","2329.528","2050.000","360","0.47µF ±10% 25V Ceramic Capacitor X5R 0805 (2012 Metric)"
+"C15",".1uF","TopLayer","C0603","3229.528","1500.000","360","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C14",".47uF","TopLayer","C0603","2320.472","1500.000","180","0.47µF ±10% 25V Ceramic Capacitor X5R 0805 (2012 Metric)"
+"C13","10uF","TopLayer","C1206","2450.000","1300.000","270","10µF ±10% 50V Ceramic Capacitor X5R 1206 (3216 Metric)"
+"C12",".1uF","TopLayer","C0603","2350.000","1300.000","270","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C11","10uF","TopLayer","C1206","2550.000","1300.000","270","10µF ±10% 50V Ceramic Capacitor X5R 1206 (3216 Metric)"
+"C10",".1uF","TopLayer","C0603","2650.000","1300.000","270","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C9",".1uF","TopLayer","C0603","1675.000","2175.000","360","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C8",".1uF","TopLayer","C0603","1675.000","2125.000","0","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C7","1000pF","TopLayer","C0603","1675.000","2075.000","0","1000pF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C6","1uF","TopLayer","C0603","2200.000","1250.000","360","1µF ±10% 25V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C5","1uF","TopLayer","C0603","2190.000","2200.000","180","1µF ±10% 25V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C4",".1uF","TopLayer","C0603","2000.000","1800.000","270","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C3",".1uF","TopLayer","C0603","1550.000","1900.000","360","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C2","1uF","TopLayer","C0603","1550.000","2050.000","0","1µF ±10% 25V Ceramic Capacitor X7R 0603 (1608 Metric)"
+"C1",".1uF","TopLayer","C0603","1675.000","2000.000","180","0.1µF ±10% 50V Ceramic Capacitor X7R 0603 (1608 Metric)"

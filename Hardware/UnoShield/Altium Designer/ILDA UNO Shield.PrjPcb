@@ -156,6 +156,27 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
+[ProjectVariant1]
+UniqueID=75962AF5-0B05-4A76-8D6D-E6589DFB7A14
+Description=SMT Only
+AllowFabrication=1
+ParameterCount=0
+VariationCount=13
+Variation1=Designator=J1|UniqueId=\KOMOEKGY|Kind=1|AlternatePart= 
+Variation2=Designator=J2|UniqueId=\CBTJVNKO|Kind=1|AlternatePart= 
+Variation3=Designator=J3|UniqueId=\JFNPAZHI|Kind=1|AlternatePart= 
+Variation4=Designator=J4|UniqueId=\LCCQORGY|Kind=1|AlternatePart= 
+Variation5=Designator=J5|UniqueId=\PTGLLBXQ|Kind=1|AlternatePart= 
+Variation6=Designator=J6|UniqueId=\BUQZYXVR|Kind=1|AlternatePart= 
+Variation7=Designator=JP1|UniqueId=\IUCHVPNA|Kind=1|AlternatePart= 
+Variation8=Designator=JP2|UniqueId=\BRFICCVF|Kind=1|AlternatePart= 
+Variation9=Designator=JP3|UniqueId=\JBQOUSYJ|Kind=1|AlternatePart= 
+Variation10=Designator=JP4|UniqueId=\CBRSDXSO|Kind=1|AlternatePart= 
+Variation11=Designator=L2|UniqueId=\ZRYCEYKB|Kind=1|AlternatePart= 
+Variation12=Designator=L3|UniqueId=\EHSAPLKR|Kind=1|AlternatePart= 
+Variation13=Designator=U2|UniqueId=\INOWTXWF|Kind=1|AlternatePart= 
+ParamVariationCount=0
+
 [Parameter1]
 Name=ProjectPartNumber
 Value=ILDA-UNO-1
