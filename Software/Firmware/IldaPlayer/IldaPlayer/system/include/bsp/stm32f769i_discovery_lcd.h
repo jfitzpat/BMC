@@ -235,7 +235,7 @@
 
 /** @brief Transparent value in ARGB8888 format
  */
-#define LCD_COLOR_TRANSPARENT   ((uint32_t) 0xFF000000)
+#define LCD_COLOR_TRANSPARENT   ((uint32_t) 0x00000000)
 
 /**
   * @brief LCD default font

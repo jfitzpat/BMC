@@ -30,9 +30,9 @@
 #define LCD_FG_LAYER_ADDRESS          LCD_FB_START_ADDRESS
 
 /* LTDC background layer address 800x480 in ARGB8888 following the foreground layer */
-#define LCD_BG_LAYER_ADDRESS          LCD_FG_LAYER_ADDRESS + (LCD_SCREEN_WIDTH * LCD_SCREEN_HEIGHT * ARGB8888_BYTE_PER_PIXEL)
+#define LCD_BG_LAYER_ADDRESS          LCD_FG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL)
 
-#define INTERNAL_BUFFER_START_ADDRESS LCD_BG_LAYER_ADDRESS + (LCD_SCREEN_WIDTH * LCD_SCREEN_HEIGHT * ARGB8888_BYTE_PER_PIXEL)
+#define INTERNAL_BUFFER_START_ADDRESS LCD_BG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL)
 
 void display_Init()
 {
@@ -50,9 +50,10 @@ void display_Init()
 	// Now do the same for the foreground layer
 	BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_FOREGROUND, LCD_BG_LAYER_ADDRESS);
 	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
-	BSP_LCD_Clear(LCD_COLOR_BLACK);
+	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
 
 	// Splash time!
+	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
 	BSP_LCD_DrawBitmap(0, 0, (uint8_t *)uiGraphics_splash_bmp);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 	BSP_LCD_DisplayStringAtLine(12, (uint8_t *)" BMC");
@@ -67,7 +68,16 @@ void display_Init()
 	// BSP_LCD_SetBrightness(100);
 
 	// Background transparent, foreground opaque
-	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, 0);
+	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, 255);
 	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
 }
 
+void display_DrawCursor (uint16_t x, uint16_t y)
+{
+	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, DISABLE);
+	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
+	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
+	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+	BSP_LCD_DrawRect(x, y, 30, 30);
+	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, ENABLE);
+}

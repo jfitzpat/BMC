@@ -17,7 +17,12 @@
 	limitations under the License.
 */
 
+#ifndef UI_GRAPHICS_H
+#define UI_GRAPHICS_H
+
 // Module Interface
 void uiGraphics_Init();
 
 extern const unsigned char uiGraphics_splash_bmp[];
+
+#endif

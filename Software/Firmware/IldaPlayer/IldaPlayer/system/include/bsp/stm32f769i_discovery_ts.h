@@ -47,7 +47,7 @@
 #include "stm32f769i_discovery_lcd.h"
 
 /* Include TouchScreen component driver */
-#include "../Components/ft6x06/ft6x06.h"
+#include "ft6x06.h"
 
 /** @addtogroup BSP
   * @{
