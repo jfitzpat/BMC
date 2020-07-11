@@ -36,43 +36,38 @@
 
 void display_Init()
 {
-  uint8_t lcd_status = LCD_OK;
+	// Initialize in Video Burst Mode, bail if we rail
+	if (BSP_LCD_Init() != LCD_OK)
+		return;
 
-  /* LCD DSI initialization in mode Video Burst */
-  /* Initialize DSI LCD */
-  lcd_status = BSP_LCD_Init();
-  while(lcd_status != LCD_OK);
+	// Initialize our background layer, using SDRAM
+	BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_BACKGROUND, LCD_FB_START_ADDRESS);
 
-  BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_BACKGROUND, LCD_FB_START_ADDRESS);
+	// Select and clear to black
+	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
+	BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  /* Select the LCD Background Layer */
-  BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
+	// Now do the same for the foreground layer
+	BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_FOREGROUND, LCD_BG_LAYER_ADDRESS);
+	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
+	BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  /* Clear the Background Layer */
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
+	// Splash time!
+	BSP_LCD_DrawBitmap(0, 0, (uint8_t *)uiGraphics_splash_bmp);
+	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+	BSP_LCD_DisplayStringAtLine(12, (uint8_t *)" BMC");
+	BSP_LCD_DisplayStringAtLine(13, (uint8_t *)" ILDA Player");
+	BSP_LCD_DisplayStringAtLine(14, (uint8_t *)" v: 1.0");
+	BSP_LCD_SetFont(&Font16);
+	BSP_LCD_DisplayStringAtLine(29, (uint8_t *)" http://Scrootch.Me/bmc");
+	BSP_LCD_SetFont(&Font24);
+	BSP_LCD_DisplayOn();
 
-  BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_FOREGROUND, LCD_BG_LAYER_ADDRESS);
+	// Adjust brightness
+	// BSP_LCD_SetBrightness(100);
 
-  /* Select the LCD Foreground Layer */
-  BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
-
-  /* Clear the Foreground Layer */
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-  BSP_LCD_DrawBitmap(0, 0, (uint8_t *)uiGraphics_splash_bmp);
-  BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-  BSP_LCD_DisplayStringAtLine(12, (uint8_t *)" BMC");
-  BSP_LCD_DisplayStringAtLine(13, (uint8_t *)" ILDA Player");
-  BSP_LCD_DisplayStringAtLine(14, (uint8_t *)" v: 1.0");
-  BSP_LCD_SetFont(&Font16);
-  BSP_LCD_DisplayStringAtLine(29, (uint8_t *)" http://Scrootch.Me/bmc");
-  BSP_LCD_SetFont(&Font24);
-  BSP_LCD_DisplayOn();
-//  BSP_LCD_SetBrightness(100);
-
-  /* Configure the transparency for foreground and background :
-  Increase the transparency */
-  BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, 0);
-  BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
+	// Background transparent, foreground opaque
+	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, 0);
+	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
 }
 

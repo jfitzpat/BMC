@@ -35,33 +35,30 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-//#pragma GCC diagnostic ignored "-Wreturn-type"
 
 int
 main(int argc, char* argv[])
 {
-  // Send a greeting to the trace device (skipped on Release).
-  trace_puts("Hello ARM World!");
+	// Send a greeting to the trace device (skipped on Release).
+	trace_puts("Hello ARM World!");
 
-  // At this stage the system clock should have already been configured
-  // at high speed.
-  trace_printf("System clock: %u Hz\n", SystemCoreClock);
+	// At this stage the system clock should have already been configured
+	// at high speed.
+	trace_printf("System clock: %u Hz\n", SystemCoreClock);
 
-  // Initialize all the modules in their dependant order
-  sysTick_Init();
-  timerCallback_Init();
-  led_Init();
-  uiGraphics_Init();
-  display_Init();
+	// Initialize all the modules in their dependant order
+	sysTick_Init();
+	timerCallback_Init();
+	led_Init();
+	uiGraphics_Init();
+	display_Init();
 
-  // Infinite loop
-  while (1)
-  {
-	  timerCallback_Dispatch();
-  }
-  // Infinite loop, never return.
+	// Infinite loop
+	while (1)
+	{
+		timerCallback_Dispatch();
+	}
+	// Infinite loop, never return.
 }
 
 #pragma GCC diagnostic pop
-
-// ----------------------------------------------------------------------------
