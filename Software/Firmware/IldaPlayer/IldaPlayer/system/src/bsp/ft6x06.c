@@ -34,6 +34,9 @@
   ******************************************************************************
   */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 /* Includes ------------------------------------------------------------------*/
 #include "ft6x06.h"
 
@@ -508,5 +511,7 @@ static uint8_t ft6x06_GetInstance(uint16_t DeviceAddr)
 /**
   * @}
   */
+
+#pragma GCC diagnostic pop
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
