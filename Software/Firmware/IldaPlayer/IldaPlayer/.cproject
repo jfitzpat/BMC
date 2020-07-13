@@ -73,6 +73,7 @@
 							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths.1574123508" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths" useByScannerDiscovery="true" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/system/include/FatFs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;../system/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;../system/include/cmsis&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;../system/include/stm32f7-hal&quot;"/>
@@ -198,11 +199,18 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1631613794.7219769" name="stm32f7xx_ll_sdmmc.c" rcbsApplicability="disable" resourcePath="system/src/stm32f7-hal/stm32f7xx_ll_sdmmc.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985.1351250784">
-						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985.1351250784" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985"/>
+						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985.1351250784" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985">
+							<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.447671514" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
+						</tool>
 					</fileInfo>
 					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1631613794.187898332" name="stm32f7xx_hal_i2c_ex.c" rcbsApplicability="disable" resourcePath="system/src/stm32f7-hal/stm32f7xx_hal_i2c_ex.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985.785680305">
 						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985.785680305" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985">
 							<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.1886891342" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
+						</tool>
+					</fileInfo>
+					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1631613794.514568228" name="stm32f7xx_hal_sd.c" rcbsApplicability="disable" resourcePath="system/src/stm32f7-hal/stm32f7xx_hal_sd.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985.654400641">
+						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985.654400641" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.961603985">
+							<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.1393048440" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
 						</tool>
 					</fileInfo>
 					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1631613794.system/src/newlib/_startup.c" name="_startup.c" rcbsApplicability="disable" resourcePath="system/src/newlib/_startup.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348.348480619">
@@ -220,6 +228,9 @@
 							<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.2003732540" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1631613794.283785595" name="ccsbcs.c" rcbsApplicability="disable" resourcePath="system/src/FatFs/ccsbcs.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348.1153179980">
+						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348.1153179980" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348"/>
+					</fileInfo>
 					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1631613794.src/stm32f7xx_hal_msp.c" name="stm32f7xx_hal_msp.c" rcbsApplicability="disable" resourcePath="src/stm32f7xx_hal_msp.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348.1277752914">
 						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348.1277752914" name="GNU ARM Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1322004348">
 							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otherwarnings.1928815793" name="Other warning flags" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otherwarnings" useByScannerDiscovery="true" value="  -Wno-missing-prototypes -Wno-missing-declarations" valueType="string"/>
@@ -228,7 +239,7 @@
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="src/stm32f7-hal/stm32f7xx_hal_dcmi.c|src/stm32f7-hal/stm32f7xx_hal_timebase_rtc_alarm_template.c|src/stm32f7-hal/stm32f7xx_hal_dma_ex.c|src/stm32f7-hal/stm32f7xx_hal_sai_ex.c|src/stm32f7-hal/stm32f7xx_hal_cryp_ex.c|src/stm32f7-hal/stm32f7xx_hal_rtc.c|src/stm32f7-hal/stm32f7xx_hal_lptim.c|src/stm32f7-hal/stm32f7xx_hal_wwdg.c|src/stm32f7-hal/stm32f7xx_hal_crc.c|src/stm32f7-hal/stm32f7xx_hal_dcmi_ex.c|src/stm32f7-hal/stm32f7xx_hal_dac.c|src/stm32f7-hal/stm32f7xx_hal_spi.c|src/stm32f7-hal/stm32f7xx_hal_sram.c|src/stm32f7-hal/stm32f7xx_hal_smartcard.c|src/stm32f7-hal/stm32f7xx_hal_nor.c|src/stm32f7-hal/stm32f7xx_hal_cryp.c|src/stm32f7-hal/stm32f7xx_hal_cec.c|src/stm32f7-hal/stm32f7xx_hal_dac_ex.c|src/stm32f7-hal/stm32f7xx_hal_tim.c|src/stm32f7-hal/stm32f7xx_hal_tim_ex.c|src/stm32f7-hal/stm32f7xx_hal_irda.c|src/stm32f7-hal/stm32f7xx_hal_rng.c|src/stm32f7-hal/stm32f7xx_hal_hcd.c|src/stm32f7-hal/stm32f7xx_hal_sai.c|src/stm32f7-hal/stm32f7xx_hal_msp_template.c|src/stm32f7-hal/stm32f7xx_hal_timebase_tim_template.c|src/stm32f7-hal/stm32f7xx_hal_sd.c|src/stm32f7-hal/stm32f7xx_ll_usb.c|src/stm32f7-hal/stm32f7xx_hal_pcd.c|src/stm32f7-hal/stm32f7xx_hal_adc.c|src/stm32f7-hal/stm32f7xx_hal_flash_ex.c|src/stm32f7-hal/stm32f7xx_hal_usart.c|src/stm32f7-hal/stm32f7xx_hal_i2s.c|src/stm32f7-hal/stm32f7xx_hal_eth.c|src/stm32f7-hal/stm32f7xx_hal_adc_ex.c|src/stm32f7-hal/stm32f7xx_hal_can.c|src/stm32f7-hal/stm32f7xx_hal_nand.c|src/stm32f7-hal/stm32f7xx_hal_timebase_rtc_wakeup_template.c|src/stm32f7-hal/stm32f7xx_hal_rtc_ex.c|src/stm32f7-hal/stm32f7xx_hal_hash.c|src/stm32f7-hal/stm32f7xx_hal_hash_ex.c|src/stm32f7-hal/stm32f7xx_hal_pcd_ex.c|src/stm32f7-hal/stm32f7xx_hal_spdifrx.c|src/stm32f7-hal/stm32f7xx_hal_uart.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
+						<entry excluding="src/FatFs/ccsbcs.c|src/stm32f7-hal/stm32f7xx_hal_dcmi.c|src/stm32f7-hal/stm32f7xx_hal_timebase_rtc_alarm_template.c|src/stm32f7-hal/stm32f7xx_hal_dma_ex.c|src/stm32f7-hal/stm32f7xx_hal_sai_ex.c|src/stm32f7-hal/stm32f7xx_hal_cryp_ex.c|src/stm32f7-hal/stm32f7xx_hal_rtc.c|src/stm32f7-hal/stm32f7xx_hal_lptim.c|src/stm32f7-hal/stm32f7xx_hal_wwdg.c|src/stm32f7-hal/stm32f7xx_hal_crc.c|src/stm32f7-hal/stm32f7xx_hal_dcmi_ex.c|src/stm32f7-hal/stm32f7xx_hal_dac.c|src/stm32f7-hal/stm32f7xx_hal_spi.c|src/stm32f7-hal/stm32f7xx_hal_sram.c|src/stm32f7-hal/stm32f7xx_hal_smartcard.c|src/stm32f7-hal/stm32f7xx_hal_nor.c|src/stm32f7-hal/stm32f7xx_hal_cryp.c|src/stm32f7-hal/stm32f7xx_hal_cec.c|src/stm32f7-hal/stm32f7xx_hal_dac_ex.c|src/stm32f7-hal/stm32f7xx_hal_tim.c|src/stm32f7-hal/stm32f7xx_hal_tim_ex.c|src/stm32f7-hal/stm32f7xx_hal_irda.c|src/stm32f7-hal/stm32f7xx_hal_rng.c|src/stm32f7-hal/stm32f7xx_hal_hcd.c|src/stm32f7-hal/stm32f7xx_hal_sai.c|src/stm32f7-hal/stm32f7xx_hal_msp_template.c|src/stm32f7-hal/stm32f7xx_hal_timebase_tim_template.c|src/stm32f7-hal/stm32f7xx_ll_usb.c|src/stm32f7-hal/stm32f7xx_hal_pcd.c|src/stm32f7-hal/stm32f7xx_hal_adc.c|src/stm32f7-hal/stm32f7xx_hal_flash_ex.c|src/stm32f7-hal/stm32f7xx_hal_usart.c|src/stm32f7-hal/stm32f7xx_hal_i2s.c|src/stm32f7-hal/stm32f7xx_hal_eth.c|src/stm32f7-hal/stm32f7xx_hal_adc_ex.c|src/stm32f7-hal/stm32f7xx_hal_can.c|src/stm32f7-hal/stm32f7xx_hal_nand.c|src/stm32f7-hal/stm32f7xx_hal_timebase_rtc_wakeup_template.c|src/stm32f7-hal/stm32f7xx_hal_rtc_ex.c|src/stm32f7-hal/stm32f7xx_hal_hash.c|src/stm32f7-hal/stm32f7xx_hal_hash_ex.c|src/stm32f7-hal/stm32f7xx_hal_pcd_ex.c|src/stm32f7-hal/stm32f7xx_hal_spdifrx.c|src/stm32f7-hal/stm32f7xx_hal_uart.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="system"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
