@@ -1,6 +1,6 @@
 /*
-	UI.h
-	Manage user input
+	GUI.h
+	Functions to manage the graphical interface
 
 	Copyright 2020 Scrootch.me!
 
@@ -17,9 +17,15 @@
 	limitations under the License.
 */
 
-#ifndef UI_H
-#define UI_H
+#ifndef DISPLAY_H
+#define DISPLAY_H
 
-void ui_Init();
+#include <stdint.h>
+
+#define DISPLAY_WIDTH		800
+#define DISPLAY_HEIGHT      480
+
+// Module Interface
+void gui_Init();
 
 #endif

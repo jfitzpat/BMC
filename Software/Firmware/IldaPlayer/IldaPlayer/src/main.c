@@ -29,9 +29,9 @@
 #include "TimerCallback.h"
 #include "Led.h"
 #include "UIGraphics.h"
-#include "Display.h"
 #include "SDCard.h"
-#include "UI.h"
+#include "GUI.h"
+#include "Scan.h"
 
 // At this point clocks should be setup and HAL should be initialized
 
@@ -52,10 +52,10 @@ main(int argc, char* argv[])
 	sysTick_Init();
 	timerCallback_Init();
 	led_Init();
-	uiGraphics_Init();
-	display_Init();
 	sdCard_Init();
-	ui_Init();
+	uiGraphics_Init();
+	gui_Init();
+	scan_Init();
 
 	// Infinite loop
 	while (1)

@@ -1,6 +1,6 @@
 /*
-	Display.h
-	Functions to manage the display
+	Scan.h
+	Scan Engine for ILDA images
 
 	Copyright 2020 Scrootch.me!
 
@@ -17,17 +17,9 @@
 	limitations under the License.
 */
 
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef SCAN_H
+#define SCAN_H
 
-#include <stdint.h>
-
-#define DISPLAY_WIDTH		800
-#define DISPLAY_HEIGHT      480
-
-// Module Interface
-void display_Init();
-
-void display_DrawCursor (uint16_t x, uint16_t y);
+void scan_Init();
 
 #endif

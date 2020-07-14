@@ -22,4 +22,6 @@
 
 void sdCard_Init();
 
+uint32_t sdCard_GetFileCount();
+
 #endif

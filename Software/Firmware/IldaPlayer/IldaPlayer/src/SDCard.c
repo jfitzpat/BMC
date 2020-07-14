@@ -29,6 +29,8 @@
 static FATFS FileSystem;
 static char SD_Path[4];
 
+static uint32_t FileCount = 0;
+
 void sdCard_Init()
 {
 	// Try to attach the driver
@@ -41,7 +43,7 @@ void sdCard_Init()
 			trace_puts("SD Mounted.");
 
 			FRESULT res;
-			uint32_t index = 0;
+			FileCount = 0;
 			FILINFO fno;
 			DIR dir;
 
@@ -54,20 +56,25 @@ void sdCard_Init()
 					// Visible and not a subdirectory or volume
 					if ((fno.fattrib & 0xE) == 0)
 					{
-						trace_printf("File %d: %s\n", index, fno.fname);
-						index++;
+						++FileCount;
+//						trace_printf("File %d: %s\n", FileCount, fno.fname);
 					}
 					res = f_findnext(&dir, &fno);
 			    }
 			    else
 			    {
-			    	index = 0;
+			    	FileCount = 0;
 			    	break;
 			    }
 			}
 
 			f_closedir(&dir);
-			f_mount((void *)0, (TCHAR const*)"", 0);
+			trace_printf("Files found: %d\n", FileCount);
 		}
 	}
+}
+
+uint32_t sdCard_GetFileCount()
+{
+	return FileCount;
 }
