@@ -18,6 +18,7 @@
 */
 
 #include "Scan.h"
+#include "GUI.h"
 #include "stm32f7xx_hal.h"
 
 // Temp stuff
@@ -33,6 +34,9 @@ const uint8_t spig[] = {
 #include "spig.inc"
 };
 
+//int16_t* xpig;
+//int16_t* ypig;
+//uint8_t* spig;
 
 static SPI_HandleTypeDef Spi_Handle;
 static DMA_HandleTypeDef hdma_tx;
@@ -53,6 +57,14 @@ void scan_Init()
 	__HAL_RCC_SPI2_CLK_ENABLE();
 	__HAL_RCC_TIM2_CLK_ENABLE();
 	__HAL_RCC_DMA1_CLK_ENABLE();
+
+//	xpig = gui_GetFreeSDRAMBase();
+//	ypig = (int16_t*)((uint32_t)xpig + sizeof(_xpig));
+//	spig = (uint8_t*)((uint32_t)ypig + sizeof(_ypig));
+
+//	__builtin_memcpy(xpig, _xpig, sizeof(_xpig));
+//	__builtin_memcpy(ypig, _ypig, sizeof(_ypig));
+//	__builtin_memcpy(spig, _spig, sizeof(_spig));
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 

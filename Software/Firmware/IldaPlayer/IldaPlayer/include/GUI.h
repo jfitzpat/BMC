@@ -28,4 +28,7 @@
 // Module Interface
 void gui_Init();
 
+void* gui_GetFreeSDRAMBase();
+
+
 #endif

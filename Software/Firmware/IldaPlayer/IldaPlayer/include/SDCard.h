@@ -20,8 +20,25 @@
 #ifndef SDCARD_H
 #define SDCARD_H
 
+// For ILDA file loading
+#include "ILDA.h"
+
+typedef struct {
+	uint32_t numPoints;
+	ILDA_FORMAT_4 points;
+} SD_FRAME;
+
+typedef struct {
+	uint8_t fname[256];
+	uint8_t altname[13];
+	uint32_t frameCount;
+	SD_FRAME* frames[];
+} SD_FRAME_TABLE;
+
+
 void sdCard_Init();
 
 uint32_t sdCard_GetFileCount();
+uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *frames);
 
 #endif

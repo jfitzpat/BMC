@@ -17,8 +17,15 @@
 	limitations under the License.
  */
 
+// Uncomment to make QSPI image
+// Not making the full image makes loading to debug faster
+// But requires that the QSPI memory has already been loaded
+//
+// #define BUILD_QSPI
+
 #include "UIGraphics.h"
 #include "stm32f769i_discovery_qspi.h"
+
 
 void uiGraphics_Init()
 {

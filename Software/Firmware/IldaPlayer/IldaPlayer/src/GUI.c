@@ -34,12 +34,12 @@ static void TouchCallback();
 #define ARGB8888_BYTE_PER_PIXEL       4
 
 /* LTDC foreground layer address 800x480 in ARGB8888 */
-#define LCD_FG_LAYER_ADDRESS          LCD_FB_START_ADDRESS
+#define LCD_FG_LAYER_ADDRESS          (LCD_FB_START_ADDRESS)
 
 /* LTDC background layer address 800x480 in ARGB8888 following the foreground layer */
-#define LCD_BG_LAYER_ADDRESS          LCD_FG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL)
+#define LCD_BG_LAYER_ADDRESS          (LCD_FG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL))
 
-#define INTERNAL_BUFFER_START_ADDRESS LCD_BG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL)
+#define INTERNAL_BUFFER_START_ADDRESS (LCD_BG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL))
 
 void gui_Init()
 {
@@ -49,6 +49,18 @@ void gui_Init()
 	// Initialize in Video Burst Mode, bail if we rail
 	if (BSP_LCD_Init() != LCD_OK)
 		return;
+
+	// Load the first ILDA
+	SD_FRAME_TABLE* table = (SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS;
+	table->frameCount = 0;
+
+	if (sdCard_GetFileCount())
+	{
+		sdCard_LoadIldaFile (1,
+				(SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS,
+				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
+	}
+
 
 	// Initialize our background layer, using SDRAM
 	BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_BACKGROUND, LCD_FB_START_ADDRESS);
@@ -101,12 +113,19 @@ void gui_Init()
 	char outstr[30];
 	sprintf(outstr, " Files: %d", (int)sdCard_GetFileCount());
 	BSP_LCD_DisplayStringAtLine(1, (uint8_t *)outstr);
+	if (table->frameCount)
+	{
+		sprintf(outstr, " #1: %s", table->altname);
+		BSP_LCD_DisplayStringAtLine(2, (uint8_t*)outstr);
+		sprintf(outstr, " Frame: 1 of %ld", table->frameCount);
+		BSP_LCD_DisplayStringAtLine(3, (uint8_t*)outstr);
+	}
 
 	BSP_LCD_SetFont(&Font16);
 	BSP_LCD_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT_MODE);
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, ENABLE);
 
-	HAL_Delay(1000);
+	HAL_Delay(2000);
 
 	for (int n = 255; n > 0; --n )
 	{
@@ -114,14 +133,19 @@ void gui_Init()
 		HAL_Delay(5);
 	}
 
-	HAL_Delay(100);
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, DISABLE);
+	HAL_Delay(100);
 	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
 	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, ENABLE);
+	HAL_Delay(100);
 	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
-
 	timerCallback_Add(&TouchCallback, 50);
+}
+
+void* gui_GetFreeSDRAMBase()
+{
+	return (void*)INTERNAL_BUFFER_START_ADDRESS;
 }
 
 static void DrawCursor (uint16_t x, uint16_t y)
