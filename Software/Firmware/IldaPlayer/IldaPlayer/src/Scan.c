@@ -136,6 +136,35 @@ void scan_Init()
     HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
 
+
+	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(TIM2_IRQn);
+
+	// Timer 2 is our master controller
+	TIM2->PSC = 0;
+	// Initialize the PWM period to get 50 Hz as frequency from 1MHz
+	TIM2->ARR = ((SystemCoreClock / 2) / 28000) - 1;
+	// Select Clock Divison of 1
+	TIM2->CR1 &= ~ TIM_CR1_CKD;
+	// CMS 00 is edge aligned up/down counter
+	// DIR 0 = up
+	TIM2->CR1 &= ~(TIM_CR1_DIR | TIM_CR1_CMS);
+	//* Trigger of TIM2 Update into TIM1 Slave
+	TIM2->CR2 &= ~TIM_CR2_MMS;
+	TIM2->CR2 |= TIM_CR2_MMS_1; // 010 = Update
+
+	// Configure the repetition counter
+	TIM2->RCR = 0;
+
+	// Enable Interrupt
+	TIM2->DIER |= TIM_DIER_UIE;
+
+	// Start the scanner
+//	TIM2->CR1 |= TIM_CR1_CEN;
+}
+
+static void SetupDAC()
+{
     // Setup the DAC
 	uint8_t bout[3];
 	uint8_t bin[3];
@@ -220,38 +249,26 @@ void scan_Init()
 		curPoint = 0;
 	else
 		++curPoint;
-
-	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(TIM2_IRQn);
-
-	// Timer 2 is our master controller
-	TIM2->PSC = 0;
-	// Initialize the PWM period to get 50 Hz as frequency from 1MHz
-	TIM2->ARR = ((SystemCoreClock / 2) / 28000) - 1;
-	// Select Clock Divison of 1
-	TIM2->CR1 &= ~ TIM_CR1_CKD;
-	// CMS 00 is edge aligned up/down counter
-	// DIR 0 = up
-	TIM2->CR1 &= ~(TIM_CR1_DIR | TIM_CR1_CMS);
-	//* Trigger of TIM2 Update into TIM1 Slave
-	TIM2->CR2 &= ~TIM_CR2_MMS;
-	TIM2->CR2 |= TIM_CR2_MMS_1; // 010 = Update
-
-	// Configure the repetition counter
-	TIM2->RCR = 0;
-
-	// Enable Interrupt
-	TIM2->DIER |= TIM_DIER_UIE;
-
-	// Start the scanner
-//	TIM2->CR1 |= TIM_CR1_CEN;
 }
-
 
 void scan_SetEnable(uint8_t enable)
 {
+	static uint8_t firstEnable = 0;
 	if (enable)
+	{
+		// We defer setting up the DAC for two reasons
+		// First, it gives the DAC itself time to initialize
+		// after reset.
+		// Second, it makes sure we start at the first point of the
+		// first frame we loaded
+		if (!firstEnable)
+		{
+			SetupDAC();
+			firstEnable = 1;
+		}
+
 		TIM2->CR1 |= TIM_CR1_CEN;
+	}
 	else
 		TIM2->CR1 &= ~TIM_CR1_CEN;
 }

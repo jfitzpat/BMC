@@ -30,8 +30,9 @@
 #include "Scan.h"
 
 static void TouchCallback();
+static void DrawFrame(int x, int y, int w, int h, SD_FRAME* frame);
 
-#define ARGB8888_BYTE_PER_PIXEL       4
+#define ARGB8888_BYTE_PER_PIXEL       (4)
 
 // LTDC foreground layer address 800x480 in ARGB8888
 #define LCD_FG_LAYER_ADDRESS          (LCD_FB_START_ADDRESS)
@@ -41,6 +42,7 @@ static void TouchCallback();
 #define INTERNAL_BUFFER_START_ADDRESS (LCD_BG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL))
 
 uint32_t CurrentFile = 1;
+uint32_t CurrentFrame = 0;
 
 void gui_Init()
 {
@@ -102,8 +104,13 @@ void gui_Init()
 	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
 	BSP_LCD_FillRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_FillRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
+	if (table->frameCount)
+		DrawFrame(DISPLAY_WIDTH - 472 - 4, 4, 472, 472, table->frames[0]);
+	else
+	{
+		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+		BSP_LCD_FillRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
+	}
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
 	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 5, 3, 474, 474);
@@ -159,6 +166,51 @@ void gui_Init()
 void* gui_GetFreeSDRAMBase()
 {
 	return (void*)INTERNAL_BUFFER_START_ADDRESS;
+}
+
+static void DrawFrame(int x, int y, int w, int h, SD_FRAME* frame)
+{
+	// Clear background
+	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+	BSP_LCD_FillRect(x,y,w,h);
+
+	ILDA_FORMAT_4* pntData = &(frame->points);
+
+	for (uint32_t n=0; n < (frame->numPoints - 1); ++n)
+	{
+		if (! (pntData[n].status & 0x40))
+		{
+			uint32_t color = 0xFF000000 |
+							 (pntData[n].red << 16) |
+							 (pntData[n].green << 8) |
+							 (pntData[n].blue);
+
+			BSP_LCD_SetTextColor(color);
+
+			// Get our coordinates
+			int32_t x1, y1, x2, y2;
+			x1 = pntData[n].x.w;
+			y1 = pntData[n].y.w;
+			x2 = pntData[n+1].x.w;
+			y2 = pntData[n+1].y.w;
+
+			// Convert from center origin to top left origin
+			x1 += 32768;
+			x2 += 32768;
+			y1 += 32768;
+			y1 = 65535 - y1;
+			y2 += 32768;
+			y2 = 65535 - y2;
+
+			// Scale to width/height
+			x1 = x1 * w / 65536 + x;
+			x2 = x2 * w / 65536 + x;
+			y1 = y1 * h / 65536 + y;
+			y2 = y2 * h / 65536 + y;
+
+			BSP_LCD_DrawLine(x1, y1, x2, y2);
+		}
+	}
 }
 
 static void DrawCursor (uint16_t x, uint16_t y)
