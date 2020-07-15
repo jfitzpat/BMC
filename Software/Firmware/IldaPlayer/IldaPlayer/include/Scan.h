@@ -20,6 +20,11 @@
 #ifndef SCAN_H
 #define SCAN_H
 
+#include "SDCard.h"
+
 void scan_Init();
+
+void scan_SetEnable(uint8_t enable);
+void scan_SetCurrentFrame (SD_FRAME* newFrame);
 
 #endif

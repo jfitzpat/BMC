@@ -27,6 +27,7 @@
 #include "UIGraphics.h"
 #include "TimerCallback.h"
 #include "SDCard.h"
+#include "Scan.h"
 
 static void TouchCallback();
 
@@ -56,7 +57,7 @@ void gui_Init()
 
 	if (sdCard_GetFileCount())
 	{
-		sdCard_LoadIldaFile (1,
+		sdCard_LoadIldaFile (2,
 				(SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS,
 				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
 	}
@@ -140,6 +141,15 @@ void gui_Init()
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, ENABLE);
 	HAL_Delay(100);
 	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
+
+	// If anything loaded, setup the frame and start the scanner
+	if (table->frameCount)
+	{
+		scan_SetCurrentFrame (table->frames[0]);
+		scan_SetEnable(1);
+	}
+
+	// Start our callback for touch input
 	timerCallback_Add(&TouchCallback, 50);
 }
 

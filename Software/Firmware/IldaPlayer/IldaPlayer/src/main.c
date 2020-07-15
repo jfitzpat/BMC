@@ -53,9 +53,9 @@ main(int argc, char* argv[])
 	timerCallback_Init();
 	led_Init();
 	sdCard_Init();
+	scan_Init();
 	uiGraphics_Init();
 	gui_Init();
-	scan_Init();
 
 	// Infinite loop
 	while (1)

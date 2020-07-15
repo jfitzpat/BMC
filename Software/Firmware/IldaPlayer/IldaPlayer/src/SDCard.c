@@ -305,7 +305,11 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 			table->frames[table->frameCount -1] = nextFrame;
 
 			// Advance the frame pointer
-			nextFrame = (SD_FRAME *)(&(nextPoint[rCount + 1]));
+			// DWORD align
+			uint32_t p = (uint32_t)(&(nextPoint[rCount + 1]));
+			p &= 0xFFFFFFFC;
+			nextFrame = (SD_FRAME *)p;
+
 			// Reset the point data pointer
 			nextPoint = &(nextFrame->points);
 		}

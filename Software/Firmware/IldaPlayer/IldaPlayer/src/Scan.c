@@ -19,37 +19,32 @@
 
 #include "Scan.h"
 #include "GUI.h"
+#include "SDCard.h"
 #include "stm32f7xx_hal.h"
 
-// Temp stuff
-const int16_t xpig[] = {
-#include "xpig.inc"
+static const SD_FRAME EmptyFrame = {
+		1,			// 1 point
+		{{0}, {0}, {0}, 	// xyz at origin
+		0xC0,		// Blanked, last point
+		0, 0, 0}		// All colors at 0
 };
-
-const int16_t ypig[] = {
-#include "ypig.inc"
-};
-
-const uint8_t spig[] = {
-#include "spig.inc"
-};
-
-//int16_t* xpig;
-//int16_t* ypig;
-//uint8_t* spig;
 
 static SPI_HandleTypeDef Spi_Handle;
-static DMA_HandleTypeDef hdma_tx;
+static DMA_HandleTypeDef Dma_Handle;
 
-int32_t pointCount = 0;
-uint8_t zout[17];
-// volatile uint8_t scan = 0;
+SD_FRAME* CurrentFrame;
+int32_t curPoint = 0;
+uint8_t DacOut[17];
 
 static void spi_Read (void *bout, uint16_t bcount);
 static void spi_Write (void *bout, uint16_t bcount);
 
 void scan_Init()
 {
+	// Default to lone dot
+	CurrentFrame = (SD_FRAME*)(&EmptyFrame);
+
+	// Lots of clocks to turn on
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	__HAL_RCC_GPIOH_CLK_ENABLE();
@@ -58,17 +53,9 @@ void scan_Init()
 	__HAL_RCC_TIM2_CLK_ENABLE();
 	__HAL_RCC_DMA1_CLK_ENABLE();
 
-//	xpig = gui_GetFreeSDRAMBase();
-//	ypig = (int16_t*)((uint32_t)xpig + sizeof(_xpig));
-//	spig = (uint8_t*)((uint32_t)ypig + sizeof(_ypig));
-
-//	__builtin_memcpy(xpig, _xpig, sizeof(_xpig));
-//	__builtin_memcpy(ypig, _ypig, sizeof(_ypig));
-//	__builtin_memcpy(spig, _spig, sizeof(_spig));
-
+	// Configure GPIO and SPI pins
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	// Configure pin in output push/pull mode
 	GPIO_InitStructure.Pin = GPIO_PIN_12;
 	GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStructure.Speed = GPIO_SPEED_FAST;
@@ -110,6 +97,7 @@ void scan_Init()
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init (GPIOJ, &GPIO_InitStructure);
 
+	// Setup the SPI peripheral
 	Spi_Handle.Instance = SPI2;
 	Spi_Handle.Init.Mode = SPI_MODE_MASTER;
 	Spi_Handle.Init.Direction = SPI_DIRECTION_2LINES;
@@ -125,32 +113,36 @@ void scan_Init()
 
 	HAL_SPI_Init(&Spi_Handle);
 
-    hdma_tx.Instance                 = DMA1_Stream4;
-    hdma_tx.Init.Channel             = DMA_CHANNEL_0;
-    hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-    hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-    hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
-    hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-    hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-    hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-    hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-    hdma_tx.Init.Mode                = DMA_NORMAL;
-    hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
+	// Setup a DMA channel to use
+    Dma_Handle.Instance                 = DMA1_Stream4;
+    Dma_Handle.Init.Channel             = DMA_CHANNEL_0;
+    Dma_Handle.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+    Dma_Handle.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+    Dma_Handle.Init.MemBurst            = DMA_MBURST_INC4;
+    Dma_Handle.Init.PeriphBurst         = DMA_PBURST_INC4;
+    Dma_Handle.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+    Dma_Handle.Init.PeriphInc           = DMA_PINC_DISABLE;
+    Dma_Handle.Init.MemInc              = DMA_MINC_ENABLE;
+    Dma_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    Dma_Handle.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+    Dma_Handle.Init.Mode                = DMA_NORMAL;
+    Dma_Handle.Init.Priority            = DMA_PRIORITY_LOW;
 
-    HAL_DMA_Init(&hdma_tx);
+    HAL_DMA_Init(&Dma_Handle);
 
     // Associate the two handles
-    __HAL_LINKDMA(&Spi_Handle, hdmatx, hdma_tx);
+    __HAL_LINKDMA(&Spi_Handle, hdmatx, Dma_Handle);
 
     HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
 
+    // Setup the DAC
 	uint8_t bout[3];
 	uint8_t bin[3];
 	uint8_t spi[3];
 
+	// Read the Chip ID
+	// Probably should allow 12 and 10 bit variants !!!!
 	bout[0] = 0x81;
 	bout[1] = 0;
 	bout[2] = 0;
@@ -158,6 +150,7 @@ void scan_Init()
 	spi_Write(bout, sizeof(bout));
 	spi_Read(bin, sizeof(bin));
 
+	// Setup the rest of the DAC registers
 	bout[0] = 0xC;
 	bout[1] = 0x99;
 	bout[2] = 0x99;
@@ -185,44 +178,48 @@ void scan_Init()
 	bout[2] = 0x0F;
 	spi_Write(bout, sizeof(bout));
 
-	zout[0] = 0x14;
-	zout[3] = 0;
-	zout[4] = 0;
-	zout[7] = 0;
-	zout[8] = 0;
-	zout[11] = 0;
-	zout[12] = 0;
-	zout[13] = 0;
-	zout[14] = 0;
-	zout[15] = 0;
-	zout[16] = 0;
+	// Initialize our DAC output packet
+	// We'll use a stream write staring at DAC0
+	DacOut[0] = 0x14;
+	DacOut[3] = 0;
+	DacOut[4] = 0;
+	DacOut[7] = 0;
+	DacOut[8] = 0;
+	DacOut[11] = 0;
+	DacOut[12] = 0;
+	DacOut[13] = 0;
+	DacOut[14] = 0;
+	DacOut[15] = 0;
+	DacOut[16] = 0;
+
+	ILDA_FORMAT_4* pntData;
+	pntData = &(CurrentFrame->points);
 
 	int32_t val;
 
-	val = xpig[pointCount];
+	val = pntData[curPoint].x.w;
 	val += 32768;
-	zout[1] = val >> 8;
-	zout[2] = val & 0xFF;
+	DacOut[1] = val >> 8;
+	DacOut[2] = val & 0xFF;
 
-	val = ypig[pointCount];
+	val = pntData[curPoint].y.w;
 	val += 32768;
-	zout[5] = val >> 8;
-	zout[6] = val & 0xFF;
+	DacOut[5] = val >> 8;
+	DacOut[6] = val & 0xFF;
 
-	if (spig[pointCount] & 0x40)
-		zout[9] = zout[10] = 0;
+	if (pntData[curPoint].status & 0x40)
+		DacOut[9] = DacOut[10] = 0;
 	else
-		zout[9] = zout[10] = 0xFF;
+		DacOut[9] = DacOut[10] = 0xFF;
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&Spi_Handle, (uint8_t *)zout, sizeof(zout), 100000);
-//	spi_Write(zout, sizeof(zout));
+	HAL_SPI_Transmit(&Spi_Handle, (uint8_t *)DacOut, sizeof(DacOut), 100000);
 	// CS will get released in timer interrupt
 
-	if (spig[pointCount] & 0x80)
-		pointCount = 0;
+	if (pntData[curPoint].status & 0x80)
+		curPoint = 0;
 	else
-		++pointCount;
+		++curPoint;
 
 	HAL_NVIC_SetPriority(TIM2_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(TIM2_IRQn);
@@ -230,7 +227,7 @@ void scan_Init()
 	// Timer 2 is our master controller
 	TIM2->PSC = 0;
 	// Initialize the PWM period to get 50 Hz as frequency from 1MHz
-	TIM2->ARR = ((SystemCoreClock / 2) / 28000) - 1;
+	TIM2->ARR = ((SystemCoreClock / 2) / 14000) - 1;
 	// Select Clock Divison of 1
 	TIM2->CR1 &= ~ TIM_CR1_CKD;
 	// CMS 00 is edge aligned up/down counter
@@ -245,10 +242,33 @@ void scan_Init()
 
 	// Enable Interrupt
 	TIM2->DIER |= TIM_DIER_UIE;
-	TIM2->CR1 |= TIM_CR1_CEN;
 
+	// Start the scanner
+//	TIM2->CR1 |= TIM_CR1_CEN;
 }
 
+
+void scan_SetEnable(uint8_t enable)
+{
+	if (enable)
+		TIM2->CR1 |= TIM_CR1_CEN;
+	else
+		TIM2->CR1 &= ~TIM_CR1_CEN;
+}
+
+// This should really be a request handled at the interrupt
+// so graphics complete by default !!!!
+void scan_SetCurrentFrame (SD_FRAME* newFrame)
+{
+	uint32_t reg = TIM2->CR1;
+
+	scan_SetEnable(0);
+	CurrentFrame = newFrame;
+	curPoint = 0;
+
+	if (reg & TIM_CR1_CEN)
+		scan_SetEnable(1);
+}
 
 // Read from Temp chip
 void spi_Read (void *bout, uint16_t bcount)
@@ -273,42 +293,49 @@ void TIM2_IRQHandler()
 	{
 		TIM2->SR &= ~TIM_SR_UIF;
 
-		// Latch Values
+		// Latch the previous values
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
 
-		int32_t val;
-		val = xpig[pointCount];
-		val += 32768;
-		zout[1] = val >> 8;
-		zout[2] = val & 0xFF;
+		ILDA_FORMAT_4* pntData;
+		pntData = &(CurrentFrame->points);
 
-		val = ypig[pointCount];
+		int32_t val;
+		val = pntData[curPoint].x.w;
 		val += 32768;
-		zout[5] = val >> 8;
-		zout[6] = val & 0xFF;
+		DacOut[1] = val >> 8;
+		DacOut[2] = val & 0xFF;
+
+		val = pntData[curPoint].y.w;
+		val += 32768;
+		DacOut[5] = val >> 8;
+		DacOut[6] = val & 0xFF;
 
 		int16_t idx;
-		idx = pointCount - 4;
-		if (pointCount < 0)
-			idx += sizeof(spig);
-
-		if (spig[idx] & 0x40)
-			zout[9] = zout[10] = 0;
+		if (CurrentFrame->numPoints > 2)
+		{
+			idx = curPoint - 2;
+			if (idx < 0)
+				idx += CurrentFrame->numPoints;
+		}
 		else
-			zout[9] = zout[10] = 0xFF;
+			idx = curPoint;
 
-		if (spig[pointCount] & 0x80)
-			pointCount = 0;
+		if (pntData[idx].status & 0x40)
+			DacOut[9] = DacOut[10] = 0;
 		else
-			++pointCount;
+			DacOut[9] = DacOut[10] = 0xFF;
+
+		if (pntData[curPoint].status & 0x80)
+			curPoint = 0;
+		else
+			++curPoint;
 
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
-//		HAL_SPI_Transmit(&Spi_Handle, (uint8_t *)zout, sizeof(zout), 100000);
-		HAL_SPI_Transmit_DMA(&Spi_Handle, (uint8_t *)zout, sizeof(zout));
+		HAL_SPI_Transmit_DMA(&Spi_Handle, (uint8_t *)DacOut, sizeof(DacOut));
 	}
 }
 
 void DMA1_Stream4_IRQHandler(void)
 {
-	HAL_DMA_IRQHandler(&hdma_tx);
+	HAL_DMA_IRQHandler(&Dma_Handle);
 }
