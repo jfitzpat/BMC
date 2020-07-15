@@ -47,41 +47,49 @@ void sdCard_Init()
 		if (f_mount(&FileSystem, (TCHAR const*)"", 0) == FR_OK)
 		{
 			trace_puts("SD Mounted.");
-
-			FRESULT res;
-			FileCount = 0;
-			FILINFO fno;
-			DIR dir;
-
-			res = f_findfirst(&dir, &fno, "/Graphics", "*.ild");
-
-			while (fno.fname[0])
-			{
-				if (res == FR_OK)
-			    {
-					// Visible and not a subdirectory or volume
-					if ((fno.fattrib & 0xE) == 0)
-					{
-						++FileCount;
-//						trace_printf("File %d: %s\n", FileCount, fno.fname);
-					}
-					res = f_findnext(&dir, &fno);
-			    }
-			    else
-			    {
-			    	FileCount = 0;
-			    	break;
-			    }
-			}
-
-			f_closedir(&dir);
-			trace_printf("Files found: %d\n", FileCount);
 		}
 	}
 }
 
 uint32_t sdCard_GetFileCount()
 {
+	static uint8_t firstCount = 0;
+
+	if (! firstCount)
+	{
+		FRESULT res;
+		FileCount = 0;
+		FILINFO fno;
+		DIR dir;
+
+		FileCount = 0;
+
+		res = f_findfirst(&dir, &fno, "/Graphics", "*.ild");
+
+		while (fno.fname[0])
+		{
+			if (res == FR_OK)
+		    {
+				// Visible and not a subdirectory or volume
+				if ((fno.fattrib & 0xE) == 0)
+				{
+					++FileCount;
+//						trace_printf("File %d: %s\n", FileCount, fno.fname);
+				}
+				res = f_findnext(&dir, &fno);
+		    }
+		    else
+		    {
+		    	FileCount = 0;
+		    	break;
+		    }
+		}
+
+		f_closedir(&dir);
+		trace_printf("Files found: %d\n", FileCount);
+		firstCount = 1;
+	}
+
 	return FileCount;
 }
 

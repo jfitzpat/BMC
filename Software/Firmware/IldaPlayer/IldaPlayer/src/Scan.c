@@ -227,7 +227,7 @@ void scan_Init()
 	// Timer 2 is our master controller
 	TIM2->PSC = 0;
 	// Initialize the PWM period to get 50 Hz as frequency from 1MHz
-	TIM2->ARR = ((SystemCoreClock / 2) / 14000) - 1;
+	TIM2->ARR = ((SystemCoreClock / 2) / 28000) - 1;
 	// Select Clock Divison of 1
 	TIM2->CR1 &= ~ TIM_CR1_CKD;
 	// CMS 00 is edge aligned up/down counter
@@ -311,9 +311,9 @@ void TIM2_IRQHandler()
 		DacOut[6] = val & 0xFF;
 
 		int16_t idx;
-		if (CurrentFrame->numPoints > 2)
+		if (CurrentFrame->numPoints > 4)
 		{
-			idx = curPoint - 2;
+			idx = curPoint - 4;
 			if (idx < 0)
 				idx += CurrentFrame->numPoints;
 		}

@@ -31,16 +31,16 @@
 
 static void TouchCallback();
 
-
 #define ARGB8888_BYTE_PER_PIXEL       4
 
-/* LTDC foreground layer address 800x480 in ARGB8888 */
+// LTDC foreground layer address 800x480 in ARGB8888
 #define LCD_FG_LAYER_ADDRESS          (LCD_FB_START_ADDRESS)
-
-/* LTDC background layer address 800x480 in ARGB8888 following the foreground layer */
+// LTDC background layer address 800x480 in ARGB8888 following the foreground layer
 #define LCD_BG_LAYER_ADDRESS          (LCD_FG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL))
-
+// Free SDRAM Start
 #define INTERNAL_BUFFER_START_ADDRESS (LCD_BG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL))
+
+uint32_t CurrentFile = 1;
 
 void gui_Init()
 {
@@ -50,18 +50,6 @@ void gui_Init()
 	// Initialize in Video Burst Mode, bail if we rail
 	if (BSP_LCD_Init() != LCD_OK)
 		return;
-
-	// Load the first ILDA
-	SD_FRAME_TABLE* table = (SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS;
-	table->frameCount = 0;
-
-	if (sdCard_GetFileCount())
-	{
-		sdCard_LoadIldaFile (2,
-				(SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS,
-				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
-	}
-
 
 	// Initialize our background layer, using SDRAM
 	BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_BACKGROUND, LCD_FB_START_ADDRESS);
@@ -98,6 +86,17 @@ void gui_Init()
 		HAL_Delay(5);
 	}
 
+	// Load the first ILDA
+	SD_FRAME_TABLE* table = (SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS;
+	table->frameCount = 0;
+
+	if (sdCard_GetFileCount())
+	{
+		sdCard_LoadIldaFile (CurrentFile,
+				(SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS,
+				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
+	}
+
 	// Draw main screen...
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, DISABLE);
 	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
@@ -112,11 +111,15 @@ void gui_Init()
 	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
 
 	char outstr[30];
-	sprintf(outstr, " Files: %d", (int)sdCard_GetFileCount());
+	if (! sdCard_GetFileCount())
+		sprintf(outstr, " Files: %d", (int)sdCard_GetFileCount());
+	else
+		sprintf(outstr, " File: %ld of %ld", CurrentFile, sdCard_GetFileCount());
+
 	BSP_LCD_DisplayStringAtLine(1, (uint8_t *)outstr);
 	if (table->frameCount)
 	{
-		sprintf(outstr, " #1: %s", table->altname);
+		sprintf(outstr, " %s", table->altname);
 		BSP_LCD_DisplayStringAtLine(2, (uint8_t*)outstr);
 		sprintf(outstr, " Frame: 1 of %ld", table->frameCount);
 		BSP_LCD_DisplayStringAtLine(3, (uint8_t*)outstr);
@@ -126,7 +129,7 @@ void gui_Init()
 	BSP_LCD_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT_MODE);
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, ENABLE);
 
-	HAL_Delay(2000);
+	HAL_Delay(1500);
 
 	for (int n = 255; n > 0; --n )
 	{
@@ -135,11 +138,11 @@ void gui_Init()
 	}
 
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, DISABLE);
-	HAL_Delay(100);
+	HAL_Delay(50);
 	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
 	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, ENABLE);
-	HAL_Delay(100);
+	HAL_Delay(50);
 	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
 
 	// If anything loaded, setup the frame and start the scanner
