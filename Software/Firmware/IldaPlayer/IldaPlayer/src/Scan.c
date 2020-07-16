@@ -32,6 +32,8 @@ static const SD_FRAME EmptyFrame = {
 static SPI_HandleTypeDef Spi_Handle;
 static DMA_HandleTypeDef Dma_Handle;
 
+volatile uint8_t NewFrameRequest = 0;
+SD_FRAME* NewFrame;
 SD_FRAME* CurrentFrame;
 int32_t curPoint = 0;
 uint8_t DacOut[17];
@@ -273,18 +275,22 @@ void scan_SetEnable(uint8_t enable)
 		TIM2->CR1 &= ~TIM_CR1_CEN;
 }
 
-// This should really be a request handled at the interrupt
-// so graphics complete by default !!!!
+// If not scanning, just stick it in, otherwise
+// Make a request for the IRQ to do it
 void scan_SetCurrentFrame (SD_FRAME* newFrame)
 {
-	uint32_t reg = TIM2->CR1;
-
-	scan_SetEnable(0);
-	CurrentFrame = newFrame;
-	curPoint = 0;
-
-	if (reg & TIM_CR1_CEN)
-		scan_SetEnable(1);
+	if (! TIM2->CR1 & TIM_CR1_CEN)
+	{
+		CurrentFrame = newFrame;
+		curPoint = 0;
+	}
+	else
+	{
+		// Wait for any pending request to finish
+		while (NewFrameRequest);
+		NewFrame = newFrame;
+		NewFrameRequest = 1;
+	}
 }
 
 // Read from Temp chip
@@ -343,7 +349,16 @@ void TIM2_IRQHandler()
 			DacOut[9] = DacOut[10] = 0xFF;
 
 		if (pntData[curPoint].status & 0x80)
+		{
 			curPoint = 0;
+
+			// Is it time for a new frame?
+			if (NewFrameRequest)
+			{
+				CurrentFrame = NewFrame;
+				NewFrameRequest = 0;
+			}
+		}
 		else
 			++curPoint;
 
