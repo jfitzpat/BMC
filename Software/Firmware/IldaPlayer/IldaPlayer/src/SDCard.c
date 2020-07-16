@@ -74,7 +74,7 @@ uint32_t sdCard_GetFileCount()
 				if ((fno.fattrib & 0xE) == 0)
 				{
 					++FileCount;
-//						trace_printf("File %d: %s\n", FileCount, fno.fname);
+//					trace_printf("File %d: %s\n", FileCount, fno.fname);
 				}
 				res = f_findnext(&dir, &fno);
 		    }
@@ -182,6 +182,8 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 		int n;
 		for (n = 0; n < rCount; ++n)
 		{
+			// We have 5 different handlers for the 5 different
+			// ILDA data formats (ugh)
 			if (header.format == 0)
 			{
 				ILDA_FORMAT_0 in;

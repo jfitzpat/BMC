@@ -30,7 +30,8 @@
 #include "Scan.h"
 
 static void TouchCallback();
-static void DrawFrame(int x, int y, int w, int h, SD_FRAME* frame);
+static void DrawMainBackground();
+static void DrawFrame();
 
 #define ARGB8888_BYTE_PER_PIXEL       (4)
 
@@ -41,8 +42,10 @@ static void DrawFrame(int x, int y, int w, int h, SD_FRAME* frame);
 // Free SDRAM Start
 #define INTERNAL_BUFFER_START_ADDRESS (LCD_BG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL))
 
+SD_FRAME_TABLE* FrameTable = (SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS;
+
 uint32_t CurrentFile = 1;
-uint32_t CurrentFrame = 0;
+uint32_t FrameIdx = 0;
 
 void gui_Init()
 {
@@ -89,52 +92,16 @@ void gui_Init()
 	}
 
 	// Load the first ILDA
-	SD_FRAME_TABLE* table = (SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS;
-	table->frameCount = 0;
+	FrameTable->frameCount = 0;
 
 	if (sdCard_GetFileCount())
 	{
-		sdCard_LoadIldaFile (CurrentFile,
-				(SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS,
+		sdCard_LoadIldaFile (CurrentFile, FrameTable,
 				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
 	}
 
-	// Draw main screen...
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, DISABLE);
-	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
-	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-	BSP_LCD_FillRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-	if (table->frameCount)
-		DrawFrame(DISPLAY_WIDTH - 472 - 4, 4, 472, 472, table->frames[0]);
-	else
-	{
-		BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-		BSP_LCD_FillRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
-	}
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
-	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 5, 3, 474, 474);
-	BSP_LCD_SetFont(&Font24);
-	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
-
-	char outstr[30];
-	if (! sdCard_GetFileCount())
-		sprintf(outstr, " Files: %d", (int)sdCard_GetFileCount());
-	else
-		sprintf(outstr, " File: %ld of %ld", CurrentFile, sdCard_GetFileCount());
-
-	BSP_LCD_DisplayStringAtLine(1, (uint8_t *)outstr);
-	if (table->frameCount)
-	{
-		sprintf(outstr, " %s", table->altname);
-		BSP_LCD_DisplayStringAtLine(2, (uint8_t*)outstr);
-		sprintf(outstr, " Frame: 1 of %ld", table->frameCount);
-		BSP_LCD_DisplayStringAtLine(3, (uint8_t*)outstr);
-	}
-
-	BSP_LCD_SetFont(&Font16);
-	BSP_LCD_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT_MODE);
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, ENABLE);
+	// Draw the main screen
+	DrawMainBackground();
 
 	HAL_Delay(1500);
 
@@ -146,16 +113,14 @@ void gui_Init()
 
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, DISABLE);
 	HAL_Delay(50);
-	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
-	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, ENABLE);
+	DrawFrame();
 	HAL_Delay(50);
 	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
 
 	// If anything loaded, setup the frame and start the scanner
-	if (table->frameCount)
+	if (FrameTable->frameCount)
 	{
-		scan_SetCurrentFrame (table->frames[0]);
+		scan_SetCurrentFrame (FrameTable->frames[0]);
 		scan_SetEnable(1);
 	}
 
@@ -168,72 +133,208 @@ void* gui_GetFreeSDRAMBase()
 	return (void*)INTERNAL_BUFFER_START_ADDRESS;
 }
 
-static void DrawFrame(int x, int y, int w, int h, SD_FRAME* frame)
+void DrawMainBackground()
 {
-	// Clear background
+	// Draw main screen...
+	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, DISABLE);
+	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
+	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
+	BSP_LCD_FillRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_FillRect(x,y,w,h);
+	BSP_LCD_FillRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
+	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
+	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 5, 3, 474, 474);
 
-	ILDA_FORMAT_4* pntData = &(frame->points);
-
-	for (uint32_t n=0; n < (frame->numPoints - 1); ++n)
-	{
-		if (! (pntData[n].status & 0x40))
-		{
-			uint32_t color = 0xFF000000 |
-							 (pntData[n].red << 16) |
-							 (pntData[n].green << 8) |
-							 (pntData[n].blue);
-
-			BSP_LCD_SetTextColor(color);
-
-			// Get our coordinates
-			int32_t x1, y1, x2, y2;
-			x1 = pntData[n].x.w;
-			y1 = pntData[n].y.w;
-			x2 = pntData[n+1].x.w;
-			y2 = pntData[n+1].y.w;
-
-			// Convert from center origin to top left origin
-			x1 += 32768;
-			x2 += 32768;
-			y1 += 32768;
-			y1 = 65535 - y1;
-			y2 += 32768;
-			y2 = 65535 - y2;
-
-			// Scale to width/height
-			x1 = x1 * w / 65536 + x;
-			x2 = x2 * w / 65536 + x;
-			y1 = y1 * h / 65536 + y;
-			y2 = y2 * h / 65536 + y;
-
-			BSP_LCD_DrawLine(x1, y1, x2, y2);
-		}
-	}
+	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
+	BSP_LCD_SetFont(&Font16);
+	BSP_LCD_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT_MODE);
+	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, ENABLE);
 }
 
-static void DrawCursor (uint16_t x, uint16_t y)
+void DrawFrame()
 {
+	int x = DISPLAY_WIDTH - 472 - 4;
+	int y = 4;
+	int w = 472;
+	int h = 472;
+
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, DISABLE);
 	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
 	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
 	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	BSP_LCD_DrawRect(x, y, 30, 30);
+	BSP_LCD_SetBackColor(LCD_COLOR_TRANSPARENT);
+	BSP_LCD_SetFont(&Font24);
+
+	char outstr[30];
+	if (! sdCard_GetFileCount())
+		sprintf(outstr, " Files: %d", (int)sdCard_GetFileCount());
+	else
+		sprintf(outstr, " File: %ld of %ld", CurrentFile, sdCard_GetFileCount());
+
+	BSP_LCD_DisplayStringAtLine(1, (uint8_t *)outstr);
+	if (FrameTable->frameCount)
+	{
+		sprintf(outstr, " %s", FrameTable->altname);
+		BSP_LCD_DisplayStringAtLine(5, (uint8_t*)outstr);
+		sprintf(outstr, " Frame: %ld of %ld", FrameIdx + 1, FrameTable->frameCount);
+		BSP_LCD_DisplayStringAtLine(6, (uint8_t*)outstr);
+	}
+
+
+	if (FrameTable->frameCount)
+	{
+		SD_FRAME* frame = FrameTable->frames[FrameIdx];
+		ILDA_FORMAT_4* pntData = &(frame->points);
+
+		for (uint32_t n=0; n < (frame->numPoints - 1); ++n)
+		{
+			if (! (pntData[n].status & 0x40))
+			{
+				uint32_t color = 0xFF000000 |
+								 (pntData[n].red << 16) |
+								 (pntData[n].green << 8) |
+								 (pntData[n].blue);
+
+				BSP_LCD_SetTextColor(color);
+
+				// Get our coordinates
+				int32_t x1, y1, x2, y2;
+				x1 = pntData[n].x.w;
+				y1 = pntData[n].y.w;
+				x2 = pntData[n+1].x.w;
+				y2 = pntData[n+1].y.w;
+
+				// Convert from center origin to top left origin
+				x1 += 32768;
+				x2 += 32768;
+				y1 += 32768;
+				y1 = 65535 - y1;
+				y2 += 32768;
+				y2 = 65535 - y2;
+
+				// Scale to width/height
+				x1 = x1 * w / 65536 + x;
+				x2 = x2 * w / 65536 + x;
+				y1 = y1 * h / 65536 + y;
+				y2 = y2 * h / 65536 + y;
+
+				BSP_LCD_DrawLine(x1, y1, x2, y2);
+			}
+		}
+	}
 	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, ENABLE);
 }
 
+static void IncFile()
+{
+	if (sdCard_GetFileCount() > 1)
+	{
+		scan_SetEnable(0);
+		++CurrentFile;
+		if (CurrentFile > sdCard_GetFileCount())
+			CurrentFile = 1;
+
+		sdCard_LoadIldaFile (CurrentFile, FrameTable,
+				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
+
+		FrameIdx = 0;
+		if (FrameTable->frameCount)
+		{
+			scan_SetCurrentFrame (FrameTable->frames[0]);
+			scan_SetEnable(1);
+		}
+
+		DrawFrame();
+	}
+}
+
+static void DecFile()
+{
+	if (sdCard_GetFileCount() > 1)
+	{
+		scan_SetEnable(0);
+
+		if (CurrentFile > 1)
+			--CurrentFile;
+		else
+			CurrentFile = sdCard_GetFileCount();
+
+		sdCard_LoadIldaFile (CurrentFile, FrameTable,
+				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
+
+		FrameIdx = 0;
+		if (FrameTable->frameCount)
+		{
+			scan_SetCurrentFrame (FrameTable->frames[0]);
+			scan_SetEnable(1);
+		}
+
+		DrawFrame();
+	}
+}
+
+static void IncFrame()
+{
+	if (FrameTable->frameCount > 1)
+	{
+		++FrameIdx;
+		if (FrameIdx >= FrameTable->frameCount)
+			FrameIdx = 0;
+
+		scan_SetCurrentFrame (FrameTable->frames[FrameIdx]);
+		DrawFrame();
+	}
+}
+
+static void DecFrame()
+{
+	if (FrameTable->frameCount > 1)
+	{
+		if (FrameIdx > 0)
+			--FrameIdx;
+		else
+			FrameIdx = FrameTable->frameCount - 1;
+
+		scan_SetCurrentFrame (FrameTable->frames[FrameIdx]);
+		DrawFrame();
+	}
+}
 
 void TouchCallback()
 {
+	static uint8_t last = 0;
+
 	TS_StateTypeDef ts;
 
 	if (BSP_TS_GetState(&ts) == TS_OK)
 	{
-		if (ts.touchDetected)
+		if (ts.touchDetected == 1)
 		{
-			DrawCursor(ts.touchX[0], ts.touchY[0]);
+			if (last == 0)
+			{
+				// Control zone?
+				if (ts.touchX[0] < 324 && ts.touchY[0] < 240)
+				{
+					if (ts.touchY[0] < 120)
+					{
+						if (ts.touchX[0] < 170)
+							DecFile();
+						else
+							IncFile();
+					}
+					else
+					{
+						if (ts.touchX[0] < 170)
+							DecFrame();
+						else
+							IncFrame();
+					}
+				}
+			}
 		}
+
+		last = ts.touchDetected;
 	}
 
 }
