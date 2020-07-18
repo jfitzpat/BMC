@@ -29,6 +29,7 @@
 #include "TimerCallback.h"
 #include "Led.h"
 #include "UIGraphics.h"
+#include "Graphics.h"
 #include "SDCard.h"
 #include "GUI.h"
 #include "Scan.h"
@@ -55,6 +56,7 @@ main(int argc, char* argv[])
 	sdCard_Init();
 	scan_Init();
 	uiGraphics_Init();
+	graphics_Init();
 	gui_Init();
 
 	// Infinite loop

@@ -28,9 +28,11 @@
 #include "TimerCallback.h"
 #include "SDCard.h"
 #include "Scan.h"
+#include "Graphics.h"
 
 static void TouchCallback();
 static void DrawMainBackground();
+static void _DrawFrame();
 static void DrawFrame();
 
 #define ARGB8888_BYTE_PER_PIXEL       (4)
@@ -42,10 +44,21 @@ static void DrawFrame();
 // Free SDRAM Start
 #define INTERNAL_BUFFER_START_ADDRESS (LCD_BG_LAYER_ADDRESS + (DISPLAY_WIDTH * DISPLAY_HEIGHT * ARGB8888_BYTE_PER_PIXEL))
 
+extern LTDC_HandleTypeDef            hltdc_discovery;
+static __IO int32_t  front_buffer   = 0;
+static __IO int32_t  pend_buffer   = -1;
+
+static const uint32_t Buffers[] =
+{
+		LCD_FG_LAYER_ADDRESS,
+		LCD_BG_LAYER_ADDRESS
+};
+
 SD_FRAME_TABLE* FrameTable = (SD_FRAME_TABLE *)INTERNAL_BUFFER_START_ADDRESS;
 
 uint32_t CurrentFile = 1;
 uint32_t FrameIdx = 0;
+uint8_t Animate = 1;
 
 void gui_Init()
 {
@@ -56,30 +69,25 @@ void gui_Init()
 	if (BSP_LCD_Init() != LCD_OK)
 		return;
 
-	// Initialize our background layer, using SDRAM
-	BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_BACKGROUND, LCD_FB_START_ADDRESS);
+	// Initialize our display layer, using SDRAM
+	BSP_LCD_LayerDefaultInit(0, LCD_FG_LAYER_ADDRESS);
+	BSP_LCD_SelectLayer(0);
+	BSP_LCD_SetTransparency(0, 0);
 
-	// Select and clear to black
-	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
-	BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-	// Now do the same for the foreground layer
-	BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER_FOREGROUND, LCD_BG_LAYER_ADDRESS);
-	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
-	BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_BACKGROUND, 255);
-	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 0);
+	// Setup a line event
+	HAL_LTDC_ProgramLineEvent(&hltdc_discovery, 0);
 
 	// Splash time!
-	BSP_LCD_DrawBitmap(0, 0, (uint8_t *)uiGraphics_splash_bmp);
-	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_DisplayStringAtLine(12, (uint8_t *)" BMC");
-	BSP_LCD_DisplayStringAtLine(13, (uint8_t *)" ILDA Player");
-	BSP_LCD_DisplayStringAtLine(14, (uint8_t *)" v: 1.0");
-	BSP_LCD_SetFont(&Font16);
-	BSP_LCD_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT_MODE);
-	BSP_LCD_DisplayOn();
+	graphics_SetTargetAddress(Buffers[0]);
+	graphics_DrawBitmap(0, 0, (uint8_t *)uiGraphics_splash_bmp);
+	graphics_SetTextColor(LCD_COLOR_BLACK);
+	graphics_SetBackColor(LCD_COLOR_WHITE);
+	graphics_SetFont(&Font24);
+	graphics_DisplayStringAtLine(12, (uint8_t *)" BMC");
+	graphics_DisplayStringAtLine(13, (uint8_t *)" ILDA Player");
+	graphics_DisplayStringAtLine(14, (uint8_t *)" v: 1.0");
+	graphics_SetFont(&Font16);
+	graphics_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT_MODE);
 
 	// Adjust brightness
 	// BSP_LCD_SetBrightness(100);
@@ -87,7 +95,7 @@ void gui_Init()
 	// Fade in splash screen
 	for (int n = 0; n <255; ++n )
 	{
-		BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, n);
+		BSP_LCD_SetTransparency(0, n);
 		HAL_Delay(5);
 	}
 
@@ -100,22 +108,13 @@ void gui_Init()
 				(SD_FRAME *)(INTERNAL_BUFFER_START_ADDRESS + 0x1000));
 	}
 
-	// Draw the main screen
-	DrawMainBackground();
-
 	HAL_Delay(1500);
 
-	for (int n = 255; n > 0; --n )
-	{
-		BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, n);
-		HAL_Delay(5);
-	}
-
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, DISABLE);
-	HAL_Delay(50);
-	DrawFrame();
-	HAL_Delay(50);
-	BSP_LCD_SetTransparency(LTDC_ACTIVE_LAYER_FOREGROUND, 255);
+	// Draw the main screen
+	graphics_SetTargetAddress(Buffers[1 - front_buffer]);
+	DrawMainBackground();
+	_DrawFrame();
+	pend_buffer = 1 - front_buffer;
 
 	// If anything loaded, setup the frame and start the scanner
 	if (FrameTable->frameCount)
@@ -123,6 +122,11 @@ void gui_Init()
 		scan_SetCurrentFrame (FrameTable->frames[0]);
 		scan_SetEnable(1);
 	}
+
+	// Wait for the display to flips
+	while (pend_buffer >= 0);
+	// Make a copy of the screen
+	graphics_CopyBuffer((uint32_t *)Buffers[front_buffer], (uint32_t *)Buffers[1 - front_buffer], 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
 
 	// Start our callback for touch input
 	timerCallback_Add(&TouchCallback, 50);
@@ -136,35 +140,44 @@ void* gui_GetFreeSDRAMBase()
 void DrawMainBackground()
 {
 	// Draw main screen...
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, DISABLE);
-	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_BACKGROUND);
-	BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
-	BSP_LCD_FillRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-	BSP_LCD_FillRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
-	BSP_LCD_DrawRect(DISPLAY_WIDTH - 472 - 5, 3, 474, 474);
+	graphics_SetTextColor(LCD_COLOR_BLUE);
+	graphics_FillRect(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+	graphics_SetTextColor(LCD_COLOR_BLACK);
+	graphics_FillRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
+	graphics_SetTextColor(LCD_COLOR_WHITE);
+	graphics_DrawRect(DISPLAY_WIDTH - 472 - 4, 4, 472, 472);
+	graphics_DrawRect(DISPLAY_WIDTH - 472 - 5, 3, 474, 474);
 
-	BSP_LCD_SetBackColor(LCD_COLOR_BLUE);
-	BSP_LCD_SetFont(&Font16);
-	BSP_LCD_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT_MODE);
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_BACKGROUND, ENABLE);
+	graphics_SetBackColor(LCD_COLOR_BLUE);
+	graphics_SetFont(&Font16);
+	graphics_DisplayStringAt(10, (29*16-2), (uint8_t *)"http://Scrootch.Me/bmc", LEFT);
 }
 
-void DrawFrame()
+static void DrawFrame()
 {
-	int x = DISPLAY_WIDTH - 472 - 4;
-	int y = 4;
-	int w = 472;
-	int h = 472;
+	// Draw is pending!
+	if (pend_buffer >= 0)
+		return;
 
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, DISABLE);
-	BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER_FOREGROUND);
-	BSP_LCD_Clear(LCD_COLOR_TRANSPARENT);
-	BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-	BSP_LCD_SetBackColor(LCD_COLOR_TRANSPARENT);
-	BSP_LCD_SetFont(&Font24);
+	graphics_SetTargetAddress(Buffers[1 - front_buffer]);
+	graphics_SetTextColor(LCD_COLOR_BLUE);
+	graphics_FillRect(0, 0, 323, 168);
+	graphics_SetTextColor(LCD_COLOR_BLACK);
+	graphics_FillRect(DISPLAY_WIDTH - 472 - 4 + 1, 5, 470, 470);
+	_DrawFrame();
+	pend_buffer = 1 - front_buffer;
+}
+
+static void _DrawFrame()
+{
+	int x = DISPLAY_WIDTH - 472 - 4 + 1;
+	int y = 4 + 1;
+	int w = 470;
+	int h = 470;
+
+	graphics_SetTextColor(LCD_COLOR_WHITE);
+	graphics_SetBackColor(LCD_COLOR_BLUE);
+	graphics_SetFont(&Font24);
 
 	char outstr[30];
 	if (! sdCard_GetFileCount())
@@ -172,15 +185,14 @@ void DrawFrame()
 	else
 		sprintf(outstr, " File: %ld of %ld", CurrentFile, sdCard_GetFileCount());
 
-	BSP_LCD_DisplayStringAtLine(1, (uint8_t *)outstr);
+	graphics_DisplayStringAtLine(1, (uint8_t *)outstr);
 	if (FrameTable->frameCount)
 	{
 		sprintf(outstr, " %s", FrameTable->altname);
-		BSP_LCD_DisplayStringAtLine(5, (uint8_t*)outstr);
+		graphics_DisplayStringAtLine(5, (uint8_t*)outstr);
 		sprintf(outstr, " Frame: %ld of %ld", FrameIdx + 1, FrameTable->frameCount);
-		BSP_LCD_DisplayStringAtLine(6, (uint8_t*)outstr);
+		graphics_DisplayStringAtLine(6, (uint8_t*)outstr);
 	}
-
 
 	if (FrameTable->frameCount)
 	{
@@ -196,7 +208,7 @@ void DrawFrame()
 								 (pntData[n].green << 8) |
 								 (pntData[n].blue);
 
-				BSP_LCD_SetTextColor(color);
+				graphics_SetTextColor(color);
 
 				// Get our coordinates
 				int32_t x1, y1, x2, y2;
@@ -219,11 +231,10 @@ void DrawFrame()
 				y1 = y1 * h / 65536 + y;
 				y2 = y2 * h / 65536 + y;
 
-				BSP_LCD_DrawLine(x1, y1, x2, y2);
+				graphics_DrawLine(x1, y1, x2, y2);
 			}
 		}
 	}
-	BSP_LCD_SetLayerVisible(LTDC_ACTIVE_LAYER_FOREGROUND, ENABLE);
 }
 
 static void IncFile()
@@ -303,9 +314,17 @@ static void DecFrame()
 
 void TouchCallback()
 {
+	static uint8_t toggle = 0;
 	static uint8_t last = 0;
 
 	TS_StateTypeDef ts;
+
+	if (Animate)
+	{
+		toggle++;
+		if (toggle & 1)
+			IncFrame();
+	}
 
 	if (BSP_TS_GetState(&ts) == TS_OK)
 	{
@@ -314,21 +333,31 @@ void TouchCallback()
 			if (last == 0)
 			{
 				// Control zone?
-				if (ts.touchX[0] < 324 && ts.touchY[0] < 240)
+				if (ts.touchX[0] < 324)
 				{
-					if (ts.touchY[0] < 120)
+					if (ts.touchY[0] < 240)
 					{
-						if (ts.touchX[0] < 170)
-							DecFile();
+						if (ts.touchY[0] < 120)
+						{
+							if (ts.touchX[0] < 170)
+								DecFile();
+							else
+								IncFile();
+						}
 						else
-							IncFile();
+						{
+							if (ts.touchX[0] < 170)
+								DecFrame();
+							else
+								IncFrame();
+						}
 					}
 					else
 					{
-						if (ts.touchX[0] < 170)
-							DecFrame();
+						if (Animate)
+							Animate = 0;
 						else
-							IncFrame();
+							Animate = 1;
 					}
 				}
 			}
@@ -336,6 +365,23 @@ void TouchCallback()
 
 		last = ts.touchDetected;
 	}
-
 }
 
+void HAL_LTDC_LineEventCallback(LTDC_HandleTypeDef *hltdc)
+{
+  if(pend_buffer >= 0)
+  {
+    LTDC_LAYER(hltdc, 0)->CFBAR = ((uint32_t)Buffers[pend_buffer]);
+    __HAL_LTDC_RELOAD_CONFIG(hltdc);
+
+    front_buffer = pend_buffer;
+    pend_buffer = -1;
+  }
+
+  HAL_LTDC_ProgramLineEvent(hltdc, 0);
+}
+
+void LTDC_IRQHandler(void)
+{
+  HAL_LTDC_IRQHandler(&hltdc_discovery);
+}
