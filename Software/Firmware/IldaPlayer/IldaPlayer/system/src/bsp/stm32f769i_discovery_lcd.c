@@ -254,10 +254,13 @@ static LCD_DrawPropTypeDef DrawProp[LTDC_MAX_LAYER_NUMBER];
 /** @defgroup STM32F769I_DISCOVERY_LCD_Private_FunctionPrototypes LCD Private FunctionPrototypes
   * @{
   */
+#if 0
 static void DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *c);
 static void FillTriangle(uint16_t x1, uint16_t x2, uint16_t x3, uint16_t y1, uint16_t y2, uint16_t y3);
 static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint32_t ySize, uint32_t OffLine, uint32_t ColorIndex);
 static void LL_ConvertLineToARGB8888(void * pSrc, void *pDst, uint32_t xSize, uint32_t ColorMode);
+#endif
+
 static uint16_t LCD_IO_GetID(void);
 /**
   * @}
@@ -471,8 +474,10 @@ uint8_t BSP_LCD_InitEx(LCD_OrientationTypeDef orientation)
   BSP_SDRAM_Init();
 #endif /* DATA_IN_ExtSDRAM */
 
+#if 0
   /* Initialize the font */
   BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
+#endif
 
 /************************End LTDC Initialization*******************************/
   
@@ -876,6 +881,7 @@ void BSP_LCD_ResetColorKeying(uint32_t LayerIndex)
   HAL_LTDC_DisableColorKeying(&(hltdc_discovery), LayerIndex);
 }
 
+#if 0
 /**
   * @brief  Sets the LCD text color.
   * @param  Color: Text color code ARGB(8-8-8-8)
@@ -1536,6 +1542,7 @@ void BSP_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius)
   }
   while (y <= 0);
 }
+#endif
 
 /**
   * @brief  Switch back on the display if was switched off by previous call of BSP_LCD_DisplayOff().
@@ -1723,6 +1730,7 @@ __weak void BSP_LCD_MspInit(void)
   HAL_NVIC_EnableIRQ(DSI_IRQn);
 }
 
+#if 0
 /**
   * @brief  Draws a pixel on LCD.
   * @param  Xpos: X position
@@ -1935,6 +1943,7 @@ static void LL_ConvertLineToARGB8888(void *pSrc, void *pDst, uint32_t xSize, uin
     }
   }
 }
+#endif
 
 /**
   * @}

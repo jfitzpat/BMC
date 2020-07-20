@@ -348,6 +348,7 @@ uint32_t BSP_LCD_GetBackColor(void);
 void     BSP_LCD_SetFont(sFONT *fonts);
 sFONT    *BSP_LCD_GetFont(void);
 
+#if 0
 uint32_t BSP_LCD_ReadPixel(uint16_t Xpos, uint16_t Ypos);
 void     BSP_LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint32_t pixel);
 void     BSP_LCD_Clear(uint32_t Color);
@@ -369,6 +370,7 @@ void     BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t
 void     BSP_LCD_FillCircle(uint16_t Xpos, uint16_t Ypos, uint16_t Radius);
 void     BSP_LCD_FillPolygon(pPoint Points, uint16_t PointCount);
 void     BSP_LCD_FillEllipse(int Xpos, int Ypos, int XRadius, int YRadius);
+#endif
 
 void     BSP_LCD_DisplayOn(void);
 void     BSP_LCD_DisplayOff(void);

@@ -1,25 +1,24 @@
 /*
-	main.c
-	Let's get this party started
+ main.c
+ Let's get this party started
 
-	Initializes the modules and then loops forever dispatching
-	foreground timer events
+ Initializes the modules and then loops forever dispatching
+ foreground timer events
 
-	Copyright 2020 Scrootch.me!
+ Copyright 2020 Scrootch.me!
 
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	     http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
-*/
-
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,8 +38,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-int
-main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	// Send a greeting to the trace device (skipped on Release).
 	trace_puts("Hello ARM World!");

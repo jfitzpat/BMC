@@ -1,21 +1,21 @@
 /*
-	SDCard.c
-	Basic FatFs SD Card access
+ SDCard.c
+ Basic FatFs SD Card access
 
-	Copyright 2020 Scrootch.me!
+ Copyright 2020 Scrootch.me!
 
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-	     http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
-*/
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,18 +33,19 @@ static char SD_Path[4];
 
 static uint32_t FileCount = 0;
 
-static const ILDA_FORMAT_2 IldaColors[] = {
+static const ILDA_FORMAT_2 IldaColors[] =
+{
 #include "ildacolors.inc"
-};
+		};
 
 void sdCard_Init()
 {
 	// Try to attach the driver
-	if(FATFS_LinkDriver(&SD_Driver, SD_Path) == FR_OK)
+	if (FATFS_LinkDriver(&SD_Driver, SD_Path) == FR_OK)
 	{
 		trace_puts("SD Driver linked");
 
-		if (f_mount(&FileSystem, (TCHAR const*)"", 0) == FR_OK)
+		if (f_mount(&FileSystem, (TCHAR const*) "", 0) == FR_OK)
 		{
 			trace_puts("SD Mounted.");
 		}
@@ -55,7 +56,7 @@ uint32_t sdCard_GetFileCount()
 {
 	static uint8_t firstCount = 0;
 
-	if (! firstCount)
+	if (!firstCount)
 	{
 		FRESULT res;
 		FileCount = 0;
@@ -69,7 +70,7 @@ uint32_t sdCard_GetFileCount()
 		while (fno.fname[0])
 		{
 			if (res == FR_OK)
-		    {
+			{
 				// Visible and not a subdirectory or volume
 				if ((fno.fattrib & 0xE) == 0)
 				{
@@ -77,12 +78,12 @@ uint32_t sdCard_GetFileCount()
 //					trace_printf("File %d: %s\n", FileCount, fno.fname);
 				}
 				res = f_findnext(&dir, &fno);
-		    }
-		    else
-		    {
-		    	FileCount = 0;
-		    	break;
-		    }
+			}
+			else
+			{
+				FileCount = 0;
+				break;
+			}
 		}
 
 		f_closedir(&dir);
@@ -93,14 +94,14 @@ uint32_t sdCard_GetFileCount()
 	return FileCount;
 }
 
-uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *frames)
+uint8_t sdCard_LoadIldaFile(uint32_t index, SD_FRAME_TABLE *table,
+		SD_FRAME *frames)
 {
-	SD_FRAME* nextFrame = frames;
-	ILDA_FORMAT_4* nextPoint = &(nextFrame->points);
+	SD_FRAME *nextFrame = frames;
+	ILDA_FORMAT_4 *nextPoint = &(nextFrame->points);
 
 	// Valid index?
-	if (index == 0 || index > FileCount)
-		return 0;
+	if (index == 0 || index > FileCount) return 0;
 
 	// Walk the directory until we find the index;
 	FRESULT res;
@@ -112,43 +113,40 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 	while (fno.fname[0])
 	{
 		if (res == FR_OK)
-	    {
+		{
 			// Visible and not a subdirectory or volume
 			if ((fno.fattrib & 0xE) == 0)
 			{
 				++idx;
-				if (idx == index)
-					break;
+				if (idx == index) break;
 			}
 			res = f_findnext(&dir, &fno);
-	    }
-	    else
-	    {
-	    	idx = 0;
-	    	break;
-	    }
+		}
+		else
+		{
+			idx = 0;
+			break;
+		}
 	}
 
 	f_closedir(&dir);
 
-	if (idx != index)
-		return 0;
+	if (idx != index) return 0;
 
 	trace_printf("Load ILDA %d (%s) found\n", index, fno.fname);
 
 	char outstr[280];
-	strcpy (outstr, "/Graphics/");
-	strcat (outstr, fno.fname);
+	strcpy(outstr, "/Graphics/");
+	strcat(outstr, fno.fname);
 
 	FIL fil;
-	if (f_open (&fil, outstr, FA_READ) != FR_OK)
-		return 0;
+	if (f_open(&fil, outstr, FA_READ) != FR_OK) return 0;
 
 	// Set the frame count to 0;
 	table->frameCount = 0;
 	// Save the name
-	strcpy((char *)table->fname, (char *)fno.fname);
-	strcpy((char *)table->altname, (char *)fno.altname);
+	strcpy((char*) table->fname, (char*) fno.fname);
+	strcpy((char*) table->altname, (char*) fno.altname);
 
 	// Loop until we are out of frames
 	do
@@ -157,18 +155,13 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 		ILDA_HEADER header;
 
 		// Read the header
-		if (f_read(&fil, &header, sizeof(header), &b) != FR_OK)
-			break;
+		if (f_read(&fil, &header, sizeof(header), &b) != FR_OK) break;
 
-		if (b != sizeof(header))
-			break;
+		if (b != sizeof(header)) break;
 
 		// Valid?
-		if (header.ilda[0] != 'I' ||
-			header.ilda[1] != 'L' ||
-			header.ilda[2] != 'D' ||
-			header.ilda[3] != 'A')
-			break;
+		if (header.ilda[0] != 'I' || header.ilda[1] != 'L'
+				|| header.ilda[2] != 'D' || header.ilda[3] != 'A') break;
 
 		uint16_t rCount;
 		rCount = header.numRecords.b[0];
@@ -176,8 +169,7 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 		rCount += header.numRecords.b[1];
 
 		// 0 records marks end
-		if (! rCount)
-			break;
+		if (!rCount) break;
 
 		int n;
 		for (n = 0; n < rCount; ++n)
@@ -189,10 +181,8 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 				ILDA_FORMAT_0 in;
 
 				// Try to read the next point
-				if (f_read(&fil, &in, sizeof(in), &b) != FR_OK)
-					break;
-				if (b != sizeof(in))
-					break;
+				if (f_read(&fil, &in, sizeof(in), &b) != FR_OK) break;
+				if (b != sizeof(in)) break;
 
 				// Change endian and store X, Y and Z
 				nextPoint[n].x.b[1] = in.x.b[0];
@@ -215,10 +205,8 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 				ILDA_FORMAT_1 in1;
 
 				// Try to read the next point
-				if (f_read(&fil, &in1, sizeof(in1), &b) != FR_OK)
-					break;
-				if (b != sizeof(in1))
-					break;
+				if (f_read(&fil, &in1, sizeof(in1), &b) != FR_OK) break;
+				if (b != sizeof(in1)) break;
 
 				// Change endian and store X, Y and Z
 				nextPoint[n].x.b[1] = in1.x.b[0];
@@ -240,20 +228,16 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 			{
 				// Color Palette
 				ILDA_FORMAT_2 in2;
-				if (f_read(&fil, &in2, sizeof(in2), &b) != FR_OK)
-					break;
-				if (b != sizeof(in2))
-					break;
+				if (f_read(&fil, &in2, sizeof(in2), &b) != FR_OK) break;
+				if (b != sizeof(in2)) break;
 			}
 			else if (header.format == 4)
 			{
 				ILDA_FORMAT_4 in4;
 
 				// Try to read the next point
-				if (f_read(&fil, &in4, sizeof(in4), &b) != FR_OK)
-					break;
-				if (b != sizeof(in4))
-					break;
+				if (f_read(&fil, &in4, sizeof(in4), &b) != FR_OK) break;
+				if (b != sizeof(in4)) break;
 
 				// Change endian and store X, Y and Z
 				nextPoint[n].x.b[1] = in4.x.b[0];
@@ -276,10 +260,8 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 				ILDA_FORMAT_5 in5;
 
 				// Try to read the next point
-				if (f_read(&fil, &in5, sizeof(in5), &b) != FR_OK)
-					break;
-				if (b != sizeof(in5))
-					break;
+				if (f_read(&fil, &in5, sizeof(in5), &b) != FR_OK) break;
+				if (b != sizeof(in5)) break;
 
 				// Change endian and store X, Y and Z
 				nextPoint[n].x.b[1] = in5.x.b[0];
@@ -301,8 +283,7 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 				break;
 		}
 
-		if (n != rCount)
-			break;
+		if (n != rCount) break;
 
 		// Don't store palletes!
 		if (header.format != 2)
@@ -312,30 +293,30 @@ uint8_t sdCard_LoadIldaFile (uint32_t index, SD_FRAME_TABLE *table, SD_FRAME *fr
 
 			// Store the frame pointer in the table
 			table->frameCount++;
-			table->frames[table->frameCount -1] = nextFrame;
+			table->frames[table->frameCount - 1] = nextFrame;
 
 			// Advance the frame pointer
 			// DWORD align
-			uint32_t p = (uint32_t)(&(nextPoint[rCount]));
+			uint32_t p = (uint32_t) (&(nextPoint[rCount]));
 			if (p & 3)
 			{
 				p += 3;
 				p &= 0xFFFFFFFC;
 			}
-			nextFrame = (SD_FRAME *)p;
+			nextFrame = (SD_FRAME*) p;
 
 			// Reset the point data pointer
 			nextPoint = &(nextFrame->points);
 		}
 
-	} while (1);
+	}
+	while (1);
 
 	// Close the file
 	f_close(&fil);
 
 	// Nothing read?
-	if (! table->frameCount)
-		return 0;
+	if (!table->frameCount) return 0;
 
 //	trace_printf("Loaded %d frames at:\n", table->frameCount);
 //	for (uint32_t i = 0; i < table->frameCount; ++i)
