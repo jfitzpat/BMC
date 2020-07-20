@@ -21,6 +21,7 @@
 #include "cortexm/ExceptionHandlers.h"
 #include "cmsis_device.h"
 #include "stm32f7xx_hal.h"
+#include "cmsis_os.h"
 
 void sysTick_Init()
 {
@@ -33,5 +34,6 @@ void sysTick_Init()
 void SysTick_Handler()
 {
 	HAL_IncTick();
+	osSystickHandler();
 }
 

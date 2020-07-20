@@ -25,12 +25,12 @@
 
 #include "GUI.h"
 #include "UIGraphics.h"
-#include "TimerCallback.h"
 #include "SDCard.h"
 #include "Scan.h"
 #include "Graphics.h"
+#include "cmsis_os.h"
 
-static void TouchCallback();
+static void TouchCallback(void const * argument);
 static void DrawMainBackground();
 static void _DrawFrame();
 static void DrawFrame();
@@ -93,7 +93,7 @@ void gui_Init()
 	for (int n = 0; n < 255; ++n)
 	{
 		BSP_LCD_SetTransparency(0, n);
-		HAL_Delay(5);
+		osDelay(5);
 	}
 
 	// Load the first ILDA
@@ -105,7 +105,7 @@ void gui_Init()
 				(SD_FRAME*) (INTERNAL_BUFFER_START_ADDRESS + 0x1000));
 	}
 
-	HAL_Delay(1500);
+	osDelay(1500);
 
 	// Draw the main screen
 	graphics_SetTargetAddress(Buffers[1 - front_buffer]);
@@ -129,7 +129,8 @@ void gui_Init()
 			DISPLAY_HEIGHT);
 
 	// Start our callback for touch input
-	timerCallback_Add(&TouchCallback, 50);
+	osThreadDef(GUI, TouchCallback, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
+	osThreadCreate (osThread(GUI), NULL);
 }
 
 void* gui_GetFreeSDRAMBase()
@@ -310,57 +311,64 @@ static void DecFrame()
 	}
 }
 
-void TouchCallback()
+void TouchCallback(void const * argument)
 {
 	static uint8_t toggle = 0;
 	static uint8_t last = 0;
 
-	TS_StateTypeDef ts;
+	(void) argument;
 
-	if (Animate)
+	while (1)
 	{
-		toggle++;
-		if (toggle & 1) IncFrame();
-	}
+		TS_StateTypeDef ts;
 
-	if (BSP_TS_GetState(&ts) == TS_OK)
-	{
-		if (ts.touchDetected == 1)
+		if (Animate)
 		{
-			if (last == 0)
+			toggle++;
+			if (toggle & 1) IncFrame();
+		}
+
+		if (BSP_TS_GetState(&ts) == TS_OK)
+		{
+			if (ts.touchDetected == 1)
 			{
-				// Control zone?
-				if (ts.touchX[0] < 324)
+				if (last == 0)
 				{
-					if (ts.touchY[0] < 240)
+					// Control zone?
+					if (ts.touchX[0] < 324)
 					{
-						if (ts.touchY[0] < 120)
+						if (ts.touchY[0] < 240)
 						{
-							if (ts.touchX[0] < 170)
-								DecFile();
+							if (ts.touchY[0] < 120)
+							{
+								if (ts.touchX[0] < 170)
+									DecFile();
+								else
+									IncFile();
+							}
 							else
-								IncFile();
+							{
+								if (ts.touchX[0] < 170)
+									DecFrame();
+								else
+									IncFrame();
+							}
 						}
 						else
 						{
-							if (ts.touchX[0] < 170)
-								DecFrame();
+							if (Animate)
+								Animate = 0;
 							else
-								IncFrame();
+								Animate = 1;
 						}
-					}
-					else
-					{
-						if (Animate)
-							Animate = 0;
-						else
-							Animate = 1;
 					}
 				}
 			}
+
+			last = ts.touchDetected;
 		}
 
-		last = ts.touchDetected;
+		osDelay(50);
 	}
 }
 

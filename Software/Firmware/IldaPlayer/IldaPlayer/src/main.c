@@ -24,14 +24,17 @@
 #include <stdlib.h>
 #include "diag/Trace.h"
 
+#include "cmsis_os.h"
+
 #include "SysTick.h"
-#include "TimerCallback.h"
 #include "Led.h"
 #include "UIGraphics.h"
 #include "Graphics.h"
 #include "SDCard.h"
 #include "GUI.h"
 #include "Scan.h"
+
+static void StartThread(void const * argument);
 
 // At this point clocks should be setup and HAL should be initialized
 
@@ -49,7 +52,19 @@ int main(int argc, char *argv[])
 
 	// Initialize all the modules in their dependant order
 	sysTick_Init();
-	timerCallback_Init();
+
+	osThreadDef(Start, StartThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
+	osThreadCreate (osThread(Start), NULL);
+
+	osKernelStart();
+
+	// Loop forever
+	for( ;; );
+}
+
+static void StartThread(void const * argument)
+{
+	// Initialize the non timer tick modules in dependency order
 	led_Init();
 	sdCard_Init();
 	scan_Init();
@@ -57,10 +72,11 @@ int main(int argc, char *argv[])
 	graphics_Init();
 	gui_Init();
 
-	// Infinite loop
+	// We're done initializing
 	while (1)
 	{
-		timerCallback_Dispatch();
+		osThreadTerminate(NULL);
+//		timerCallback_Dispatch();
 	}
 	// Infinite loop, never return.
 }

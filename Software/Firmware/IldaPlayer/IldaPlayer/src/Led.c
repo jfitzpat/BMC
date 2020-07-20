@@ -18,10 +18,10 @@
  */
 
 #include "Led.h"
-#include "TimerCallback.h"
+#include "cmsis_os.h"
 #include "stm32f7xx_hal.h"
 
-static void LedTimerCallback();
+static void LedTimerCallback(void const* argument);
 
 void led_Init()
 {
@@ -41,10 +41,14 @@ void led_Init()
 	GPIO_InitStruct.Alternate = 0;
 	HAL_GPIO_Init(GPIOJ, &GPIO_InitStruct);
 
-	timerCallback_Add(&LedTimerCallback, 500);
+	osTimerDef(LEDtimer, LedTimerCallback);
+	osTimerId osTimer = osTimerCreate(osTimer(LEDtimer), osTimerPeriodic, NULL);
+	osTimerStart(osTimer, 500);
 }
 
-void LedTimerCallback()
+void LedTimerCallback(void const* argument)
 {
+	(void) argument;
+
 	HAL_GPIO_TogglePin(GPIOJ, GPIO_PIN_5);
 }
