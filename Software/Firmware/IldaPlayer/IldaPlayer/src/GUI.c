@@ -91,7 +91,7 @@ void gui_Init()
 	// BSP_LCD_SetBrightness(100);
 
 	// Fade in splash screen
-	for (int n = 0; n < 255; ++n)
+	for (int n = 0; n <= 255; ++n)
 	{
 		BSP_LCD_SetTransparency(0, n);
 		osDelay(2);
@@ -109,6 +109,12 @@ void gui_Init()
 
 void gui_Start()
 {
+	// Fade out splash screen
+	for (int n = 255; n >= 0; --n)
+	{
+		BSP_LCD_SetTransparency(0, n);
+		osDelay(2);
+	}
 	// Draw the main screen
 	graphics_SetTargetAddress(Buffers[1 - front_buffer]);
 	DrawMainBackground();
@@ -129,6 +135,8 @@ void gui_Start()
 	graphics_CopyBuffer((uint32_t*) Buffers[front_buffer],
 			(uint32_t*) Buffers[1 - front_buffer], 0, 0, DISPLAY_WIDTH,
 			DISPLAY_HEIGHT);
+
+	BSP_LCD_SetTransparency(0, 255);
 
 	// Start our callback for touch input
 	osThreadDef(GUI, TouchCallback, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
