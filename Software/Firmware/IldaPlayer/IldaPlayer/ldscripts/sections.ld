@@ -340,6 +340,11 @@ SECTIONS
         _ebss = . ;             /* STM specific definition */
     } >RAM
 
+    .RxDescripSection (NOLOAD) : { *(.RxDescripSection) } >Memory_B1
+    .TxDescripSection (NOLOAD) : { *(.TxDescripSection) } >Memory_B2
+    .RxBUF (NOLOAD) : { *(.RxBUF) } >Memory_B3
+    .TxBUF (NOLOAD) : { *(.TxBUF) } >Memory_B4
+    
     .noinit_CCMRAM (NOLOAD) : ALIGN(4)
     {
         *(.noinit.CCMRAM .noinit.CCMRAM.*)         

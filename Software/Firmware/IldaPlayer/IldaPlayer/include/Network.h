@@ -1,6 +1,6 @@
 /*
- GUI.h
- Functions to manage the graphical interface
+ Network.h
+ Ethernet Control
 
  Copyright 2020 Scrootch.me!
 
@@ -17,15 +17,13 @@
  limitations under the License.
  */
 
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef NETWORK_H
+#define NETWORK_H
 
-#include <stdint.h>
+#include "stdint.h"
 
-// Module Interface
-void gui_Init();
-void gui_Start();
+void network_Init();
 
-void* gui_GetFreeSDRAMBase();
+uint8_t network_GetIP (char *outstr);
 
 #endif

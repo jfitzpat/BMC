@@ -29,6 +29,7 @@
 #include "Scan.h"
 #include "Graphics.h"
 #include "cmsis_os.h"
+#include "Network.h"
 
 static void TouchCallback(void const * argument);
 static void DrawMainBackground();
@@ -93,7 +94,7 @@ void gui_Init()
 	for (int n = 0; n < 255; ++n)
 	{
 		BSP_LCD_SetTransparency(0, n);
-		osDelay(5);
+		osDelay(2);
 	}
 
 	// Load the first ILDA
@@ -104,9 +105,10 @@ void gui_Init()
 		sdCard_LoadIldaFile(CurrentFile, FrameTable,
 				(SD_FRAME*) (INTERNAL_BUFFER_START_ADDRESS + 0x1000));
 	}
+}
 
-	osDelay(1500);
-
+void gui_Start()
+{
 	// Draw the main screen
 	graphics_SetTargetAddress(Buffers[1 - front_buffer]);
 	DrawMainBackground();
@@ -187,7 +189,16 @@ static void _DrawFrame()
 		sprintf(outstr, " File: %ld of %ld", CurrentFile,
 				sdCard_GetFileCount());
 
-	graphics_DisplayStringAtLine(1, (uint8_t*) outstr);
+	graphics_DisplayStringAtLine(1, (uint8_t*) (outstr));
+
+	outstr[0] = ' '; outstr[1] = 'I';
+	outstr[2] = 'P'; outstr[3] = ':';
+
+	if (! network_GetIP(outstr + 4))
+		graphics_DisplayStringAtLine(17, (uint8_t*)" No Network");
+	else
+		graphics_DisplayStringAtLine(17, (uint8_t*) outstr);
+
 	if (FrameTable->frameCount)
 	{
 		sprintf(outstr, " %s", FrameTable->altname);
