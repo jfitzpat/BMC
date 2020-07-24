@@ -35,6 +35,8 @@
 #include "SDCard.h"
 #include "GUI.h"
 #include "Scan.h"
+#include "Sync.h"
+#include "DMX.h"
 #include "Network.h"
 
 static void StartThread(void const * argument);
@@ -72,6 +74,8 @@ static void StartThread(void const * argument)
 	led_Init();
 	sdCard_Init();
 	scan_Init();
+	sync_Init();
+	dmx_Init();
 	uiGraphics_Init();
 	graphics_Init();
 	gui_Init();

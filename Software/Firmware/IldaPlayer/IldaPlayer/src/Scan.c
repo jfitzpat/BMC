@@ -52,6 +52,7 @@ void scan_Init()
 	// Lots of clocks to turn on
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOF_CLK_ENABLE();
 	__HAL_RCC_GPIOH_CLK_ENABLE();
 	__HAL_RCC_GPIOJ_CLK_ENABLE();
 	__HAL_RCC_SPI2_CLK_ENABLE();
@@ -61,6 +62,7 @@ void scan_Init()
 	// Configure GPIO and SPI pins
 	GPIO_InitTypeDef GPIO_InitStructure;
 
+	// SPI CLK
 	GPIO_InitStructure.Pin = GPIO_PIN_12;
 	GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStructure.Speed = GPIO_SPEED_FAST;
@@ -68,6 +70,7 @@ void scan_Init()
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
 
+	// SPI MISO and MOSI
 	GPIO_InitStructure.Pin = GPIO_PIN_14 | GPIO_PIN_15;
 	GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStructure.Speed = GPIO_SPEED_FAST;
@@ -75,6 +78,7 @@ void scan_Init()
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);
 
+	// SPI NSS (GPIO, not SPI controlled)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET);
 
 	GPIO_InitStructure.Pin = GPIO_PIN_11;
@@ -84,6 +88,7 @@ void scan_Init()
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
 
+	// /LDAC Line
 	HAL_GPIO_WritePin(GPIOH, GPIO_PIN_6, GPIO_PIN_SET);
 
 	GPIO_InitStructure.Pin = GPIO_PIN_6;
@@ -93,14 +98,25 @@ void scan_Init()
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOH, &GPIO_InitStructure);
 
-	HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_4, GPIO_PIN_SET);
+	// Shutter
+	HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_3, GPIO_PIN_RESET);
 
-	GPIO_InitStructure.Pin = GPIO_PIN_4;
+	GPIO_InitStructure.Pin = GPIO_PIN_3;
 	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStructure.Speed = GPIO_SPEED_FAST;
 	GPIO_InitStructure.Alternate = 0;
 	GPIO_InitStructure.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOJ, &GPIO_InitStructure);
+
+	// Blanking
+	HAL_GPIO_WritePin(GPIOF, GPIO_PIN_7, GPIO_PIN_RESET);
+
+	GPIO_InitStructure.Pin = GPIO_PIN_7;
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FAST;
+	GPIO_InitStructure.Alternate = 0;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOF, &GPIO_InitStructure);
 
 	// Setup the SPI peripheral
 	Spi_Handle.Instance = SPI2;
@@ -184,17 +200,17 @@ static void SetupDAC()
 	spi_Read(bin, sizeof(bin));
 
 	// Setup the rest of the DAC registers
-	bout[0] = 0xC;
-	bout[1] = 0x99;
-	bout[2] = 0x99;
+	bout[0] = 0xC;		// DACRANGE1
+	bout[1] = 0x99;		// 0 and 1 to 0-5
+	bout[2] = 0x0; 		// 2 and 3 to +/-5V
 	spi_Write(bout, sizeof(bout));
 
-	bout[0] = 0x4;
-	bout[1] = 0x00;
-	bout[2] = 0x0C;
+	bout[0] = 0x4;		// GENCONFIG
+	bout[1] = 0x00;		// Power up internal reference
+	bout[2] = 0x00;
 	spi_Write(bout, sizeof(bout));
 
-	bout[0] = 0x83;
+	bout[0] = 0x83;		// SPICONFIG
 	spi_Write(bout, sizeof(bout));
 	spi_Read(spi, sizeof(spi));
 
@@ -202,12 +218,12 @@ static void SetupDAC()
 	bout[1] = spi[1];
 	bout[2] = spi[2];
 
-	bout[2] &= (~0x20);
-	bout[2] |= 0x8;
+	bout[2] &= (~0x20);	// Active mode
+	bout[2] |= 0x8;		// Enable streaming mode
 	spi_Write(bout, sizeof(bout));
 
-	bout[0] = 0x9;
-	bout[1] = 0xF0;
+	bout[0] = 0x9;		// DACPWDWN
+	bout[1] = 0xF0;		// Turn on all 8 DACs
 	bout[2] = 0x0F;
 	spi_Write(bout, sizeof(bout));
 
@@ -232,8 +248,8 @@ static void SetupDAC()
 
 	val = pntData[curPoint].x.w;
 	val += 32768;
-	DacOut[1] = val >> 8;
-	DacOut[2] = val & 0xFF;
+	DacOut[7] = val >> 8;
+	DacOut[8] = val & 0xFF;
 
 	val = pntData[curPoint].y.w;
 	val += 32768;
@@ -241,9 +257,17 @@ static void SetupDAC()
 	DacOut[6] = val & 0xFF;
 
 	if (pntData[curPoint].status & 0x40)
-		DacOut[9] = DacOut[10] = 0;
+	{
+		DacOut[3] = DacOut[4] = 0;
+		DacOut[1] = DacOut[2] = 0;
+		DacOut[15] = DacOut[16] = 0;
+	}
 	else
-		DacOut[9] = DacOut[10] = 0xFF;
+	{
+		DacOut[3] = pntData[curPoint].red;
+		DacOut[1] = pntData[curPoint].green;
+		DacOut[15] = pntData[curPoint].blue;
+	}
 
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(&Spi_Handle, (uint8_t*) DacOut, sizeof(DacOut), 100000);
@@ -267,7 +291,13 @@ void scan_SetEnable(uint8_t enable)
 		// first frame we loaded
 		if (!firstEnable)
 		{
+			// Configure DAC
 			SetupDAC();
+
+			// Open Shutter
+			HAL_GPIO_WritePin(GPIOJ, GPIO_PIN_3, GPIO_PIN_SET);
+
+			// Only once
 			firstEnable = 1;
 		}
 
@@ -328,8 +358,8 @@ void TIM2_IRQHandler()
 		int32_t val;
 		val = pntData[curPoint].x.w;
 		val += 32768;
-		DacOut[1] = val >> 8;
-		DacOut[2] = val & 0xFF;
+		DacOut[7] = val >> 8;
+		DacOut[8] = val & 0xFF;
 
 		val = pntData[curPoint].y.w;
 		val += 32768;
@@ -346,9 +376,17 @@ void TIM2_IRQHandler()
 			idx = curPoint;
 
 		if (pntData[idx].status & 0x40)
-			DacOut[9] = DacOut[10] = 0;
+		{
+			DacOut[3] = DacOut[4] = 0;
+			DacOut[1] = DacOut[2] = 0;
+			DacOut[15] = DacOut[16] = 0;
+		}
 		else
-			DacOut[9] = DacOut[10] = 0xFF;
+		{
+			DacOut[3] = pntData[idx].red;
+			DacOut[1] = pntData[idx].green;
+			DacOut[15] = pntData[idx].blue;
+		}
 
 		if (pntData[curPoint].status & 0x80)
 		{
