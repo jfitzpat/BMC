@@ -315,6 +315,7 @@ void scan_SetCurrentFrame(SD_FRAME *newFrame)
 	{
 		CurrentFrame = newFrame;
 		curPoint = 0;
+		NewFrameRequest = 0;
 	}
 	else
 	{
