@@ -172,7 +172,7 @@ static void DrawFrame()
 
 	graphics_SetTargetAddress(Buffers[1 - front_buffer]);
 	graphics_SetBrushColor(LCD_COLOR_BLUE);
-	graphics_FillRect(0, 0, 323, 168);
+	graphics_FillRect(0, 0, 323, 192);
 	graphics_SetBrushColor(LCD_COLOR_BLACK);
 	graphics_FillRect(DISPLAY_WIDTH - 472 - 4 + 1, 5, 470, 470);
 	_DrawFrame();
@@ -214,6 +214,8 @@ static void _DrawFrame()
 		sprintf(outstr, " Frame: %ld of %ld", FrameIdx + 1,
 				FrameTable->frameCount);
 		graphics_DisplayStringAtLine(6, (uint8_t*) outstr);
+		sprintf(outstr, " Rate: %ld", scan_GetScanRate());
+		graphics_DisplayStringAtLine(7, (uint8_t*) outstr);
 	}
 
 	if (FrameTable->frameCount)
@@ -330,21 +332,51 @@ static void DecFrame()
 	}
 }
 
+static void IncScan(uint32_t n)
+{
+	if (FrameTable->frameCount >= 1)
+	{
+		scan_SetScanRate(scan_GetScanRate() + n);
+		DrawFrame();
+	}
+}
+
+static void DecScan(uint32_t n)
+{
+	if (FrameTable->frameCount >= 1)
+	{
+		scan_SetScanRate(scan_GetScanRate() - n);
+		DrawFrame();
+	}
+}
+
 void TouchCallback(void const * argument)
 {
 	static uint8_t toggle = 0;
 	static uint8_t last = 0;
+	static uint16_t rotZ = 0;
 
 	(void) argument;
 
 	while (1)
 	{
 		TS_StateTypeDef ts;
-
-		if (Animate)
+		toggle++;
+		if (toggle & 1)
 		{
-			toggle++;
-			if (toggle & 1) IncFrame();
+			if (Animate)
+				IncFrame();
+			rotZ += 7;
+			if (rotZ > 3599)
+				rotZ -= 3600;
+
+			scan_UpdateTransform (0, 0,
+								  0, 0, 0,
+								  -4,
+								  1.0,
+								  .7, .7, .7,
+								  0, 0, rotZ);
+
 		}
 
 		if (BSP_TS_GetState(&ts) == TS_OK)
@@ -380,6 +412,24 @@ void TouchCallback(void const * argument)
 							else
 								Animate = 1;
 						}
+					}
+					else	// Image area
+					{
+						if (ts.touchY[0] < 240)
+						{
+							if (ts.touchX[0] < 562)
+								DecScan(1000);
+							else
+								IncScan(1000);
+						}
+						else
+						{
+							if (ts.touchX[0] < 562)
+								DecScan(1);
+							else
+								IncScan(1);
+						}
+
 					}
 				}
 			}

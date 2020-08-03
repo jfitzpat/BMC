@@ -36,8 +36,8 @@
 /*Static IP ADDRESS*/
 #define IP_ADDR0   192
 #define IP_ADDR1   168
-#define IP_ADDR2   0
-#define IP_ADDR3   10
+#define IP_ADDR2   1
+#define IP_ADDR3   100
 
 /*NETMASK*/
 #define NETMASK_ADDR0   255
@@ -48,8 +48,8 @@
 /*Gateway Address*/
 #define GW_ADDR0   192
 #define GW_ADDR1   168
-#define GW_ADDR2   0
-#define GW_ADDR3   1
+#define GW_ADDR2   1
+#define GW_ADDR3   10
 
 #define DHCP_OFF                   (uint8_t) 0
 #define DHCP_START                 (uint8_t) 1

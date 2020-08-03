@@ -27,4 +27,21 @@ void scan_Init();
 void scan_SetEnable(uint8_t enable);
 void scan_SetCurrentFrame(SD_FRAME *newFrame);
 
+void scan_UpdateTransform (int32_t posX,
+						   int32_t posY,
+						   int32_t corX,
+						   int32_t corY,
+						   int32_t corZ,
+						   int32_t blankOffset,
+						   double intensity,
+						   double scaleX,
+						   double scaleY,
+						   double scaleZ,
+						   uint16_t rotX,
+						   uint16_t rotY,
+						   uint16_t rotZ);
+
+uint32_t scan_GetScanRate();
+void scan_SetScanRate(uint32_t newrate);
+
 #endif

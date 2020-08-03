@@ -21,6 +21,14 @@
 #include "GUI.h"
 #include "SDCard.h"
 #include "stm32f7xx_hal.h"
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
+#define SCAN_MAX_RATE (28000)
+#define SCAN_MIN_ARR (((SystemCoreClock / 2) / SCAN_MAX_RATE) - 1)
+
+#define DEG_IN_RAD (0.01745329252)
 
 static const SD_FRAME EmptyFrame =
 { 1,			// 1 point
@@ -40,6 +48,54 @@ SD_FRAME *NewFrame;
 SD_FRAME *CurrentFrame;
 int32_t curPoint = 0;
 uint8_t DacOut[17];
+
+// Sintable in .1 degree steps
+static const double SinTable[] = {
+#include "sintable.inc"
+};
+
+typedef struct {
+	int32_t posX;	// X, Y position
+	int32_t posY;
+	int32_t roX;	// Center of rotation
+	int32_t roY;
+	int32_t roZ;
+	int32_t blankOffset;
+	double intensity;
+	double scaleX;
+	double scaleY;
+	double scaleZ;
+	double matrix11;
+	double matrix12;
+	double matrix13;
+	double matrix21;
+	double matrix22;
+	double matrix23;
+	double matrix31;
+	double matrix32;
+	double matrix33;
+} TRANSFORM;
+
+TRANSFORM currentTransform = { 0, 0,
+							   0, 0, 0,
+							   0,
+							   1.0,
+							   0.5, 0.5, 0.5,
+							   1.0, 0, 0,
+							   0, 1.0, 0,
+							   0, 0, 1.0 };
+
+TRANSFORM pendingTransform = { 0, 0,
+		   	   	   	   	   	   0, 0, 0,
+							   0,
+							   1.0,
+							   0.5, 0.5, 0.5,
+							   1.0, 0, 0,
+							   0, 1.0, 0,
+							   0, 0, 1.0 };
+
+uint8_t UpdateTransform = 0;
+
 
 static void spi_Read(void *bout, uint16_t bcount);
 static void spi_Write(void *bout, uint16_t bcount);
@@ -162,10 +218,12 @@ void scan_Init()
 
 	// Timer 2 is our master controller
 	TIM2->PSC = 0;
-	// Initialize the PWM period to get 50 Hz as frequency from 1MHz
-	TIM2->ARR = ((SystemCoreClock / 2) / 28000) - 1;
+	// Initialize the period to get 28 kHz as frequency from 96MHz
+	TIM2->ARR = SCAN_MIN_ARR;
 	// Select Clock Divison of 1
 	TIM2->CR1 &= ~ TIM_CR1_CKD;
+	// buffer ARR
+	TIM2->CR1 |= TIM_CR1_ARPE;
 	// CMS 00 is edge aligned up/down counter
 	// DIR 0 = up
 	TIM2->CR1 &= ~(TIM_CR1_DIR | TIM_CR1_CMS);
@@ -240,43 +298,6 @@ static void SetupDAC()
 	DacOut[14] = 0;
 	DacOut[15] = 0;
 	DacOut[16] = 0;
-
-	ILDA_FORMAT_4 *pntData;
-	pntData = &(CurrentFrame->points);
-
-	int32_t val;
-
-	val = pntData[curPoint].x.w;
-	val += 32768;
-	DacOut[7] = val >> 8;
-	DacOut[8] = val & 0xFF;
-
-	val = pntData[curPoint].y.w;
-	val += 32768;
-	DacOut[5] = val >> 8;
-	DacOut[6] = val & 0xFF;
-
-	if (pntData[curPoint].status & 0x40)
-	{
-		DacOut[3] = DacOut[4] = 0;
-		DacOut[1] = DacOut[2] = 0;
-		DacOut[15] = DacOut[16] = 0;
-	}
-	else
-	{
-		DacOut[3] = pntData[curPoint].red;
-		DacOut[1] = pntData[curPoint].green;
-		DacOut[15] = pntData[curPoint].blue;
-	}
-
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_RESET);
-	HAL_SPI_Transmit(&Spi_Handle, (uint8_t*) DacOut, sizeof(DacOut), 100000);
-	// CS will get released in timer interrupt
-
-	if (pntData[curPoint].status & 0x80)
-		curPoint = 0;
-	else
-		++curPoint;
 }
 
 void scan_SetEnable(uint8_t enable)
@@ -320,11 +341,149 @@ void scan_SetCurrentFrame(SD_FRAME *newFrame)
 	else
 	{
 		// Wait for any pending request to finish
-		while (NewFrameRequest)
-			;
+//		while (NewFrameRequest)
+//			;
 		NewFrame = newFrame;
 		NewFrameRequest = 1;
 	}
+}
+
+uint32_t scan_GetScanRate()
+{
+	return TIM2->ARR;
+}
+
+void scan_SetScanRate(uint32_t newrate)
+{
+	if (newrate < SCAN_MIN_ARR)
+		newrate = SCAN_MIN_ARR;
+
+	TIM2->ARR = newrate;
+}
+
+static void Multiply3by3(double in1[3][3], double in2[3][3], double out[3][3])
+{
+	for (int col = 0 ; col < 3; ++col)
+	{
+		for (int row = 0; row < 3; ++row)
+		{
+			double d = 0;
+			d += in1[row][0] * in2[0][col];
+			d += in1[row][1] * in2[1][col];
+			d += in1[row][2] * in2[2][col];
+			out[row][col] = d;
+		}
+	}
+}
+
+void scan_UpdateTransform (int32_t posX,
+						   int32_t posY,
+						   int32_t roX,
+						   int32_t roY,
+						   int32_t roZ,
+						   int32_t blankOffset,
+						   double intensity,
+						   double scaleX,
+						   double scaleY,
+						   double scaleZ,
+						   uint16_t rotX,
+						   uint16_t rotY,
+						   uint16_t rotZ)
+{
+	// Keep some rotation matrixes around
+	static double rx[3][3] = {{1, 0, 0},
+							  {0, 1, 0},
+							  {0, 0, 1}};
+	static double ry[3][3] = {{1, 0, 0},
+			  	  	  	  	  {0, 1, 0},
+							  {0, 0, 1}};
+	static double rz[3][3] = {{1, 0, 0},
+			  	  	  	  	  {0, 1, 0},
+							  {0, 0, 1}};
+	// Update already peding !!!!
+	// Ideally we should just update to the latest, but the structure
+	// isn't an automic operation
+	if (UpdateTransform)
+		return;
+
+	// Position and center of rotation are just copies
+	pendingTransform.posX = posX;
+	pendingTransform.posY = posY;
+	pendingTransform.roX = roX;
+	pendingTransform.roY = roY;
+	pendingTransform.roZ = roZ;
+	pendingTransform.blankOffset = blankOffset;
+	pendingTransform.intensity = intensity;
+	pendingTransform.scaleX = scaleX;
+	pendingTransform.scaleY = scaleY;
+	pendingTransform.scaleZ = scaleZ;
+
+	// Scale and rotations we convert to a affine transform matrix
+	double sin, cos;
+
+	// Clip rotation
+	if (rotX > 3599)
+		rotX = 0;
+
+	// Get sin and cos, sin is straight lookup,
+	// cos is 90 degres offset from sin
+	sin = SinTable[rotX];
+	rotX += 900;
+	if (rotX > 3599)
+		rotX -= 3600;
+	cos = SinTable[rotX];
+
+	rx[1][1] = cos;
+	rx[2][2] = cos;
+	rx[1][2] = 0 - sin;
+	rx[2][1] = sin;
+
+	// Repeat for Y
+	if (rotY > 3599)
+		rotY = 0;
+
+	sin = SinTable[rotY];
+	rotY += 900;
+	if (rotY > 3599)
+		rotY -= 3600;
+	cos = SinTable[rotY];
+
+	ry[0][0] = cos;
+	ry[2][2] = cos;
+	ry[2][0] = 0 - sin;
+	ry[0][2] = sin;
+
+	// And Z
+	if (rotZ > 3599)
+		rotZ = 0;
+
+	sin = SinTable[rotZ];
+	rotZ += 900;
+	if (rotZ > 3599)
+		rotZ -= 3600;
+	cos = SinTable[rotZ];
+
+	rz[0][0] = cos;
+	rz[1][1] = cos;
+	rz[0][1] = 0 - sin;
+	rz[1][0] = sin;
+
+	double out1[3][3];
+	Multiply3by3(rx, ry, out1);
+	double out2[3][3];
+	Multiply3by3(out1, rz, out2);
+
+	pendingTransform.matrix11 = out2[0][0];
+	pendingTransform.matrix12 = out2[1][0];
+	pendingTransform.matrix13 = out2[2][0];
+	pendingTransform.matrix21 = out2[0][1];
+	pendingTransform.matrix22 = out2[1][1];
+	pendingTransform.matrix23 = out2[2][1];
+	pendingTransform.matrix31 = out2[0][2];
+	pendingTransform.matrix32 = out2[1][2];
+	pendingTransform.matrix33 = out2[2][2];
+
+	UpdateTransform = 1;
 }
 
 // Read from Temp chip
@@ -357,26 +516,69 @@ void TIM2_IRQHandler()
 		pntData = &(CurrentFrame->points);
 
 		int32_t val;
-		val = pntData[curPoint].x.w;
+		double d;
+		double dx, dy, dz;
+		uint8_t clip = 0;
+
+		dx = pntData[curPoint].x.w;
+		dx *= currentTransform.scaleX;
+		dx += currentTransform.roX;
+		dy = pntData[curPoint].y.w;
+		dy *= currentTransform.scaleY;
+		dy += currentTransform.roY;
+		dz = pntData[curPoint].z.w;
+		dz *= currentTransform.scaleZ;
+		dz += currentTransform.roZ;
+
+		d = dx * currentTransform.matrix11 + dy * currentTransform.matrix12 + dz * currentTransform.matrix13;
+		val = (int32_t)d;
+		val += currentTransform.posX;
+		if (val < -32768)
+		{
+			val = -32768;
+			clip = 1;
+		}
+		if (val > 32767)
+		{
+			val = 32767;
+			clip = 1;
+		}
+
 		val += 32768;
 		DacOut[7] = val >> 8;
 		DacOut[8] = val & 0xFF;
 
-		val = pntData[curPoint].y.w;
+		d = dx * currentTransform.matrix21 + dy * currentTransform.matrix22 + dz * currentTransform.matrix23;
+		val = (int32_t)d;
+		val += currentTransform.posY;
+		if (val < -32768)
+		{
+			val = -32768;
+			clip = 1;
+		}
+		if (val > 32767)
+		{
+			val = 32767;
+			clip = 1;
+		}
+
 		val += 32768;
 		DacOut[5] = val >> 8;
 		DacOut[6] = val & 0xFF;
 
 		int16_t idx;
-		if (CurrentFrame->numPoints > 4)
+		if (CurrentFrame->numPoints > (uint32_t)abs(currentTransform.blankOffset))
 		{
-			idx = curPoint - 4;
-			if (idx < 0) idx += CurrentFrame->numPoints;
+			idx = curPoint + currentTransform.blankOffset;
+			if (idx < 0)
+				idx += CurrentFrame->numPoints;
+			else if (idx >= (int16_t)CurrentFrame->numPoints)
+				idx -= CurrentFrame->numPoints;
 		}
 		else
 			idx = curPoint;
 
-		if (pntData[idx].status & 0x40)
+		if ((pntData[idx].status & 0x40) || clip)
 		{
 			DacOut[3] = DacOut[4] = 0;
 			DacOut[1] = DacOut[2] = 0;
@@ -384,9 +586,13 @@ void TIM2_IRQHandler()
 		}
 		else
 		{
-			DacOut[3] = pntData[idx].red;
-			DacOut[1] = pntData[idx].green;
-			DacOut[15] = pntData[idx].blue;
+			double i;
+			i = pntData[idx].red * currentTransform.intensity;
+			DacOut[3] = (uint8_t)i;
+			i = pntData[idx].green * currentTransform.intensity;
+			DacOut[1] = (uint8_t)i;
+			i = pntData[idx].blue * currentTransform.intensity;
+			DacOut[15] = (uint8_t)i;
 		}
 
 		if (pntData[curPoint].status & 0x80)
@@ -398,6 +604,13 @@ void TIM2_IRQHandler()
 			{
 				CurrentFrame = NewFrame;
 				NewFrameRequest = 0;
+			}
+
+			// Update transform?
+			if (UpdateTransform)
+			{
+				memcpy (&currentTransform, &pendingTransform, sizeof(TRANSFORM));
+				UpdateTransform = 0;
 			}
 		}
 		else
