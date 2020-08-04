@@ -43,7 +43,7 @@ MEMORY
   /*
    * TCM 128K, SRAM1 240K, SRAM2 16K
    */
-  RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 512K
+  RAM (xrw) : ORIGIN = 0x20000000, LENGTH = 496K
   Memory_B1(xrw)   : ORIGIN = 0x2007C000, LENGTH = 0x80
   Memory_B2(xrw)   : ORIGIN = 0x2007C080, LENGTH = 0x80
   Memory_B3(xrw)   : ORIGIN = 0x2007C100, LENGTH = 0x17d0 

@@ -203,44 +203,10 @@ void http_server_serve(int conn)
 	    write(conn, (const unsigned char*)(file.data), (size_t)file.len);
 	    fs_close(&file);
   }
-  else if (strncmp((char *)recv_buffer,"GET /STM32F7xx_files/ST.gif",27)==0)
-  {
-    fs_open(&file, "/STM32F7xx_files/ST.gif"); 
-    write(conn, (const unsigned char*)(file.data), (size_t)file.len);
-    fs_close(&file);
-  }
-  /* Check if request to get stm32.jpeg */
-  else if (strncmp((char *)recv_buffer,"GET /STM32F7xx_files/stm32.jpg",30)==0)
-  {
-    fs_open(&file, "/STM32F7xx_files/stm32.jpg"); 
-    write(conn, (const unsigned char*)(file.data), (size_t)file.len);
-    fs_close(&file);
-  }
-  /* Check if request to get ST logo.jpeg */
-  else if (strncmp((char *)recv_buffer,"GET /STM32F7xx_files/logo.jpg", 29) == 0)
-  {
-    fs_open(&file, "/STM32F7xx_files/logo.jpg"); 
-    write(conn, (const unsigned char*)(file.data), (size_t)file.len);
-    fs_close(&file);
-  }
-  else if(strncmp((char *)recv_buffer, "GET /STM32F7xxTASKS.html", 24) == 0)
+  else if(strncmp((char *)recv_buffer, "GET /tasks.html", 15) == 0)
   {
     /* Load dynamic page */
     DynWebPage(conn);
-  }
-  else if((strncmp((char *)recv_buffer, "GET /STM32F7xx.html", 19) == 0)||(strncmp((char *)recv_buffer, "GET / ", 6) == 0))
-  {
-    /* Load STM32F7xxpage */
-    fs_open(&file, "/STM32F7xx.html"); 
-    write(conn, (const unsigned char*)(file.data), (size_t)file.len);
-    fs_close(&file);
-  }
-  else
-  {
-    /* Load 404 page */
-    fs_open(&file, "/404.html");
-    write(conn, (const unsigned char*)(file.data), (size_t)file.len);
-    fs_close(&file);
   }
   /* Close connection socket */
   close(conn);
