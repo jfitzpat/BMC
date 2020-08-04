@@ -92,8 +92,6 @@ static void Netif_Config(void)
 	ip_addr_t netmask;
 	ip_addr_t gw;
 
-	HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
-
 #ifdef USE_DHCP
 	ip_addr_set_zero_ip4(&ipaddr);
 	ip_addr_set_zero_ip4(&netmask);

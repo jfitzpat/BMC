@@ -127,11 +127,7 @@ static void MPU_Init(void)
 
 	  HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
-	  // We don't enable here, we enable just before
-	  // we initialize our Ethernet driver because
-	  // otherwise we will get a protection fault at
-	  // startup outside the debugger
-//	  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+	  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
 void __initialize_hardware(void)
@@ -145,7 +141,9 @@ void __initialize_hardware(void)
 
 	// Enable instruction & data cache.
 	SCB_EnableICache();
-	SCB_EnableDCache();
+// At reduced clock speeds the DSI will flicker if we enable the
+// data cache while using the FPU
+//	SCB_EnableDCache();
 
 	// Enable HSE Oscillator and activate PLL with HSE as source
 	SystemClock_Config();

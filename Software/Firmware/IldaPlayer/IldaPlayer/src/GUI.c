@@ -376,7 +376,6 @@ void TouchCallback(void const * argument)
 								  1.0,
 								  .7, .7, .7,
 								  0, 0, rotZ);
-
 		}
 
 		if (BSP_TS_GetState(&ts) == TS_OK)
