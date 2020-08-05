@@ -355,6 +355,7 @@ void TouchCallback(void const * argument)
 	static uint8_t toggle = 0;
 	static uint8_t last = 0;
 	static uint16_t rotZ = 0;
+	static uint16_t rotY = 0;
 
 	(void) argument;
 
@@ -369,13 +370,16 @@ void TouchCallback(void const * argument)
 			rotZ += 7;
 			if (rotZ > 3599)
 				rotZ -= 3600;
+			rotY += 25;
+			if (rotY > 3599)
+				rotY -= 3600;
 
 			scan_UpdateTransform (0, 0,
 								  0, 0, 0,
 								  -4,
 								  1.0,
 								  .7, .7, .7,
-								  0, 0, rotZ);
+								  rotY, 0, rotZ);
 		}
 
 		if (BSP_TS_GetState(&ts) == TS_OK)

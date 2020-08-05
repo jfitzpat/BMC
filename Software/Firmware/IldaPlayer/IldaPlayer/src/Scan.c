@@ -55,17 +55,17 @@ static const double SinTable[] = {
 };
 
 typedef struct {
-	int32_t posX;	// X, Y position
+	int32_t posX;			// X, Y position
 	int32_t posY;
-	int32_t roX;	// Center of rotation
+	int32_t roX;			// Rotation offset
 	int32_t roY;
 	int32_t roZ;
-	int32_t blankOffset;
-	double intensity;
-	double scaleX;
+	int32_t blankOffset;	// Blanking/Color offset
+	double intensity;		// Intensity (0-1)
+	double scaleX;			// X,Y, and Z scale (0-2)
 	double scaleY;
 	double scaleZ;
-	double matrix11;
+	double matrix11;		// 3x3 Rotation Matrix
 	double matrix12;
 	double matrix13;
 	double matrix21;
