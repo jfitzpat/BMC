@@ -23,16 +23,16 @@
 MainComponent::MainComponent()
 {
     // Shared frame data
-    currentFrame.reset (new Frame());
-    toolBar.reset (new EditToolBar (currentFrame.get()));
+    frameEditor.reset (new FrameEditor());
+    toolBar.reset (new EditToolBar (frameEditor.get()));
     addAndMakeVisible (toolBar.get());
-    laserControls.reset (new LaserControls (currentFrame.get()));
+    laserControls.reset (new LaserControls (frameEditor.get()));
     addAndMakeVisible (laserControls.get());
-    editProperties.reset (new EditProperties (currentFrame.get()));
+    editProperties.reset (new EditProperties (frameEditor.get()));
     addAndMakeVisible (editProperties.get());
-    mainEditor.reset (new MainEditor (currentFrame.get()));
+    mainEditor.reset (new MainEditor (frameEditor.get()));
     addAndMakeVisible (mainEditor.get());
-    frameList.reset (new FrameList (currentFrame.get()));
+    frameList.reset (new FrameList (frameEditor.get()));
     addAndMakeVisible (frameList.get());
     
     setApplicationCommandManagerToWatch (&commandManager);
@@ -43,7 +43,11 @@ MainComponent::MainComponent()
 
     setWantsKeyboardFocus(true);
 
-    setSize (1200, 800);
+    Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
+    if (r.getWidth() >= 1200 && r.getHeight() >= 800)
+        setSize (1200, 800);
+    else
+        setSize(r.getWidth(), r.getHeight());
 }
 
 MainComponent::~MainComponent()
@@ -53,7 +57,7 @@ MainComponent::~MainComponent()
     laserControls = nullptr;
     editProperties = nullptr;
     mainEditor = nullptr;
-    currentFrame = nullptr;
+    frameEditor = nullptr;
 }
 
 //==============================================================================

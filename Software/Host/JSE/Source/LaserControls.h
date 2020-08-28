@@ -20,14 +20,14 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Frame.h"
+#include "FrameEditor.h"
 
 //==============================================================================
 class LaserControls  : public Component,
                        public ActionListener
 {
 public:
-    LaserControls (Frame* frame);
+    LaserControls (FrameEditor* frame);
     ~LaserControls() override;
 
     //==============================================================================
@@ -38,7 +38,7 @@ public:
     void actionListenerCallback (const String& message) override;
 
 private:
-    Frame* currentFrame;
+    FrameEditor* frameEditor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LaserControls)
 };

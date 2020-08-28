@@ -20,7 +20,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Frame.h"
+#include "FrameEditor.h"
 
 //==============================================================================
 /*
@@ -28,14 +28,14 @@
 class FrameList  : public juce::Component
 {
 public:
-    FrameList (Frame* frame);
+    FrameList (FrameEditor* frame);
     ~FrameList() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
 
 private:
-    Frame* currentFrame;
+    FrameEditor* frameEditor;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameList)
 };

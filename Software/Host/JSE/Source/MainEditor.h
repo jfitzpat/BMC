@@ -20,7 +20,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Frame.h"
+#include "FrameEditor.h"
 
 //==============================================================================
 /*
@@ -29,7 +29,7 @@ class MainEditor  : public Component,
                     public ActionListener
 {
 public:
-    MainEditor (Frame* frame);
+    MainEditor (FrameEditor* frame);
     ~MainEditor() override;
 
     //==============================================================================
@@ -40,7 +40,7 @@ public:
     void actionListenerCallback (const String& message) override;
 
 private:
-    Frame* currentFrame;
+    FrameEditor* frameEditor;
     Rectangle<int> activeArea;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainEditor)

@@ -20,7 +20,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Frame.h"
+#include "FrameEditor.h"
 #include "EditToolBar.h"
 #include "LaserControls.h"
 #include "EditProperties.h"
@@ -71,7 +71,7 @@ public:
     
 private:
     //==============================================================================
-    std::unique_ptr<Frame> currentFrame;
+    std::unique_ptr<FrameEditor> frameEditor;
     std::unique_ptr<EditToolBar> toolBar;
     std::unique_ptr<LaserControls> laserControls;
     std::unique_ptr<EditProperties> editProperties;

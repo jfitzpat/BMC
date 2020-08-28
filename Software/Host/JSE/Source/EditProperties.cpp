@@ -21,10 +21,10 @@
 #include "EditProperties.h"
 
 //==============================================================================
-EditProperties::EditProperties (Frame* frame)
+EditProperties::EditProperties (FrameEditor* frame)
 {
-    currentFrame = frame;
-    currentFrame->addActionListener (this);
+    frameEditor = frame;
+    frameEditor->addActionListener (this);
 }
 
 EditProperties::~EditProperties()

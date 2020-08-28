@@ -21,10 +21,10 @@
 #include "EditToolBar.h"
 
 //==============================================================================
-EditToolBar::EditToolBar (Frame* frame)
+EditToolBar::EditToolBar (FrameEditor* frame)
 {
-    currentFrame = frame;
-    currentFrame->addActionListener (this);
+    frameEditor = frame;
+    frameEditor->addActionListener (this);
 }
 
 EditToolBar::~EditToolBar()

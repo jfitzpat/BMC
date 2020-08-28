@@ -22,10 +22,10 @@
 #include "MainEditor.h"
 
 //==============================================================================
-MainEditor::MainEditor (Frame* frame)
+MainEditor::MainEditor (FrameEditor* frame)
 {
-    currentFrame = frame;
-    currentFrame->addActionListener (this);
+    frameEditor = frame;
+    frameEditor->addActionListener (this);
 }
 
 MainEditor::~MainEditor()

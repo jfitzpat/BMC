@@ -11,8 +11,8 @@
               file="Source/EditProperties.h"/>
         <FILE id="qppk3R" name="EditToolBar.cpp" compile="1" resource="0" file="Source/EditToolBar.cpp"/>
         <FILE id="kq54fx" name="EditToolBar.h" compile="0" resource="0" file="Source/EditToolBar.h"/>
-        <FILE id="o7xuOw" name="Frame.cpp" compile="1" resource="0" file="Source/Frame.cpp"/>
-        <FILE id="KWhH67" name="Frame.h" compile="0" resource="0" file="Source/Frame.h"/>
+        <FILE id="o7xuOw" name="FrameEditor.cpp" compile="1" resource="0" file="Source/FrameEditor.cpp"/>
+        <FILE id="KWhH67" name="FrameEditor.h" compile="0" resource="0" file="Source/FrameEditor.h"/>
         <FILE id="vtloTM" name="FrameList.cpp" compile="1" resource="0" file="Source/FrameList.cpp"/>
         <FILE id="JFWu8F" name="FrameList.h" compile="0" resource="0" file="Source/FrameList.h"/>
         <FILE id="pfwhIW" name="LaserControls.cpp" compile="1" resource="0"

@@ -1,7 +1,7 @@
 /*
-    Frame.h
-    Frame Object that is shared between editor controls
- 
+    FrameEditor.cpp
+    Frame Editor Object that is shared between editor GUI components
+
     Copyright 2020 Scrootch.me!
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,19 +17,18 @@
     limitations under the License.
 */
 
-#pragma once
-
 #include <JuceHeader.h>
+#include "FrameEditor.h"
 
 //==============================================================================
-/*
-*/
-class Frame  : public ActionBroadcaster
+FrameEditor::FrameEditor()
 {
-public:
-    Frame();
-    ~Frame() override;
+    // In your constructor, you should add any child components, and
+    // initialise any special settings that your component needs.
 
-private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Frame)
-};
+}
+
+FrameEditor::~FrameEditor()
+{
+}
+

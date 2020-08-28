@@ -21,10 +21,10 @@
 #include "LaserControls.h"
 
 //==============================================================================
-LaserControls::LaserControls (Frame* frame)
+LaserControls::LaserControls (FrameEditor* frame)
 {
-    currentFrame = frame;
-    currentFrame->addActionListener (this);
+    frameEditor = frame;
+    frameEditor->addActionListener (this);
 }
 
 LaserControls::~LaserControls()

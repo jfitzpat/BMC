@@ -21,9 +21,9 @@
 #include "FrameList.h"
 
 //==============================================================================
-FrameList::FrameList (Frame* frame)
+FrameList::FrameList (FrameEditor* frame)
 {
-    currentFrame = frame;
+    frameEditor = frame;
 }
 
 FrameList::~FrameList()
