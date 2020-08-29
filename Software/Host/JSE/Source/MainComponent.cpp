@@ -22,8 +22,10 @@
 //==============================================================================
 MainComponent::MainComponent()
 {
-    // Shared frame data
+    // Shared frame editor worker class
     frameEditor.reset (new FrameEditor());
+    
+    // GUI components
     toolBar.reset (new EditToolBar (frameEditor.get()));
     addAndMakeVisible (toolBar.get());
     laserControls.reset (new LaserControls (frameEditor.get()));

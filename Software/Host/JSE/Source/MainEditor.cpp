@@ -34,8 +34,22 @@ MainEditor::~MainEditor()
 
 void MainEditor::paint (juce::Graphics& g)
 {
-    g.fillAll (Colours::black);  // Background "grey" (damn English!)
-    
+    // Black background
+    g.fillAll (Colours::black);
+        
+    // Outline working area
+    g.setColour (juce::Colours::grey);
+    g.drawRect (activeArea, 1);
+
+    // Class name
+    g.setColour (juce::Colours::white);
+    g.setFont (14.0f);
+    g.drawText ("MainEditor", getLocalBounds(),
+                juce::Justification::centred, true);
+}
+
+void MainEditor::resized()
+{
     // Figure out our working area
     auto w = getWidth();
     auto h = getHeight();
@@ -44,21 +58,6 @@ void MainEditor::paint (juce::Graphics& g)
         activeArea.setBounds ((w - h) >> 1, 0, h, h);
     else
         activeArea.setBounds (0, (h - w) >> 1, w, w);
-    
-    g.setColour (juce::Colours::grey);
-    g.drawRect (activeArea, 1);
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("MainEditor", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
-}
-
-void MainEditor::resized()
-{
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-
 }
 
 void MainEditor::actionListenerCallback (const String& message)
