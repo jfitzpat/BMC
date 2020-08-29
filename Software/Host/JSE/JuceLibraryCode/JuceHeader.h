@@ -39,7 +39,7 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "JSE";
-    const char* const  companyName    = "";
+    const char* const  companyName    = "Scrootch.Me!";
     const char* const  versionString  = "1.0.0";
     const int          versionNumber  = 0x10000;
 }
