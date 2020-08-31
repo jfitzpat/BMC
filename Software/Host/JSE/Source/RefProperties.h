@@ -1,7 +1,7 @@
 /*
-    FrameEditor.cpp
-    Frame Editor Object that is shared between editor GUI components
-
+    RefProperties.h
+    Properties Pane for Reference layer
+ 
     Copyright 2020 Scrootch.me!
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,28 +17,28 @@
     limitations under the License.
 */
 
+#pragma once
+
 #include <JuceHeader.h>
 #include "FrameEditor.h"
 
 //==============================================================================
-FrameEditor::FrameEditor()
-    : activeLayer (sketch)
+/*
+*/
+class RefProperties  : public Component,
+                       public ActionListener
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
+public:
+    RefProperties (FrameEditor* editor);
+    ~RefProperties() override;
 
-}
+    void paint (juce::Graphics&) override;
+    void resized() override;
 
-FrameEditor::~FrameEditor()
-{
-}
+    void actionListenerCallback (const String& message) override;
 
-void FrameEditor::setActiveLayer (Layer layer)
-{
-    if (layer != activeLayer)
-    {
-        activeLayer = layer;
-        sendActionMessage(EditorActions::layerChanged);
-    }
-}
-
+private:
+    FrameEditor* frameEditor;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RefProperties)
+};

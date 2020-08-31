@@ -1,7 +1,7 @@
 /*
-    LaserControls.cpp
-    Laser Controls Component
-
+    RefProperties.cpp
+    Properties Pane for Reference layer
+ 
     Copyright 2020 Scrootch.me!
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,21 +17,22 @@
     limitations under the License.
 */
 
+
 #include <JuceHeader.h>
-#include "LaserControls.h"
+#include "RefProperties.h"
 
 //==============================================================================
-LaserControls::LaserControls (FrameEditor* frame)
+RefProperties::RefProperties (FrameEditor* editor)
 {
-    frameEditor = frame;
+    frameEditor = editor;
     frameEditor->addActionListener (this);
 }
 
-LaserControls::~LaserControls()
+RefProperties::~RefProperties()
 {
 }
 
-void LaserControls::paint (juce::Graphics& g)
+void RefProperties::paint (juce::Graphics& g)
 {
     /* This demo code just fills the component's background and
        draws some placeholder text to get you started.
@@ -42,24 +43,20 @@ void LaserControls::paint (juce::Graphics& g)
 
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
-    g.setColour (juce::Colours::grey);
-    g.drawLine(0, 0, 0, getHeight(), 1);
-
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawText ("LaserControls", getLocalBounds(),
+    g.drawText ("RefProperties", getLocalBounds(),
                 juce::Justification::centred, true);   // draw some placeholder text
 }
 
-void LaserControls::resized()
+void RefProperties::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
 }
 
-void LaserControls::actionListenerCallback (const String& message)
+void RefProperties::actionListenerCallback (const String& message)
 {
     
 }
-

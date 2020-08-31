@@ -6,6 +6,19 @@
   <MAINGROUP id="dkE1Q5" name="JSE">
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">
+        <GROUP id="{1E02FE6E-4294-6982-39BF-7F9B70C87DB0}" name="Property Pages">
+          <FILE id="Ink4QW" name="IldaProperties.cpp" compile="1" resource="0"
+                file="Source/IldaProperties.cpp"/>
+          <FILE id="VrDP24" name="IldaProperties.h" compile="0" resource="0"
+                file="Source/IldaProperties.h"/>
+          <FILE id="mBwSRq" name="RefProperties.cpp" compile="1" resource="0"
+                file="Source/RefProperties.cpp"/>
+          <FILE id="nTpqJ1" name="RefProperties.h" compile="0" resource="0" file="Source/RefProperties.h"/>
+          <FILE id="zXlTkv" name="SketchProperties.cpp" compile="1" resource="0"
+                file="Source/SketchProperties.cpp"/>
+          <FILE id="GgNRij" name="SketchProperties.h" compile="0" resource="0"
+                file="Source/SketchProperties.h"/>
+        </GROUP>
         <FILE id="CpF1YK" name="EditProperties.cpp" compile="1" resource="0"
               file="Source/EditProperties.cpp"/>
         <FILE id="g32aaP" name="EditProperties.h" compile="0" resource="0"

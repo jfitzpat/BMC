@@ -1,7 +1,7 @@
 /*
-    LaserControls.cpp
-    Laser Controls Component
-
+    IldaProperties.cpp
+    Properties Pane for ILDA layer
+ 
     Copyright 2020 Scrootch.me!
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,20 +18,20 @@
 */
 
 #include <JuceHeader.h>
-#include "LaserControls.h"
+#include "IldaProperties.h"
 
 //==============================================================================
-LaserControls::LaserControls (FrameEditor* frame)
+IldaProperties::IldaProperties (FrameEditor* editor)
 {
-    frameEditor = frame;
+    frameEditor = editor;
     frameEditor->addActionListener (this);
 }
 
-LaserControls::~LaserControls()
+IldaProperties::~IldaProperties()
 {
 }
 
-void LaserControls::paint (juce::Graphics& g)
+void IldaProperties::paint (juce::Graphics& g)
 {
     /* This demo code just fills the component's background and
        draws some placeholder text to get you started.
@@ -42,24 +42,20 @@ void LaserControls::paint (juce::Graphics& g)
 
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
-    g.setColour (juce::Colours::grey);
-    g.drawLine(0, 0, 0, getHeight(), 1);
-
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawText ("LaserControls", getLocalBounds(),
+    g.drawText ("IldaProperties", getLocalBounds(),
                 juce::Justification::centred, true);   // draw some placeholder text
 }
 
-void LaserControls::resized()
+void IldaProperties::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
 }
 
-void LaserControls::actionListenerCallback (const String& message)
+void IldaProperties::actionListenerCallback (const String& message)
 {
     
 }
-

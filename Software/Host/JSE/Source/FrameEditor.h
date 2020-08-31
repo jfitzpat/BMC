@@ -28,6 +28,22 @@ public:
     FrameEditor();
     ~FrameEditor() override;
 
+    typedef enum {
+        sketch = 0,
+        ilda,
+        reference
+    } Layer;
+    
+    void setActiveLayer (Layer layer);
+    Layer getActiveLayer() { return activeLayer; }
+    
 private:
+    Layer activeLayer;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
+
+namespace EditorActions
+{
+    const String layerChanged ("LC");
+}

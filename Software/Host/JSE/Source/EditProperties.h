@@ -23,8 +23,27 @@
 #include "FrameEditor.h"
 
 //==============================================================================
-/*
-*/
+class PropTabbedComponent : public TabbedComponent
+{
+public:
+    PropTabbedComponent (FrameEditor* editor)
+    : TabbedComponent (TabbedButtonBar::TabsAtTop)
+    {
+        frameEditor = editor;
+    }
+    
+    virtual ~PropTabbedComponent() {;}
+    
+    void currentTabChanged (int newTabIndex, const String & newTabName) override
+    {
+        frameEditor->setActiveLayer ((FrameEditor::Layer) newTabIndex);
+    }
+    
+private:
+    FrameEditor* frameEditor;
+};
+
+//==============================================================================
 class EditProperties  : public Component,
                         public ActionListener
 {
@@ -41,6 +60,7 @@ public:
 
 private:
     FrameEditor* frameEditor;
-    
+    std::unique_ptr<PropTabbedComponent> layerTabs;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditProperties)
 };

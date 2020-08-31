@@ -18,6 +18,9 @@
 */
 
 #include <JuceHeader.h>
+#include "SketchProperties.h"
+#include "IldaProperties.h"
+#include "RefProperties.h"
 #include "EditProperties.h"
 
 //==============================================================================
@@ -25,6 +28,24 @@ EditProperties::EditProperties (FrameEditor* frame)
 {
     frameEditor = frame;
     frameEditor->addActionListener (this);
+    
+    layerTabs.reset (new PropTabbedComponent (frame));
+    layerTabs->setOutline (0);
+    addAndMakeVisible (layerTabs.get());
+    
+    auto tabColor = getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId);
+    
+    layerTabs->addTab("Sketch",
+                      tabColor,
+                      new SketchProperties (frame), true);
+    layerTabs->addTab("ILDA",
+                      tabColor,
+                      new IldaProperties (frame), true);
+    layerTabs->addTab("Background",
+                      tabColor,
+                      new RefProperties (frame), true);
+    
+    frameEditor->setActiveLayer (FrameEditor::sketch);
 }
 
 EditProperties::~EditProperties()
@@ -33,32 +54,23 @@ EditProperties::~EditProperties()
 
 void EditProperties::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-
+    // clear the background
+    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    
     g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("EditProperties", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    g.drawLine(0, 0, 0, getHeight(), 1);
 }
 
 void EditProperties::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-
+    layerTabs->setBounds (1, 0, getWidth()-1, getHeight());
 }
 
 void EditProperties::actionListenerCallback (const String& message)
 {
-    
+    if (message == EditorActions::layerChanged)
+    {
+        if (frameEditor->getActiveLayer() != layerTabs->getCurrentTabIndex())
+            layerTabs->setCurrentTabIndex (frameEditor->getActiveLayer());
+    }
 }
