@@ -26,6 +26,9 @@ MainEditor::MainEditor (FrameEditor* frame)
 {
     frameEditor = frame;
     frameEditor->addActionListener (this);
+    
+    workingArea.reset (new WorkingArea(frame));
+    addAndMakeVisible (workingArea.get());
 }
 
 MainEditor::~MainEditor()
@@ -58,9 +61,51 @@ void MainEditor::resized()
         activeArea.setBounds ((w - h) >> 1, 0, h, h);
     else
         activeArea.setBounds (0, (h - w) >> 1, w, w);
+    
+    // Scale our working area to fit on screen, but still
+    // draw in full ILDA space
+    activeScale = (float)activeArea.getHeight() / 65535.0f;
+    activeInvScale = 1.0 / activeScale;
+    workingArea->setTransform (AffineTransform::scale (activeScale));
+    
+    workingArea->setBounds (activeArea.getX() * activeInvScale,
+                            activeArea.getY() * activeInvScale,
+                            65535, 65535);
 }
 
 void MainEditor::actionListenerCallback (const String& message)
+{
+    
+}
+
+//==============================================================================
+MainEditor::WorkingArea::WorkingArea (FrameEditor* frame)
+{
+    frameEditor = frame;
+    frameEditor->addActionListener (this);
+}
+
+MainEditor::WorkingArea::~WorkingArea()
+{
+}
+
+void MainEditor::WorkingArea::mouseDown(const MouseEvent& event)
+{
+    Logger::outputDebugString ("Mouse: " + String(event.getMouseDownX() - 32768) +
+                               ", " + String(32768 - event.getMouseDownY()));
+}
+
+void MainEditor::WorkingArea::paint (juce::Graphics& g)
+{
+    // Black background
+    g.fillAll (Colours::transparentBlack);
+}
+
+void MainEditor::WorkingArea::resized()
+{
+}
+
+void MainEditor::WorkingArea::actionListenerCallback (const String& message)
 {
     
 }

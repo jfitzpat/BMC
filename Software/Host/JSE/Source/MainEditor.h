@@ -22,9 +22,8 @@
 #include <JuceHeader.h>
 #include "FrameEditor.h"
 
+
 //==============================================================================
-/*
-*/
 class MainEditor  : public Component,
                     public ActionListener
 {
@@ -39,9 +38,36 @@ public:
     //==============================================================================
     void actionListenerCallback (const String& message) override;
 
+    //==============================================================================
+    class WorkingArea : public Component,
+                        public ActionListener
+    {
+    public:
+        WorkingArea (FrameEditor* frame);
+        ~WorkingArea() override;
+
+        //==============================================================================
+        void mouseDown (const MouseEvent& event) override;
+        
+        void paint (juce::Graphics&) override;
+        void resized() override;
+
+        //==============================================================================
+        void actionListenerCallback (const String& message) override;
+
+    private:
+        FrameEditor* frameEditor;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WorkingArea)
+    };
+
 private:
     FrameEditor* frameEditor;
+    std::unique_ptr<WorkingArea> workingArea;
+    
     Rectangle<int> activeArea;
+    float activeScale;
+    float activeInvScale;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainEditor)
 };
