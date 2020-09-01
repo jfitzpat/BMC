@@ -24,6 +24,7 @@ MainComponent::MainComponent()
 {
     // Shared frame editor worker class
     frameEditor.reset (new FrameEditor());
+    frameEditor->addActionListener (this);
     
     // GUI components
     toolBar.reset (new EditToolBar (frameEditor.get()));
@@ -107,6 +108,11 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     return menu;
 }
 
+void MainComponent::actionListenerCallback (const String& message)
+{
+    commandManager.commandStatusChanged();
+}
+
 //==============================================================================
 ApplicationCommandTarget* MainComponent::getNextCommandTarget()
 {
@@ -142,14 +148,32 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setActive(false);
             break;
         case CommandIDs::editUndo:
-            result.setInfo ("Undo", "Undo the last operation", "Menu", 0);
             result.addDefaultKeypress('z', ModifierKeys::commandModifier);
-            result.setActive(false);
+            if (frameEditor->canUndo())
+            {
+                result.setInfo ("Undo " + frameEditor->getUndoDescription(),
+                                "Undo the last operation", "Menu", 0);
+                result.setActive(true);
+            }
+            else
+            {
+                result.setInfo ("Undo", "Undo the last operation", "Menu", 0);
+                result.setActive(false);
+            }
             break;
         case CommandIDs::editRedo:
-            result.setInfo ("Redo", "Redo the last undo", "Menu", 0);
             result.addDefaultKeypress('z', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setActive(false);
+            if (frameEditor->canRedo())
+            {
+                result.setInfo ("Redo " + frameEditor->getRedoDescription(),
+                                "Redo the last undo", "Menu", 0);
+                result.setActive(true);
+            }
+            else
+            {
+                result.setInfo ("Redo", "Redo the last undo", "Menu", 0);
+                result.setActive(false);
+            }
             break;
         case CommandIDs::helpWebSite:
             result.setInfo ("BMC Website", "Open the BMC Website", "Menu", 0);
@@ -161,6 +185,14 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
 
 bool MainComponent::perform (const InvocationInfo& info)
 {
-    Logger::outputDebugString("perform: " + String(info.commandID));
+    switch (info.commandID)
+    {
+        case CommandIDs::editUndo:
+            frameEditor->undo();
+            break;
+        case CommandIDs::editRedo:
+            frameEditor->redo();
+            break;
+    }
     return true;
 }

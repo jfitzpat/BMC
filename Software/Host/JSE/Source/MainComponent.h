@@ -34,7 +34,8 @@
 */
 class MainComponent  : public Component,
                        public MenuBarModel,
-                       public ApplicationCommandTarget
+                       public ApplicationCommandTarget,
+                       public ActionListener
 {
 public:
     // Commands we respond to
@@ -60,7 +61,10 @@ public:
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int menuIndex, const String& /*menuName*/) override;
     void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override {}
-    
+ 
+    //==============================================================================
+    void actionListenerCallback (const String& message) override;
+
     //==============================================================================
     ApplicationCommandTarget* getNextCommandTarget() override;
     void getAllCommands (Array<CommandID>& c) override;

@@ -20,6 +20,8 @@
 #include <JuceHeader.h>
 #include "FrameEditor.h"
 
+#include "FrameUndo.h"      // UndoableTask classes
+
 //==============================================================================
 FrameEditor::FrameEditor()
     : activeLayer (sketch),
@@ -42,8 +44,8 @@ void FrameEditor::setActiveLayer (Layer layer)
 {
     if (layer != activeLayer)
     {
-        activeLayer = layer;
-        sendActionMessage(EditorActions::layerChanged);
+        beginNewTransaction ("Layer Change");
+        perform(new UndoableSetLayer (this, layer));
     }
 }
 
@@ -70,8 +72,8 @@ void FrameEditor::setRefVisible (bool visible)
 {
     if (visible != refVisible)
     {
-        refVisible = visible;
-        sendActionMessage (EditorActions::refVisibilityChanged);
+        beginNewTransaction ("Background Visible Change");
+        perform(new UndoableSetRefVisibility (this, visible));
     }
 }
 
@@ -230,5 +232,24 @@ void FrameEditor::setImageYoffset (float off)
     {
         currentFrame->setImageYoffset (off);
         sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
+
+//==============================================================================
+void FrameEditor::_setActiveLayer (Layer layer)
+{
+    if (layer != activeLayer)
+    {
+        activeLayer = layer;
+        sendActionMessage(EditorActions::layerChanged);
+    }
+}
+
+void FrameEditor::_setRefVisible (bool visible)
+{
+    if (visible != refVisible)
+    {
+        refVisible = visible;
+        sendActionMessage (EditorActions::refVisibilityChanged);
     }
 }

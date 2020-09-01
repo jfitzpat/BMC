@@ -23,7 +23,8 @@
 #include "Frame.h"
 
 //==============================================================================
-class FrameEditor  : public ActionBroadcaster
+class FrameEditor  : public ActionBroadcaster,
+                     public UndoManager
 {
 public:
     FrameEditor();
@@ -34,31 +35,37 @@ public:
         ilda,
         reference
     } Layer;
-    
-    void setActiveLayer (Layer layer);
+
+    // Polling
     Layer getActiveLayer() { return activeLayer; }
-    
-    void setSketchVisible (bool visible);
-    void setIldaVisible (bool visible);
-    void setRefVisible (bool visible);
     bool getSketchVisible() { return sketchVisible; }
     bool getIldaVisible() { return ildaVisible; }
     bool getRefVisible() { return refVisible; }
-    
     File getImageFile();
-    void selectImage();
     const Image* getImage();
-    
     float getRefOpacity() { return refOpacity; }
-    void setRefOpacity (float opacity);
     float getImageScale();
-    void setImageScale (float scale);
     float getImageRotation();
-    void setImageRotation (float rot);
     float getImageXoffset();
-    void setImageXoffset (float off);
     float getImageYoffset();
+
+    // Undoable Commands
+    void setActiveLayer (Layer layer);
+    void setSketchVisible (bool visible);
+    void setIldaVisible (bool visible);
+    void setRefVisible (bool visible);
+    
+    void selectImage();
+    
+    void setRefOpacity (float opacity);
+    void setImageScale (float scale);
+    void setImageRotation (float rot);
+    void setImageXoffset (float off);
     void setImageYoffset (float off);
+
+    // Destructive Version
+    void _setActiveLayer (Layer layer);
+    void _setRefVisible (bool visible);
 
 private:
     Layer activeLayer;

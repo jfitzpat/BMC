@@ -31,6 +31,7 @@
         <FILE id="KWhH67" name="FrameEditor.h" compile="0" resource="0" file="Source/FrameEditor.h"/>
         <FILE id="vtloTM" name="FrameList.cpp" compile="1" resource="0" file="Source/FrameList.cpp"/>
         <FILE id="JFWu8F" name="FrameList.h" compile="0" resource="0" file="Source/FrameList.h"/>
+        <FILE id="URe2fI" name="FrameUndo.h" compile="0" resource="0" file="Source/FrameUndo.h"/>
         <FILE id="pfwhIW" name="LaserControls.cpp" compile="1" resource="0"
               file="Source/LaserControls.cpp"/>
         <FILE id="rtHiO9" name="LaserControls.h" compile="0" resource="0" file="Source/LaserControls.h"/>
