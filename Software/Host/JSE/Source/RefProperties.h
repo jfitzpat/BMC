@@ -26,6 +26,8 @@
 /*
 */
 class RefProperties  : public Component,
+                       public Button::Listener,
+                       public Slider::Listener,
                        public ActionListener
 {
 public:
@@ -35,10 +37,18 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
+
     void actionListenerCallback (const String& message) override;
 
 private:
     FrameEditor* frameEditor;
+    std::unique_ptr<ToggleButton> layerVisible;
+    std::unique_ptr<Label> imageFileLabel;
+    std::unique_ptr<TextButton> selectImageButton;
+    std::unique_ptr<Slider> backgroundAlpha;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RefProperties)
 };

@@ -22,17 +22,22 @@
 
 //==============================================================================
 FrameEditor::FrameEditor()
-    : activeLayer (sketch)
+    : activeLayer (sketch),
+      sketchVisible (true),
+      ildaVisible (true),
+      refVisible (true),
+      refOpacity(1.0)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
+    currentFrame.reset (new Frame());
 }
 
 FrameEditor::~FrameEditor()
 {
+    currentFrame = nullptr;
 }
 
+
+//==============================================================================
 void FrameEditor::setActiveLayer (Layer layer)
 {
     if (layer != activeLayer)
@@ -42,3 +47,88 @@ void FrameEditor::setActiveLayer (Layer layer)
     }
 }
 
+//==============================================================================
+void FrameEditor::setSketchVisible (bool visible)
+{
+    if (visible != sketchVisible)
+    {
+        sketchVisible = visible;
+        sendActionMessage (EditorActions::sketchVisibilityChanged);
+    }
+}
+
+void FrameEditor::setIldaVisible (bool visible)
+{
+    if (visible != ildaVisible)
+    {
+        ildaVisible = visible;
+        sendActionMessage (EditorActions::ildaVisibilityChanged);
+    }
+}
+
+void FrameEditor::setRefVisible (bool visible)
+{
+    if (visible != refVisible)
+    {
+        refVisible = visible;
+        sendActionMessage (EditorActions::refVisibilityChanged);
+    }
+}
+
+File FrameEditor::getImageFile()
+{
+    if (currentFrame == nullptr)
+        return File();
+    
+    return currentFrame->getImageFile();
+}
+
+void FrameEditor::selectImage()
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    FileChooser myChooser ("Choose Image to Load...",
+                           File::getSpecialLocation (File::userDocumentsDirectory),
+                           "*.png,*.jpg,*.jpeg,*.gif");
+ 
+    if (myChooser.browseForFileToOpen())
+    {
+        File f = myChooser.getResult();
+        
+        Image i = ImageFileFormat::loadFrom (f);
+        if (i.isNull())
+        {
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
+                                        "An error occurred loading the selected image file.", "ok");
+        }
+        else
+        {
+            currentFrame->setImageFile (f);
+            currentFrame->setOwnedBackgroundImage (new Image(i));
+            sendActionMessage (EditorActions::backgroundImageChanged);
+        }
+    }
+}
+
+const Image* FrameEditor::getImage()
+{
+    if (currentFrame == nullptr)
+        return nullptr;
+    else
+        return currentFrame->getBackgroundImage();
+}
+
+void FrameEditor::setRefOpacity (float opacity)
+{
+    if (opacity < 0)
+        opacity = 0;
+    else if (opacity > 1.0)
+        opacity = 1.0;
+    
+    if (opacity != refOpacity)
+    {
+        refOpacity = opacity;
+        sendActionMessage (EditorActions::refOpacityChanged);
+    }
+}

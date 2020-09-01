@@ -43,12 +43,6 @@ void MainEditor::paint (juce::Graphics& g)
     // Outline working area
     g.setColour (juce::Colours::grey);
     g.drawRect (activeArea, 1);
-
-    // Class name
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("MainEditor", getLocalBounds(),
-                juce::Justification::centred, true);
 }
 
 void MainEditor::resized()
@@ -99,6 +93,15 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
 {
     // Black background
     g.fillAll (Colours::transparentBlack);
+    
+    if (frameEditor->getRefVisible())
+    {
+        g.setOpacity (frameEditor->getRefOpacity());
+        const Image* i = frameEditor->getImage();
+        if (i != nullptr)
+            g.drawImage (*i, {0, 0, (float)getWidth(), (float)getHeight()},
+                     0);
+    }
 }
 
 void MainEditor::WorkingArea::resized()
@@ -107,5 +110,14 @@ void MainEditor::WorkingArea::resized()
 
 void MainEditor::WorkingArea::actionListenerCallback (const String& message)
 {
-    
+    if (message == EditorActions::backgroundImageChanged)
+        repaint();
+    else if (message == EditorActions::sketchVisibilityChanged)
+        repaint();
+    else if (message == EditorActions::ildaVisibilityChanged)
+        repaint();
+    else if (message == EditorActions::refVisibilityChanged)
+        repaint();
+    else if (message == EditorActions::refOpacityChanged)
+        repaint();
 }

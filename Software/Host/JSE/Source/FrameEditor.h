@@ -20,6 +20,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Frame.h"
 
 //==============================================================================
 class FrameEditor  : public ActionBroadcaster
@@ -37,8 +38,28 @@ public:
     void setActiveLayer (Layer layer);
     Layer getActiveLayer() { return activeLayer; }
     
+    void setSketchVisible (bool visible);
+    void setIldaVisible (bool visible);
+    void setRefVisible (bool visible);
+    bool getSketchVisible() { return sketchVisible; }
+    bool getIldaVisible() { return ildaVisible; }
+    bool getRefVisible() { return refVisible; }
+    
+    File getImageFile();
+    void selectImage();
+    const Image* getImage();
+    
+    float getRefOpacity() { return refOpacity; }
+    void setRefOpacity (float opacity);
+
 private:
     Layer activeLayer;
+    bool sketchVisible;
+    bool ildaVisible;
+    bool refVisible;
+    float refOpacity;
+    
+    std::unique_ptr<Frame> currentFrame;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
@@ -46,4 +67,9 @@ private:
 namespace EditorActions
 {
     const String layerChanged ("LC");
+    const String sketchVisibilityChanged ("SVC");
+    const String ildaVisibilityChanged ("IVC");
+    const String refVisibilityChanged ("RVC");
+    const String backgroundImageChanged ("BIC");
+    const String refOpacityChanged("ROC");
 }

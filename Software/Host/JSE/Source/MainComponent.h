@@ -71,6 +71,8 @@ public:
     
 private:
     //==============================================================================
+    TooltipWindow toolTipWindow;
+    
     std::unique_ptr<FrameEditor> frameEditor;
     std::unique_ptr<EditToolBar> toolBar;
     std::unique_ptr<LaserControls> laserControls;

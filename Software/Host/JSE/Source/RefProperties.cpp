@@ -26,37 +26,100 @@ RefProperties::RefProperties (FrameEditor* editor)
 {
     frameEditor = editor;
     frameEditor->addActionListener (this);
+
+    layerVisible.reset (new juce::ToggleButton ("layerVisible"));
+    addAndMakeVisible (layerVisible.get());
+    layerVisible->setTooltip ("Make this layer visible or invisible.");
+    layerVisible->setButtonText ("Visible");
+    layerVisible->addListener (this);
+
+    imageFileLabel.reset (new juce::Label ("imageFileLabel",
+                                           "<None>"));
+    addAndMakeVisible (imageFileLabel.get());
+    imageFileLabel->setTooltip (TRANS("Filename of background image."));
+    imageFileLabel->setFont (juce::Font (10.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    imageFileLabel->setJustificationType (juce::Justification::centredLeft);
+    imageFileLabel->setEditable (false, false, false);
+    imageFileLabel->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    imageFileLabel->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    selectImageButton.reset (new juce::TextButton ("selectImageButton"));
+    addAndMakeVisible (selectImageButton.get());
+    selectImageButton->setTooltip ("Select the background image file to display.");
+    selectImageButton->setButtonText ("Select Image");
+    selectImageButton->addListener (this);
+
+    backgroundAlpha.reset (new juce::Slider ("backgroundAlpha"));
+    addAndMakeVisible (backgroundAlpha.get());
+    backgroundAlpha->setTooltip (TRANS("Adjusts the opacity of the background image."));
+    backgroundAlpha->setRange (0, 100, 1);
+    backgroundAlpha->setSliderStyle (juce::Slider::LinearHorizontal);
+    backgroundAlpha->setTextBoxStyle (juce::Slider::TextBoxBelow, true, 90, 20);
+    backgroundAlpha->setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0x008e989b));
+    backgroundAlpha->setTextValueSuffix ("% Opacity");
+    backgroundAlpha->addListener (this);
+
+    layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
+    
+    String s = frameEditor->getImageFile().getFileName();
+    if (s.length())
+        imageFileLabel->setText(s, dontSendNotification);
+    else
+        imageFileLabel->setText("<none>", dontSendNotification);
+    
+    backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100.0, dontSendNotification);
 }
 
 RefProperties::~RefProperties()
 {
+    layerVisible = nullptr;
+    imageFileLabel = nullptr;
+    selectImageButton = nullptr;
+    backgroundAlpha = nullptr;
 }
 
+//==============================================================================
 void RefProperties::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("RefProperties", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    // clear the background
+    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
 void RefProperties::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-
+    layerVisible->setBounds (16, 16, 150, 24);
+    imageFileLabel->setBounds (10, 48, 182, 24);
+    selectImageButton->setBounds (16, 72, 166, 24);
+    backgroundAlpha->setBounds (16, 112, 166, 40);
 }
 
+//==============================================================================
+void RefProperties::buttonClicked (juce::Button* buttonThatWasClicked)
+{
+    if (buttonThatWasClicked == layerVisible.get())
+    {
+        frameEditor->setRefVisible (layerVisible->getToggleState());
+    }
+    else if (buttonThatWasClicked == selectImageButton.get())
+    {
+        frameEditor->selectImage();
+    }
+}
+
+//==============================================================================
+void RefProperties::sliderValueChanged (juce::Slider* sliderThatWasMoved)
+{
+    if (sliderThatWasMoved == backgroundAlpha.get())
+        frameEditor->setRefOpacity (backgroundAlpha->getValue() / 100.0);
+}
+
+//==============================================================================
 void RefProperties::actionListenerCallback (const String& message)
 {
-    
+    if (message == EditorActions::refVisibilityChanged)
+        layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
+    else if (message == EditorActions::backgroundImageChanged)
+        imageFileLabel->setText (frameEditor->getImageFile().getFileName(), dontSendNotification);
+    else if (message == EditorActions::refOpacityChanged)
+        backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100, dontSendNotification);
 }
