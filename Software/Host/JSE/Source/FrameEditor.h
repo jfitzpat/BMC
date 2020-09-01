@@ -63,9 +63,18 @@ public:
     void setImageXoffset (float off);
     void setImageYoffset (float off);
 
-    // Destructive Version
+    // Destructive Version (invoked by UndoManager)
     void _setActiveLayer (Layer layer);
+    void _setSketchVisible (bool visible);
+    void _setIldaVisible (bool visible);
     void _setRefVisible (bool visible);
+    bool _setImage (File& file);
+    void _setRefOpacity (float opacity);
+    void _setImageScale (float scale);
+    void _setImageRotation (float rot);
+    void _setImageXoffset (float off);
+    void _setImageYoffset (float off);
+
 
 private:
     Layer activeLayer;

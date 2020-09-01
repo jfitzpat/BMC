@@ -46,6 +46,7 @@ EditProperties::EditProperties (FrameEditor* frame)
                       new RefProperties (frame), true);
     
     frameEditor->setActiveLayer (FrameEditor::sketch);
+    setWantsKeyboardFocus (true);
 }
 
 EditProperties::~EditProperties()

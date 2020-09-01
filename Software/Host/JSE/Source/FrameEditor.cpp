@@ -63,8 +63,8 @@ void FrameEditor::setIldaVisible (bool visible)
 {
     if (visible != ildaVisible)
     {
-        ildaVisible = visible;
-        sendActionMessage (EditorActions::ildaVisibilityChanged);
+        beginNewTransaction ("Ilda Visible Change");
+        perform(new UndoableSetIldaVisibility (this, visible));
     }
 }
 
@@ -106,9 +106,8 @@ void FrameEditor::selectImage()
         }
         else
         {
-            currentFrame->setImageFile (f);
-            currentFrame->setOwnedBackgroundImage (new Image(i));
-            sendActionMessage (EditorActions::backgroundImageChanged);
+            beginNewTransaction ("Background Image Change");
+            perform(new UndoableSetImage (this, f));
         }
     }
 }
@@ -130,8 +129,11 @@ void FrameEditor::setRefOpacity (float opacity)
     
     if (opacity != refOpacity)
     {
-        refOpacity = opacity;
-        sendActionMessage (EditorActions::refOpacityChanged);
+        if (getCurrentTransactionName() == "Background Opacity")
+            undoCurrentTransactionOnly();
+        
+        beginNewTransaction ("Background Opacity");
+        perform(new UndoableSetRefAlpha (this, opacity));
     }
 }
 
@@ -155,8 +157,11 @@ void FrameEditor::setImageScale (float scale)
     
     if (scale != currentFrame->getImageScale())
     {
-        currentFrame->setImageScale (scale);
-        sendActionMessage (EditorActions::backgroundImageAdjusted);
+        if (getCurrentTransactionName() == "Background Scale")
+            undoCurrentTransactionOnly();
+        
+        beginNewTransaction ("Background Scale");
+        perform(new UndoableSetImageScale (this, scale));
     }
 }
 
@@ -180,8 +185,11 @@ void FrameEditor::setImageRotation (float rot)
     
     if (rot != currentFrame->getImageRotation())
     {
-        currentFrame->setImageRotation (rot);
-        sendActionMessage (EditorActions::backgroundImageAdjusted);
+        if (getCurrentTransactionName() == "Background Rotation")
+            undoCurrentTransactionOnly();
+        
+        beginNewTransaction ("Background Rotation");
+        perform(new UndoableSetImageRotation (this, rot));
     }
 }
 
@@ -205,8 +213,11 @@ void FrameEditor::setImageXoffset (float off)
     
     if (off != currentFrame->getImageXoffset())
     {
-        currentFrame->setImageXoffset (off);
-        sendActionMessage (EditorActions::backgroundImageAdjusted);
+        if (getCurrentTransactionName() == "Background X-Offset")
+            undoCurrentTransactionOnly();
+        
+        beginNewTransaction ("Background X-Offset");
+        perform(new UndoableSetImageXoffset (this, off));
     }
 }
 
@@ -230,8 +241,11 @@ void FrameEditor::setImageYoffset (float off)
     
     if (off != currentFrame->getImageYoffset())
     {
-        currentFrame->setImageYoffset (off);
-        sendActionMessage (EditorActions::backgroundImageAdjusted);
+        if (getCurrentTransactionName() == "Background Y-Offset")
+            undoCurrentTransactionOnly();
+        
+        beginNewTransaction ("Background Y-Offset");
+        perform(new UndoableSetImageYoffset (this, off));
     }
 }
 
@@ -245,11 +259,130 @@ void FrameEditor::_setActiveLayer (Layer layer)
     }
 }
 
+void FrameEditor::_setSketchVisible (bool visible)
+{
+    if (visible != sketchVisible)
+    {
+        sketchVisible = visible;
+        sendActionMessage (EditorActions::sketchVisibilityChanged);
+    }
+}
+
+void FrameEditor::_setIldaVisible (bool visible)
+{
+    if (visible != ildaVisible)
+    {
+        ildaVisible = visible;
+        sendActionMessage (EditorActions::ildaVisibilityChanged);
+    }
+}
+
 void FrameEditor::_setRefVisible (bool visible)
 {
     if (visible != refVisible)
     {
         refVisible = visible;
         sendActionMessage (EditorActions::refVisibilityChanged);
+    }
+}
+
+bool FrameEditor::_setImage (File& file)
+{
+    if (currentFrame == nullptr)
+        return false;
+    
+    // A little sneaky, if the file went invalid, fail
+    // But if it was an empty file to begin with, use it
+    Image i = ImageFileFormat::loadFrom (file);
+    if (i.isValid() || file.getFullPathName().length() == 0)
+    {
+        currentFrame->setImageFile (file);
+        currentFrame->setOwnedBackgroundImage (new Image(i));
+        sendActionMessage (EditorActions::backgroundImageChanged);
+        return true;
+    }
+    
+    return false;
+}
+
+void FrameEditor::_setRefOpacity (float opacity)
+{
+    if (opacity < 0)
+        opacity = 0;
+    else if (opacity > 1.0)
+        opacity = 1.0;
+    
+    if (opacity != refOpacity)
+    {
+        refOpacity = opacity;
+        sendActionMessage (EditorActions::refOpacityChanged);
+    }
+}
+
+void FrameEditor::_setImageScale (float scale)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (scale < 0.01)
+        scale = 0.01;
+    else if (scale > 2.00)
+        scale = 2.00;
+    
+    if (scale != currentFrame->getImageScale())
+    {
+        currentFrame->setImageScale (scale);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
+
+void FrameEditor::_setImageRotation (float rot)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (rot < 0)
+        rot = 0;
+    else if (rot > 359.9)
+        rot = 359.9;
+    
+    if (rot != currentFrame->getImageRotation())
+    {
+        currentFrame->setImageRotation (rot);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
+
+void FrameEditor::_setImageXoffset (float off)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (off < -100)
+        off = -100;
+    else if (off > 100)
+        off = 100;
+    
+    if (off != currentFrame->getImageXoffset())
+    {
+        currentFrame->setImageXoffset (off);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
+
+void FrameEditor::_setImageYoffset (float off)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (off < -100)
+        off = -100;
+    else if (off > 100)
+        off = 100;
+    
+    if (off != currentFrame->getImageYoffset())
+    {
+        currentFrame->setImageYoffset (off);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
     }
 }

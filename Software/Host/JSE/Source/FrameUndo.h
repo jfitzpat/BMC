@@ -47,6 +47,56 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableSetSketchVisibility : public UndoableAction
+{
+public:
+    UndoableSetSketchVisibility (FrameEditor* editor, bool visibility)
+    : newVisibility (visibility), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldVisibility = frameEditor->getSketchVisible();
+        frameEditor->_setSketchVisible (newVisibility);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setSketchVisible (oldVisibility);
+        return true;
+    }
+    
+private:
+    bool oldVisibility;
+    bool newVisibility;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetIldaVisibility : public UndoableAction
+{
+public:
+    UndoableSetIldaVisibility (FrameEditor* editor, bool visibility)
+    : newVisibility (visibility), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldVisibility = frameEditor->getIldaVisible();
+        frameEditor->_setIldaVisible (newVisibility);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setIldaVisible (oldVisibility);
+        return true;
+    }
+    
+private:
+    bool oldVisibility;
+    bool newVisibility;
+    FrameEditor* frameEditor;
+};
+
 class UndoableSetRefVisibility : public UndoableAction
 {
 public:
@@ -69,5 +119,153 @@ public:
 private:
     bool oldVisibility;
     bool newVisibility;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetImage : public UndoableAction
+{
+public:
+    UndoableSetImage (FrameEditor* editor, File& file)
+    : newFile (file), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldFile = frameEditor->getImageFile();
+        return frameEditor->_setImage (newFile);
+    }
+    
+    bool undo() override
+    {
+        return frameEditor->_setImage (oldFile);
+    }
+    
+private:
+    File oldFile;
+    File newFile;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetRefAlpha : public UndoableAction
+{
+public:
+    UndoableSetRefAlpha (FrameEditor* editor, float alpha)
+    : newAlpha (alpha), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldAlpha = frameEditor->getRefOpacity();
+        frameEditor->_setRefOpacity (newAlpha);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setRefOpacity (oldAlpha);
+        return true;
+    }
+    
+private:
+    float oldAlpha;
+    float newAlpha;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetImageScale : public UndoableAction
+{
+public:
+    UndoableSetImageScale (FrameEditor* editor, float scale)
+    : newScale (scale), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldScale = frameEditor->getImageScale();
+        frameEditor->_setImageScale (newScale);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setImageScale (oldScale);
+        return true;
+    }
+    
+private:
+    float oldScale;
+    float newScale;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetImageRotation : public UndoableAction
+{
+public:
+    UndoableSetImageRotation (FrameEditor* editor, float rot)
+    : newRot (rot), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldRot = frameEditor->getImageRotation();
+        frameEditor->_setImageRotation(newRot);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setImageRotation (oldRot);
+        return true;
+    }
+    
+private:
+    float oldRot;
+    float newRot;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetImageXoffset : public UndoableAction
+{
+public:
+    UndoableSetImageXoffset (FrameEditor* editor, float rot)
+    : newRot (rot), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldRot = frameEditor->getImageXoffset();
+        frameEditor->_setImageXoffset(newRot);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setImageXoffset (oldRot);
+        return true;
+    }
+    
+private:
+    float oldRot;
+    float newRot;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetImageYoffset : public UndoableAction
+{
+public:
+    UndoableSetImageYoffset (FrameEditor* editor, float rot)
+    : newRot (rot), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldRot = frameEditor->getImageYoffset();
+        frameEditor->_setImageYoffset(newRot);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setImageYoffset (oldRot);
+        return true;
+    }
+    
+private:
+    float oldRot;
+    float newRot;
     FrameEditor* frameEditor;
 };
