@@ -49,6 +49,10 @@ private:
     std::unique_ptr<Label> imageFileLabel;
     std::unique_ptr<TextButton> selectImageButton;
     std::unique_ptr<Slider> backgroundAlpha;
-    
+    std::unique_ptr<Slider> backgroundScale;
+    std::unique_ptr<Slider> backgroundRotation;
+    std::unique_ptr<Slider> backgroundXoffset;
+    std::unique_ptr<Slider> backgroundYoffset;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RefProperties)
 };

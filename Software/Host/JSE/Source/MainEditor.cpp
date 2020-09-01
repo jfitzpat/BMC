@@ -99,8 +99,31 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
         g.setOpacity (frameEditor->getRefOpacity());
         const Image* i = frameEditor->getImage();
         if (i != nullptr)
-            g.drawImage (*i, {0, 0, (float)getWidth(), (float)getHeight()},
-                     0);
+        {
+            auto w = i->getWidth();
+            auto h = i->getHeight();
+            float scale;
+            float iscale = frameEditor->getImageScale();
+            
+            if (w > h)
+                scale = iscale * 65535.0 / w;
+            else
+                scale = iscale * 65535.0 / h;
+
+            float x = 32768 - (w * scale / 2) +
+                (frameEditor->getImageXoffset() / 100.0 * 65535.0);
+            float y = 32768 - (h * scale / 2) +
+                (frameEditor->getImageYoffset() / 100.0 * 65535.0);
+
+            AffineTransform t = \
+                AffineTransform::rotation (frameEditor->getImageRotation() * MathConstants<float>::pi / 180.0,
+                    w / 2.0,
+                    h / 2.0) \
+                .followedBy (AffineTransform::scale (scale)) \
+                .followedBy (AffineTransform::translation(x, y));
+            
+            g.drawImageTransformed (*i, t);
+        }
     }
 }
 
@@ -119,5 +142,7 @@ void MainEditor::WorkingArea::actionListenerCallback (const String& message)
     else if (message == EditorActions::refVisibilityChanged)
         repaint();
     else if (message == EditorActions::refOpacityChanged)
+        repaint();
+    else if (message == EditorActions::backgroundImageAdjusted)
         repaint();
 }

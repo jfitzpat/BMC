@@ -21,6 +21,10 @@
 
 //==============================================================================
 Frame::Frame()
+: imageScale(1.0),
+  imageRotation(0.0),
+  imageXoffset(0.0),
+  imageYoffset(0.0)
 {
 }
 

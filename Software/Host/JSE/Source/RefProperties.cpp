@@ -51,13 +51,53 @@ RefProperties::RefProperties (FrameEditor* editor)
 
     backgroundAlpha.reset (new juce::Slider ("backgroundAlpha"));
     addAndMakeVisible (backgroundAlpha.get());
-    backgroundAlpha->setTooltip (TRANS("Adjusts the opacity of the background image."));
+    backgroundAlpha->setTooltip (TRANS("Adjust the opacity of the background image."));
     backgroundAlpha->setRange (0, 100, 1);
     backgroundAlpha->setSliderStyle (juce::Slider::LinearHorizontal);
-    backgroundAlpha->setTextBoxStyle (juce::Slider::TextBoxBelow, true, 90, 20);
+    backgroundAlpha->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 90, 20);
     backgroundAlpha->setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0x008e989b));
     backgroundAlpha->setTextValueSuffix ("% Opacity");
     backgroundAlpha->addListener (this);
+
+    backgroundScale.reset (new juce::Slider ("backgroundScale"));
+    addAndMakeVisible (backgroundScale.get());
+    backgroundScale->setTooltip (TRANS("Adjust the size of the background image."));
+    backgroundScale->setRange (1, 200, 1);
+    backgroundScale->setSliderStyle (juce::Slider::LinearHorizontal);
+    backgroundScale->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 90, 20);
+    backgroundScale->setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0x008e989b));
+    backgroundScale->setTextValueSuffix ("% Scale");
+    backgroundScale->addListener (this);
+
+    backgroundRotation.reset (new juce::Slider ("backgroundRotation"));
+    addAndMakeVisible (backgroundRotation.get());
+    backgroundRotation->setTooltip (TRANS("Rotate the background image."));
+    backgroundRotation->setRange (0, 359, 1);
+    backgroundRotation->setSliderStyle (juce::Slider::LinearHorizontal);
+    backgroundRotation->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 110, 20);
+    backgroundRotation->setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0x008e989b));
+    backgroundRotation->setTextValueSuffix (String(CharPointer_UTF8("° Rotation")));
+    backgroundRotation->addListener (this);
+
+    backgroundXoffset.reset (new juce::Slider ("backgroundXoffset"));
+    addAndMakeVisible (backgroundXoffset.get());
+    backgroundXoffset->setTooltip (TRANS("Shift the background image left/right."));
+    backgroundXoffset->setRange (-100, 100, 1);
+    backgroundXoffset->setSliderStyle (juce::Slider::LinearHorizontal);
+    backgroundXoffset->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 110, 20);
+    backgroundXoffset->setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0x008e989b));
+    backgroundXoffset->setTextValueSuffix ("% XOffset");
+    backgroundXoffset->addListener (this);
+
+    backgroundYoffset.reset (new juce::Slider ("backgroundYoffset"));
+    addAndMakeVisible (backgroundYoffset.get());
+    backgroundYoffset->setTooltip (TRANS("Shift the background image up/down."));
+    backgroundYoffset->setRange (-100, 100, 1);
+    backgroundYoffset->setSliderStyle (juce::Slider::LinearHorizontal);
+    backgroundYoffset->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 110, 20);
+    backgroundYoffset->setColour (juce::Slider::textBoxOutlineColourId, juce::Colour (0x008e989b));
+    backgroundYoffset->setTextValueSuffix ("% YOffset");
+    backgroundYoffset->addListener (this);
 
     layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
     
@@ -68,6 +108,10 @@ RefProperties::RefProperties (FrameEditor* editor)
         imageFileLabel->setText("<none>", dontSendNotification);
     
     backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100.0, dontSendNotification);
+    backgroundScale->setValue (frameEditor->getImageScale() * 100.0, dontSendNotification);
+    backgroundRotation->setValue (frameEditor->getImageRotation(), dontSendNotification);
+    backgroundXoffset->setValue (frameEditor->getImageXoffset(), dontSendNotification);
+    backgroundYoffset->setValue (frameEditor->getImageYoffset(), dontSendNotification);
 }
 
 RefProperties::~RefProperties()
@@ -76,6 +120,10 @@ RefProperties::~RefProperties()
     imageFileLabel = nullptr;
     selectImageButton = nullptr;
     backgroundAlpha = nullptr;
+    backgroundScale = nullptr;
+    backgroundRotation = nullptr;
+    backgroundXoffset = nullptr;
+    backgroundYoffset = nullptr;
 }
 
 //==============================================================================
@@ -91,6 +139,10 @@ void RefProperties::resized()
     imageFileLabel->setBounds (10, 48, 182, 24);
     selectImageButton->setBounds (16, 72, 166, 24);
     backgroundAlpha->setBounds (16, 112, 166, 40);
+    backgroundScale->setBounds (16, 160, 166, 40);
+    backgroundRotation->setBounds (16, 208, 166, 40);
+    backgroundXoffset->setBounds (16, 256, 166, 40);
+    backgroundYoffset->setBounds (16, 304, 166, 40);
 }
 
 //==============================================================================
@@ -111,6 +163,15 @@ void RefProperties::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     if (sliderThatWasMoved == backgroundAlpha.get())
         frameEditor->setRefOpacity (backgroundAlpha->getValue() / 100.0);
+    else if (sliderThatWasMoved == backgroundScale.get())
+        frameEditor->setImageScale (backgroundScale->getValue() / 100.0);
+    else if (sliderThatWasMoved == backgroundRotation.get())
+        frameEditor->setImageRotation (backgroundRotation->getValue());
+    else if (sliderThatWasMoved == backgroundXoffset.get())
+        frameEditor->setImageXoffset (backgroundXoffset->getValue());
+    else if (sliderThatWasMoved == backgroundYoffset.get())
+        frameEditor->setImageYoffset (backgroundYoffset->getValue());
+            
 }
 
 //==============================================================================
@@ -122,4 +183,11 @@ void RefProperties::actionListenerCallback (const String& message)
         imageFileLabel->setText (frameEditor->getImageFile().getFileName(), dontSendNotification);
     else if (message == EditorActions::refOpacityChanged)
         backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100, dontSendNotification);
+    else if (message == EditorActions::backgroundImageAdjusted)
+    {
+        backgroundScale->setValue (frameEditor->getImageScale() * 100, dontSendNotification);
+        backgroundRotation->setValue (frameEditor->getImageRotation(), dontSendNotification);
+        backgroundXoffset->setValue (frameEditor->getImageXoffset(), dontSendNotification);
+        backgroundYoffset->setValue (frameEditor->getImageYoffset(), dontSendNotification);
+    }
 }

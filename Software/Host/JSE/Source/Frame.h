@@ -32,7 +32,20 @@ public:
     const Image* getBackgroundImage() { return backgroundImage.get(); }
     void setOwnedBackgroundImage (Image* image) { backgroundImage.reset (image); }
     
+    float getImageScale()               { return imageScale; }
+    void setImageScale (float scale)    { imageScale = scale; }
+    float getImageRotation()            { return imageRotation; }
+    void setImageRotation (float rot)   { imageRotation = rot; }
+    float getImageXoffset()             { return imageXoffset; }
+    void setImageXoffset (float off)    { imageXoffset = off; }
+    float getImageYoffset()             { return imageYoffset; }
+    void setImageYoffset (float off)    { imageYoffset = off; }
+
 private:
     File imageFile;
     std::unique_ptr<Image> backgroundImage;
+    float imageScale;
+    float imageRotation;
+    float imageXoffset;
+    float imageYoffset;
 };

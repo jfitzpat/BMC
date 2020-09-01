@@ -51,6 +51,14 @@ public:
     
     float getRefOpacity() { return refOpacity; }
     void setRefOpacity (float opacity);
+    float getImageScale();
+    void setImageScale (float scale);
+    float getImageRotation();
+    void setImageRotation (float rot);
+    float getImageXoffset();
+    void setImageXoffset (float off);
+    float getImageYoffset();
+    void setImageYoffset (float off);
 
 private:
     Layer activeLayer;
@@ -72,4 +80,5 @@ namespace EditorActions
     const String refVisibilityChanged ("RVC");
     const String backgroundImageChanged ("BIC");
     const String refOpacityChanged("ROC");
+    const String backgroundImageAdjusted ("BIA");
 }

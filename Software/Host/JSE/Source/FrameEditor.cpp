@@ -132,3 +132,103 @@ void FrameEditor::setRefOpacity (float opacity)
         sendActionMessage (EditorActions::refOpacityChanged);
     }
 }
+
+float FrameEditor::getImageScale()
+{
+    if (currentFrame == nullptr)
+        return 1.0;
+    
+    return currentFrame->getImageScale();
+}
+
+void FrameEditor::setImageScale (float scale)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (scale < 0.01)
+        scale = 0.01;
+    else if (scale > 2.00)
+        scale = 2.00;
+    
+    if (scale != currentFrame->getImageScale())
+    {
+        currentFrame->setImageScale (scale);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
+
+float FrameEditor::getImageRotation()
+{
+    if (currentFrame == nullptr)
+        return 0.0;
+    
+    return currentFrame->getImageRotation();
+}
+
+void FrameEditor::setImageRotation (float rot)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (rot < 0)
+        rot = 0;
+    else if (rot > 359.9)
+        rot = 359.9;
+    
+    if (rot != currentFrame->getImageRotation())
+    {
+        currentFrame->setImageRotation (rot);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
+
+float FrameEditor::getImageXoffset()
+{
+    if (currentFrame == nullptr)
+        return 0.0;
+    
+    return currentFrame->getImageXoffset();
+}
+
+void FrameEditor::setImageXoffset (float off)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (off < -100)
+        off = -100;
+    else if (off > 100)
+        off = 100;
+    
+    if (off != currentFrame->getImageXoffset())
+    {
+        currentFrame->setImageXoffset (off);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
+
+float FrameEditor::getImageYoffset()
+{
+    if (currentFrame == nullptr)
+        return 0.0;
+    
+    return currentFrame->getImageYoffset();
+}
+
+void FrameEditor::setImageYoffset (float off)
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (off < -100)
+        off = -100;
+    else if (off > 100)
+        off = 100;
+    
+    if (off != currentFrame->getImageYoffset())
+    {
+        currentFrame->setImageYoffset (off);
+        sendActionMessage (EditorActions::backgroundImageAdjusted);
+    }
+}
