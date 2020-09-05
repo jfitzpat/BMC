@@ -28,6 +28,8 @@ FrameEditor::FrameEditor()
     : activeLayer (sketch),
       sketchVisible (true),
       ildaVisible (true),
+      ildaShowBlanked (true),
+      ildaDrawLines (true),
       refVisible (true),
       refOpacity (1.0),
       frameIndex (0)
@@ -276,6 +278,24 @@ void FrameEditor::loadFile()
    }
 }
 
+void FrameEditor::setIldaShowBlanked (bool visible)
+{
+    if (visible != ildaShowBlanked)
+    {
+        beginNewTransaction ("Blanked Coordinates");
+        perform(new UndoableSetIldaShowBlanked (this, visible));
+    }
+}
+
+void FrameEditor::setIldaDrawLines (bool visible)
+{
+    if (visible != ildaDrawLines)
+    {
+        beginNewTransaction ("Draw Lines");
+        perform(new UndoableSetIldaDrawLines (this, visible));
+    }
+}
+
 //==============================================================================
 void FrameEditor::_setActiveLayer (Layer layer)
 {
@@ -427,4 +447,22 @@ void FrameEditor::_setFrameIndex (uint16 index)
     
     currentFrame = Frames[index];
     sendActionMessage (EditorActions::frameIndexChanged);
+}
+
+void FrameEditor::_setIldaShowBlanked (bool show)
+{
+    if (getIldaShowBlanked() != show)
+    {
+        ildaShowBlanked = show;
+        sendActionMessage (EditorActions::frameIndexChanged);
+    }
+}
+
+void FrameEditor::_setIldaDrawLines (bool draw)
+{
+    if (getIldaDrawLines() != draw)
+    {
+        ildaDrawLines = draw;
+        sendActionMessage (EditorActions::ildaDrawLinesChanged);
+    }
 }

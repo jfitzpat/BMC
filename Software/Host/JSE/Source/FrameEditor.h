@@ -59,6 +59,9 @@ public:
         return currentFrame->getPoint (index, point);
     }
 
+    bool getIldaShowBlanked() { return ildaShowBlanked; }
+    bool getIldaDrawLines() { return ildaDrawLines; }
+    
     // Undoable Commands
     void setActiveLayer (Layer layer);
     void setSketchVisible (bool visible);
@@ -74,30 +77,41 @@ public:
 
     void loadFile();
     
+    void setIldaShowBlanked (bool show);
+    void setIldaDrawLines (bool show);
+    
     // Destructive Version (invoked by UndoManager)
     void _setActiveLayer (Layer layer);
     void _setSketchVisible (bool visible);
     void _setIldaVisible (bool visible);
     void _setRefVisible (bool visible);
+
     bool _setImage (File& file);
     void _setRefOpacity (float opacity);
     void _setImageScale (float scale);
     void _setImageRotation (float rot);
     void _setImageXoffset (float off);
     void _setImageYoffset (float off);
+
     void _setFrames (const ReferenceCountedArray<Frame> frames);
     void _setFrameIndex (uint16 index);
+
+    void _setIldaShowBlanked (bool show);
+    void _setIldaDrawLines (bool draw);
 
 private:
     Layer activeLayer;
     bool sketchVisible;
     bool ildaVisible;
+    bool ildaShowBlanked;
+    bool ildaDrawLines;
     bool refVisible;
     float refOpacity;
     
     uint16 frameIndex;
     ReferenceCountedArray<Frame> Frames;
     Frame::Ptr currentFrame;
+
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
@@ -113,4 +127,6 @@ namespace EditorActions
     const String backgroundImageAdjusted ("BIA");
     const String framesChanged ("FC");
     const String frameIndexChanged ("FIC");
+    const String ildaShowBlankChanged ("SBC");
+    const String ildaDrawLinesChanged ("DLC");
 }

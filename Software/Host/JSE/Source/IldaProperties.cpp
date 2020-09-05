@@ -25,37 +25,81 @@ IldaProperties::IldaProperties (FrameEditor* editor)
 {
     frameEditor = editor;
     frameEditor->addActionListener (this);
+    
+    layerVisible.reset (new juce::ToggleButton ("layerVisible"));
+    addAndMakeVisible (layerVisible.get());
+    layerVisible->setTooltip ("Make this layer visible or invisible.");
+    layerVisible->setButtonText ("Visible");
+    layerVisible->addListener (this);
+
+    drawLines.reset (new juce::ToggleButton ("drawLines"));
+    addAndMakeVisible (drawLines.get());
+    drawLines->setTooltip ("Draw lines between coordinates");
+    drawLines->setButtonText ("Draw Lines");
+    drawLines->addListener (this);
+
+    showBlanking.reset (new juce::ToggleButton ("showBlanking"));
+    addAndMakeVisible (showBlanking.get());
+    showBlanking->setTooltip ("Show blanked (invisible) coordinates.");
+    showBlanking->setButtonText ("Show Blanked Points");
+    showBlanking->addListener (this);
+
+    refresh();
 }
 
 IldaProperties::~IldaProperties()
 {
 }
 
+//==============================================================================
 void IldaProperties::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("IldaProperties", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    // Clear background
+    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 }
 
 void IldaProperties::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-
+    layerVisible->setBounds (16, 16, 150, 24);
+    drawLines->setBounds (16, 48, 150, 24);
+    showBlanking->setBounds (16, 80, 150, 24);
 }
+
+//==============================================================================
 
 void IldaProperties::actionListenerCallback (const String& message)
 {
-    
+    if (message == EditorActions::ildaVisibilityChanged)
+        layerVisible->setToggleState (frameEditor->getIldaVisible(), dontSendNotification);
+    else if (message == EditorActions::ildaShowBlankChanged)
+        showBlanking->setToggleState (frameEditor->getIldaShowBlanked(), dontSendNotification);
+    else if (message == EditorActions::ildaDrawLinesChanged)
+        drawLines->setToggleState (frameEditor->getIldaDrawLines(), dontSendNotification);
+    else if (message == EditorActions::frameIndexChanged)
+        refresh();
+}
+
+//==============================================================================
+void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
+{
+    if (buttonThatWasClicked == layerVisible.get())
+    {
+        frameEditor->setIldaVisible (layerVisible->getToggleState());
+    }
+    else if (buttonThatWasClicked == showBlanking.get())
+    {
+        frameEditor->setIldaShowBlanked (showBlanking->getToggleState());
+    }
+    else if (buttonThatWasClicked == drawLines.get())
+    {
+        frameEditor->setIldaDrawLines (drawLines->getToggleState());
+    }
+}
+
+//==============================================================================
+void IldaProperties::refresh()
+{
+    layerVisible->setToggleState (frameEditor->getIldaVisible(), dontSendNotification);
+    showBlanking->setToggleState (frameEditor->getIldaShowBlanked(), dontSendNotification);
+    drawLines->setToggleState (frameEditor->getIldaDrawLines(), dontSendNotification);
 }

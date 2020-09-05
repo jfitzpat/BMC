@@ -142,16 +142,57 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
             
             if (frameEditor->getPoint (n, point))
             {
-                if (point.status & Frame::BlankedPoint)
+                if (frameEditor->getIldaDrawLines())
                 {
-                    g.setColour (Colours::darkgrey);
-                    g.drawEllipse((float)(point.x.w + (32768 - halfSize)),
-                               (float)((32768 - halfSize) - point.y.w), size, size, activeInvScale);
+                    Frame::XYPoint nextPoint;
+                    bool b;
+                    
+                    if (n < (frameEditor->getPointCount() - 1))
+                        b = frameEditor->getPoint (n+1, nextPoint);
+                    else
+                        b = frameEditor->getPoint (n+1, nextPoint);
+
+                    if (b)
+                    {
+                        if (point.status & Frame::BlankedPoint)
+                        {
+                            if (frameEditor->getIldaShowBlanked())
+                            {
+                                g.setColour (Colours::darkgrey);
+                                g.drawLine ((float)(point.x.w + 32768),
+                                            (float)(32768 - point.y.w),
+                                            (float)(nextPoint.x.w + 32768),
+                                            (float)(32768 - nextPoint.y.w),
+                                            activeInvScale);
+                            }
+                        }
+                        else
+                        {
+                            g.setColour (Colour (point.red, point.blue, point.green));
+                            g.drawLine ((float)(point.x.w + 32768),
+                                        (float)(32768 - point.y.w),
+                                        (float)(nextPoint.x.w + 32768),
+                                        (float)(32768 - nextPoint.y.w),
+                                        size);
+                        }
+                    }
                 }
                 else
                 {
-                    g.setColour (Colour (point.red, point.blue, point.green));
-                    g.fillEllipse(point.x.w + (32768 - halfSize), (32768 - halfSize) - point.y.w, size, size);
+                    if (point.status & Frame::BlankedPoint)
+                    {
+                        if (frameEditor->getIldaShowBlanked())
+                        {
+                            g.setColour (Colours::darkgrey);
+                            g.drawEllipse((float)(point.x.w + (32768 - halfSize)),
+                                       (float)((32768 - halfSize) - point.y.w), size, size, activeInvScale);
+                        }
+                    }
+                    else
+                    {
+                        g.setColour (Colour (point.red, point.blue, point.green));
+                        g.fillEllipse(point.x.w + (32768 - halfSize), (32768 - halfSize) - point.y.w, size, size);
+                    }
                 }
             }
         }
@@ -177,5 +218,9 @@ void MainEditor::WorkingArea::actionListenerCallback (const String& message)
     else if (message == EditorActions::backgroundImageAdjusted)
         repaint();
     else if (message == EditorActions::frameIndexChanged)
+        repaint();
+    else if (message == EditorActions::ildaShowBlankChanged)
+        repaint();
+    else if (message == EditorActions::ildaDrawLinesChanged)
         repaint();
 }

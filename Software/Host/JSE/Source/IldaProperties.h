@@ -26,6 +26,7 @@
 /*
 */
 class IldaProperties  : public Component,
+                        public Button::Listener,
                         public ActionListener
 {
 public:
@@ -35,10 +36,17 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+
     void actionListenerCallback (const String& message) override;
 
+    void refresh();
+    
 private:
     FrameEditor* frameEditor;
-    
+    std::unique_ptr<ToggleButton> layerVisible;
+    std::unique_ptr<ToggleButton> showBlanking;
+    std::unique_ptr<ToggleButton> drawLines;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

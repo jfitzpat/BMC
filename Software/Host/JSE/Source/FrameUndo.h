@@ -298,3 +298,53 @@ private:
     ReferenceCountedArray<Frame> newFrames;
     FrameEditor* frameEditor;
 };
+
+class UndoableSetIldaShowBlanked : public UndoableAction
+{
+public:
+    UndoableSetIldaShowBlanked (FrameEditor* editor, bool visibility)
+    : newVisibility (visibility), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldVisibility = frameEditor->getIldaShowBlanked();
+        frameEditor->_setIldaShowBlanked (newVisibility);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setIldaShowBlanked (oldVisibility);
+        return true;
+    }
+    
+private:
+    bool oldVisibility;
+    bool newVisibility;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetIldaDrawLines : public UndoableAction
+{
+public:
+    UndoableSetIldaDrawLines (FrameEditor* editor, bool visibility)
+    : newVisibility (visibility), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldVisibility = frameEditor->getIldaDrawLines();
+        frameEditor->_setIldaDrawLines (newVisibility);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setIldaDrawLines (oldVisibility);
+        return true;
+    }
+    
+private:
+    bool oldVisibility;
+    bool newVisibility;
+    FrameEditor* frameEditor;
+};
