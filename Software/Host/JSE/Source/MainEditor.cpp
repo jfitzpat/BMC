@@ -58,13 +58,16 @@ void MainEditor::resized()
     
     // Scale our working area to fit on screen, but still
     // draw in full ILDA space
-    activeScale = (float)activeArea.getHeight() / 65535.0f;
-    activeInvScale = 1.0 / activeScale;
-    workingArea->setTransform (AffineTransform::scale (activeScale));
+    float scale = (float)activeArea.getHeight() / 65536.0f;
+    float invScale = 1.0 / scale;
     
-    workingArea->setBounds (activeArea.getX() * activeInvScale,
-                            activeArea.getY() * activeInvScale,
-                            65535, 65535);
+    workingArea->setTransform (AffineTransform::scale (scale));
+    
+    workingArea->setBounds (activeArea.getX() * invScale,
+                            activeArea.getY() * invScale,
+                            65536, 65536);
+    workingArea->setActiveScale (scale);
+    workingArea->setActiveInvScale (invScale);
 }
 
 void MainEditor::actionListenerCallback (const String& message)
@@ -94,6 +97,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
     // Black background
     g.fillAll (Colours::transparentBlack);
     
+    // Background Image
     if (frameEditor->getRefVisible())
     {
         g.setOpacity (frameEditor->getRefOpacity());
@@ -106,14 +110,14 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
             float iscale = frameEditor->getImageScale();
             
             if (w > h)
-                scale = iscale * 65535.0 / w;
+                scale = iscale * 65536.0 / w;
             else
-                scale = iscale * 65535.0 / h;
+                scale = iscale * 65536.0 / h;
 
             float x = 32768 - (w * scale / 2) +
-                (frameEditor->getImageXoffset() / 100.0 * 65535.0);
+                (frameEditor->getImageXoffset() / 100.0 * 65536.0);
             float y = 32768 - (h * scale / 2) +
-                (frameEditor->getImageYoffset() / 100.0 * 65535.0);
+                (frameEditor->getImageYoffset() / 100.0 * 65536.0);
 
             AffineTransform t = \
                 AffineTransform::rotation (frameEditor->getImageRotation() * MathConstants<float>::pi / 180.0,
@@ -123,6 +127,33 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                 .followedBy (AffineTransform::translation(x, y));
             
             g.drawImageTransformed (*i, t);
+        }
+    }
+    
+    // ILDA points
+    if (frameEditor->getIldaVisible())
+    {
+        float size = 3.0 * activeInvScale;
+        float halfSize = size / 2.0;
+        
+        for (auto n = 0; n < frameEditor->getPointCount(); ++n)
+        {
+            Frame::XYPoint point;
+            
+            if (frameEditor->getPoint (n, point))
+            {
+                if (point.status & Frame::BlankedPoint)
+                {
+                    g.setColour (Colours::darkgrey);
+                    g.drawEllipse((float)(point.x.w + (32768 - halfSize)),
+                               (float)((32768 - halfSize) - point.y.w), size, size, activeInvScale);
+                }
+                else
+                {
+                    g.setColour (Colour (point.red, point.blue, point.green));
+                    g.fillEllipse(point.x.w + (32768 - halfSize), (32768 - halfSize) - point.y.w, size, size);
+                }
+            }
         }
     }
 }
@@ -144,5 +175,7 @@ void MainEditor::WorkingArea::actionListenerCallback (const String& message)
     else if (message == EditorActions::refOpacityChanged)
         repaint();
     else if (message == EditorActions::backgroundImageAdjusted)
+        repaint();
+    else if (message == EditorActions::frameIndexChanged)
         repaint();
 }

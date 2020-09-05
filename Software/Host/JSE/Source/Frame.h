@@ -20,8 +20,11 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "ILDA.h"
 
-class Frame
+// Reference Counted so we can keep frames around for undo and just have them
+// clean up whenever those undo objects are released
+class Frame : public ReferenceCountedObject
 {
 public:
     Frame();
@@ -41,6 +44,20 @@ public:
     float getImageYoffset()             { return imageYoffset; }
     void setImageYoffset (float off)    { imageYoffset = off; }
 
+    typedef ILDA_FORMAT_4 XYPoint;
+    typedef enum {
+        BlankedPoint = 0x40,
+        LastPoint = 0x80
+    } Status;
+    
+    uint16 getPointCount() { return (uint16)framePoints.size(); }
+    
+    bool getPoint (uint16 index, XYPoint& point);
+    void addPoint (XYPoint& point);
+    
+    // Make a counting pointer of our type
+    using Ptr = ReferenceCountedObjectPtr<Frame>;
+    
 private:
     File imageFile;
     std::unique_ptr<Image> backgroundImage;
@@ -48,4 +65,6 @@ private:
     float imageRotation;
     float imageXoffset;
     float imageYoffset;
+    
+    Array<XYPoint> framePoints;
 };

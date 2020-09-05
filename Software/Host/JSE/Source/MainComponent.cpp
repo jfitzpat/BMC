@@ -123,7 +123,6 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
 {
     Array<CommandID> commands { CommandIDs::fileNew,
                                 CommandIDs::fileOpen,
-                                CommandIDs::fileClose,
                                 CommandIDs::editUndo,
                                 CommandIDs::editRedo,
                                 CommandIDs::helpWebSite };
@@ -139,13 +138,8 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress('n', ModifierKeys::commandModifier);
             break;
         case CommandIDs::fileOpen:
-            result.setInfo ("Open", "Open an existing file", "Menu", 0);
+            result.setInfo ("Open", "Open an existing file...", "Menu", 0);
             result.addDefaultKeypress('o', ModifierKeys::commandModifier);
-            break;
-        case CommandIDs::fileClose:
-            result.setInfo ("Close", "Close the current file", "Menu", 0);
-            result.addDefaultKeypress('w', ModifierKeys::commandModifier);
-            result.setActive(false);
             break;
         case CommandIDs::editUndo:
             result.addDefaultKeypress('z', ModifierKeys::commandModifier);
@@ -192,6 +186,10 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::editRedo:
             frameEditor->redo();
+            break;
+            
+        case CommandIDs::fileOpen:
+            frameEditor->loadFile();
             break;
     }
     return true;

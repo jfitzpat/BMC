@@ -18,6 +18,7 @@
 */
 
 #include <JuceHeader.h>
+#include "IldaLoader.h"
 #include "FrameEditor.h"
 
 #include "FrameUndo.h"      // UndoableTask classes
@@ -28,9 +29,11 @@ FrameEditor::FrameEditor()
       sketchVisible (true),
       ildaVisible (true),
       refVisible (true),
-      refOpacity(1.0)
+      refOpacity (1.0),
+      frameIndex (0)
 {
-    currentFrame.reset (new Frame());
+    Frames.add (new Frame());
+    currentFrame = Frames[frameIndex];
 }
 
 FrameEditor::~FrameEditor()
@@ -249,6 +252,30 @@ void FrameEditor::setImageYoffset (float off)
     }
 }
 
+void FrameEditor::loadFile()
+{
+   FileChooser myChooser ("ILDA file to Load...",
+                          File::getSpecialLocation (File::userDocumentsDirectory),
+                          "*.ild");
+
+   if (myChooser.browseForFileToOpen())
+   {
+       File f = myChooser.getResult();
+
+       ReferenceCountedArray<Frame> frames;
+       if (! IldaLoader::load (frames, f))
+       {
+           AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
+                                       "An error occurred loading the selected ILDA file.", "ok");
+       }
+       else
+       {
+           beginNewTransaction ("Load File");
+           perform(new UndoableLoadFile (this, frames));
+       }
+   }
+}
+
 //==============================================================================
 void FrameEditor::_setActiveLayer (Layer layer)
 {
@@ -385,4 +412,19 @@ void FrameEditor::_setImageYoffset (float off)
         currentFrame->setImageYoffset (off);
         sendActionMessage (EditorActions::backgroundImageAdjusted);
     }
+}
+
+void FrameEditor::_setFrames (const ReferenceCountedArray<Frame> frames)
+{
+    Frames = frames;
+    sendActionMessage (EditorActions::framesChanged);
+}
+
+void FrameEditor::_setFrameIndex (uint16 index)
+{
+    if (Frames.size() <= index)
+        index = 0;
+    
+    currentFrame = Frames[index];
+    sendActionMessage (EditorActions::frameIndexChanged);
 }

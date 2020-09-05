@@ -41,6 +41,7 @@ public:
     bool getSketchVisible() { return sketchVisible; }
     bool getIldaVisible() { return ildaVisible; }
     bool getRefVisible() { return refVisible; }
+    
     File getImageFile();
     const Image* getImage();
     float getRefOpacity() { return refOpacity; }
@@ -48,6 +49,15 @@ public:
     float getImageRotation();
     float getImageXoffset();
     float getImageYoffset();
+    
+    const ReferenceCountedArray<Frame>& getFrames() { return Frames; }
+    uint16 getFrameIndex() { return frameIndex; }
+    
+    uint16 getPointCount() { return currentFrame->getPointCount(); }
+    bool getPoint (uint16 index, Frame::XYPoint& point)
+    {
+        return currentFrame->getPoint (index, point);
+    }
 
     // Undoable Commands
     void setActiveLayer (Layer layer);
@@ -56,13 +66,14 @@ public:
     void setRefVisible (bool visible);
     
     void selectImage();
-    
     void setRefOpacity (float opacity);
     void setImageScale (float scale);
     void setImageRotation (float rot);
     void setImageXoffset (float off);
     void setImageYoffset (float off);
 
+    void loadFile();
+    
     // Destructive Version (invoked by UndoManager)
     void _setActiveLayer (Layer layer);
     void _setSketchVisible (bool visible);
@@ -74,7 +85,8 @@ public:
     void _setImageRotation (float rot);
     void _setImageXoffset (float off);
     void _setImageYoffset (float off);
-
+    void _setFrames (const ReferenceCountedArray<Frame> frames);
+    void _setFrameIndex (uint16 index);
 
 private:
     Layer activeLayer;
@@ -83,7 +95,9 @@ private:
     bool refVisible;
     float refOpacity;
     
-    std::unique_ptr<Frame> currentFrame;
+    uint16 frameIndex;
+    ReferenceCountedArray<Frame> Frames;
+    Frame::Ptr currentFrame;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
@@ -97,4 +111,6 @@ namespace EditorActions
     const String backgroundImageChanged ("BIC");
     const String refOpacityChanged("ROC");
     const String backgroundImageAdjusted ("BIA");
+    const String framesChanged ("FC");
+    const String frameIndexChanged ("FIC");
 }

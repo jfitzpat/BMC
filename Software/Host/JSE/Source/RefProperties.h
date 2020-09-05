@@ -54,5 +54,7 @@ private:
     std::unique_ptr<Slider> backgroundXoffset;
     std::unique_ptr<Slider> backgroundYoffset;
 
+    void refresh();
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RefProperties)
 };

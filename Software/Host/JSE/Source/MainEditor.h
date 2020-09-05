@@ -55,8 +55,16 @@ public:
         //==============================================================================
         void actionListenerCallback (const String& message) override;
 
+        //==============================================================================
+        float getActiveScale() { return activeScale; }
+        void setActiveScale (float scale) { activeScale = scale; }
+        float getActiveInvScale() { return activeInvScale; }
+        void setActiveInvScale (float scale) { activeInvScale = scale; }
+
     private:
         FrameEditor* frameEditor;
+        float activeScale;
+        float activeInvScale;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WorkingArea)
     };
@@ -66,8 +74,6 @@ private:
     std::unique_ptr<WorkingArea> workingArea;
     
     Rectangle<int> activeArea;
-    float activeScale;
-    float activeInvScale;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainEditor)
 };

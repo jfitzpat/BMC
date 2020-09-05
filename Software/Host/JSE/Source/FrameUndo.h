@@ -269,3 +269,32 @@ private:
     float newRot;
     FrameEditor* frameEditor;
 };
+
+class UndoableLoadFile : public UndoableAction
+{
+public:
+    UndoableLoadFile (FrameEditor* editor, const ReferenceCountedArray<Frame> frames)
+    : newFrames (frames), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldIndex = frameEditor->getFrameIndex();
+        oldFrames = frameEditor->getFrames();
+        frameEditor->_setFrames (newFrames);
+        frameEditor->_setFrameIndex (0);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setFrames (oldFrames);
+        frameEditor->_setFrameIndex (oldIndex);
+        return true;
+    }
+    
+private:
+    uint16 oldIndex;
+    ReferenceCountedArray<Frame> oldFrames;
+    ReferenceCountedArray<Frame> newFrames;
+    FrameEditor* frameEditor;
+};

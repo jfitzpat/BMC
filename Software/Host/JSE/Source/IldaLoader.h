@@ -1,6 +1,6 @@
 /*
-    Frame.cpp
-    Editable Frame Container
+    IldaLoader.h
+    Load and ILDA file as an array of Frame objects
  
     Copyright 2020 Scrootch.me!
 
@@ -17,33 +17,13 @@
     limitations under the License.
 */
 
+#pragma once
+
+#include <JuceHeader.h>
 #include "Frame.h"
 
-//==============================================================================
-Frame::Frame()
-: imageScale(1.0),
-  imageRotation(0.0),
-  imageXoffset(0.0),
-  imageYoffset(0.0)
+class IldaLoader
 {
-}
-
-Frame::~Frame()
-{
-}
-
-//==============================================================================
-bool Frame::getPoint (uint16 index, XYPoint& point)
-{
-    if (index >= framePoints.size())
-        return false;
-    
-    point = framePoints[index];
-    return true;
-}
-
-void Frame::addPoint (XYPoint& point)
-{
-    framePoints.add (point);
-}
-
+public:
+    static bool load (ReferenceCountedArray<Frame>& frameArray, File& file);
+};

@@ -99,19 +99,7 @@ RefProperties::RefProperties (FrameEditor* editor)
     backgroundYoffset->setTextValueSuffix ("% YOffset");
     backgroundYoffset->addListener (this);
 
-    layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
-    
-    String s = frameEditor->getImageFile().getFileName();
-    if (s.length())
-        imageFileLabel->setText(s, dontSendNotification);
-    else
-        imageFileLabel->setText("<none>", dontSendNotification);
-    
-    backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100.0, dontSendNotification);
-    backgroundScale->setValue (frameEditor->getImageScale() * 100.0, dontSendNotification);
-    backgroundRotation->setValue (frameEditor->getImageRotation(), dontSendNotification);
-    backgroundXoffset->setValue (frameEditor->getImageXoffset(), dontSendNotification);
-    backgroundYoffset->setValue (frameEditor->getImageYoffset(), dontSendNotification);
+    refresh();
 }
 
 RefProperties::~RefProperties()
@@ -185,9 +173,29 @@ void RefProperties::actionListenerCallback (const String& message)
         backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100, dontSendNotification);
     else if (message == EditorActions::backgroundImageAdjusted)
     {
-        backgroundScale->setValue (frameEditor->getImageScale() * 100, dontSendNotification);
+        backgroundScale->setValue (frameEditor->getImageScale() * 100.0, dontSendNotification);
         backgroundRotation->setValue (frameEditor->getImageRotation(), dontSendNotification);
         backgroundXoffset->setValue (frameEditor->getImageXoffset(), dontSendNotification);
         backgroundYoffset->setValue (frameEditor->getImageYoffset(), dontSendNotification);
     }
+    else if (message == EditorActions::frameIndexChanged)
+        refresh();
+}
+
+//==============================================================================
+void RefProperties::refresh()
+{
+    layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
+    
+    String s = frameEditor->getImageFile().getFileName();
+    if (s.length())
+        imageFileLabel->setText(s, dontSendNotification);
+    else
+        imageFileLabel->setText("<none>", dontSendNotification);
+    
+    backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100.0, dontSendNotification);
+    backgroundScale->setValue (frameEditor->getImageScale() * 100.0, dontSendNotification);
+    backgroundRotation->setValue (frameEditor->getImageRotation(), dontSendNotification);
+    backgroundXoffset->setValue (frameEditor->getImageXoffset(), dontSendNotification);
+    backgroundYoffset->setValue (frameEditor->getImageYoffset(), dontSendNotification);
 }
