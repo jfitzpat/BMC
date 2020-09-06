@@ -43,6 +43,25 @@ void MainEditor::paint (juce::Graphics& g)
     // Outline working area
     g.setColour (juce::Colours::grey);
     g.drawRect (activeArea, 1);
+    
+    if (frameEditor->getRefVisible() && frameEditor->getRefDrawGrid())
+    {
+        Line<float> vline ((float)activeArea.getCentreX(),
+                           (float)activeArea.getY(),
+                           (float)activeArea.getCentreX(),
+                           (float)(activeArea.getY() + activeArea.getHeight()));
+
+        Line<float> hline ((float)activeArea.getX(),
+                           (float)activeArea.getCentreY(),
+                           (float)activeArea.getX() + activeArea.getWidth(),
+                           (float)(activeArea.getCentreY()));
+
+        float segments = (float)activeArea.getWidth() / 73.0;
+        float dashes[] = { segments, segments };
+        
+        g.drawDashedLine (hline, dashes, 2);
+        g.drawDashedLine (vline, dashes, 2);
+    }
 }
 
 void MainEditor::resized()
@@ -133,8 +152,8 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
     // ILDA points
     if (frameEditor->getIldaVisible())
     {
-        float size = 3.0 * activeInvScale;
-        float halfSize = size / 2.0;
+        float dotSize = 3.0 * activeInvScale;
+        float halfDotSize = dotSize / 2.0;
         
         for (auto n = 0; n < frameEditor->getPointCount(); ++n)
         {
@@ -142,6 +161,23 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
             
             if (frameEditor->getPoint (n, point))
             {
+                // Draw the dots
+                if (point.status & Frame::BlankedPoint)
+                {
+                    if (frameEditor->getIldaShowBlanked())
+                    {
+                        g.setColour (Colours::darkgrey);
+                        g.drawEllipse((float)(point.x.w + (32768 - halfDotSize)),
+                                   (float)((32768 - halfDotSize) - point.y.w), dotSize, dotSize, activeInvScale);
+                    }
+                }
+                else
+                {
+                    g.setColour (Colour (point.red, point.blue, point.green));
+                    g.fillEllipse(point.x.w + (32768 - halfDotSize), (32768 - halfDotSize) - point.y.w, dotSize, dotSize);
+                }
+                
+                // Draw lines
                 if (frameEditor->getIldaDrawLines())
                 {
                     Frame::XYPoint nextPoint;
@@ -150,7 +186,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                     if (n < (frameEditor->getPointCount() - 1))
                         b = frameEditor->getPoint (n+1, nextPoint);
                     else
-                        b = frameEditor->getPoint (n+1, nextPoint);
+                        b = frameEditor->getPoint (0, nextPoint);
 
                     if (b)
                     {
@@ -173,25 +209,8 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                                         (float)(32768 - point.y.w),
                                         (float)(nextPoint.x.w + 32768),
                                         (float)(32768 - nextPoint.y.w),
-                                        size);
+                                        halfDotSize);
                         }
-                    }
-                }
-                else
-                {
-                    if (point.status & Frame::BlankedPoint)
-                    {
-                        if (frameEditor->getIldaShowBlanked())
-                        {
-                            g.setColour (Colours::darkgrey);
-                            g.drawEllipse((float)(point.x.w + (32768 - halfSize)),
-                                       (float)((32768 - halfSize) - point.y.w), size, size, activeInvScale);
-                        }
-                    }
-                    else
-                    {
-                        g.setColour (Colour (point.red, point.blue, point.green));
-                        g.fillEllipse(point.x.w + (32768 - halfSize), (32768 - halfSize) - point.y.w, size, size);
                     }
                 }
             }
@@ -222,5 +241,7 @@ void MainEditor::WorkingArea::actionListenerCallback (const String& message)
     else if (message == EditorActions::ildaShowBlankChanged)
         repaint();
     else if (message == EditorActions::ildaDrawLinesChanged)
+        repaint();
+    else if (message == EditorActions::refDrawGridChanged)
         repaint();
 }

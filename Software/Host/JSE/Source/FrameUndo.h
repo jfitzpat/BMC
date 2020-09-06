@@ -348,3 +348,29 @@ private:
     bool newVisibility;
     FrameEditor* frameEditor;
 };
+
+class UndoableSetRefDrawGrid : public UndoableAction
+{
+public:
+    UndoableSetRefDrawGrid (FrameEditor* editor, bool visibility)
+    : newVisibility (visibility), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldVisibility = frameEditor->getRefDrawGrid();
+        frameEditor->_setDrawGrid (newVisibility);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setDrawGrid (oldVisibility);
+        return true;
+    }
+    
+private:
+    bool oldVisibility;
+    bool newVisibility;
+    FrameEditor* frameEditor;
+};
+

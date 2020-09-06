@@ -45,6 +45,7 @@ public:
     File getImageFile();
     const Image* getImage();
     float getRefOpacity() { return refOpacity; }
+    bool getRefDrawGrid() { return refDrawGrid; }
     float getImageScale();
     float getImageRotation();
     float getImageXoffset();
@@ -69,7 +70,9 @@ public:
     void setRefVisible (bool visible);
     
     void selectImage();
+    void clearImage();
     void setRefOpacity (float opacity);
+    void setDrawGrid (bool draw);
     void setImageScale (float scale);
     void setImageRotation (float rot);
     void setImageXoffset (float off);
@@ -88,6 +91,7 @@ public:
 
     bool _setImage (File& file);
     void _setRefOpacity (float opacity);
+    void _setDrawGrid (bool draw);
     void _setImageScale (float scale);
     void _setImageRotation (float rot);
     void _setImageXoffset (float off);
@@ -106,6 +110,7 @@ private:
     bool ildaShowBlanked;
     bool ildaDrawLines;
     bool refVisible;
+    bool refDrawGrid;
     float refOpacity;
     
     uint16 frameIndex;
@@ -124,6 +129,7 @@ namespace EditorActions
     const String refVisibilityChanged ("RVC");
     const String backgroundImageChanged ("BIC");
     const String refOpacityChanged("ROC");
+    const String refDrawGridChanged("RGC");
     const String backgroundImageAdjusted ("BIA");
     const String framesChanged ("FC");
     const String frameIndexChanged ("FIC");

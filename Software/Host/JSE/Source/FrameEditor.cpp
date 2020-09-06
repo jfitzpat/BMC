@@ -31,6 +31,7 @@ FrameEditor::FrameEditor()
       ildaShowBlanked (true),
       ildaDrawLines (true),
       refVisible (true),
+      refDrawGrid (true),
       refOpacity (1.0),
       frameIndex (0)
 {
@@ -114,6 +115,19 @@ void FrameEditor::selectImage()
             beginNewTransaction ("Background Image Change");
             perform(new UndoableSetImage (this, f));
         }
+    }
+}
+
+void FrameEditor::clearImage()
+{
+    if (currentFrame == nullptr)
+        return;
+    
+    if (currentFrame->getBackgroundImage() != nullptr)
+    {
+        File f;
+        beginNewTransaction ("Clear Background Change");
+        perform(new UndoableSetImage (this, f));
     }
 }
 
@@ -282,7 +296,7 @@ void FrameEditor::setIldaShowBlanked (bool visible)
 {
     if (visible != ildaShowBlanked)
     {
-        beginNewTransaction ("Blanked Coordinates");
+        beginNewTransaction ("Show Blanked Change");
         perform(new UndoableSetIldaShowBlanked (this, visible));
     }
 }
@@ -291,8 +305,17 @@ void FrameEditor::setIldaDrawLines (bool visible)
 {
     if (visible != ildaDrawLines)
     {
-        beginNewTransaction ("Draw Lines");
+        beginNewTransaction ("Draw Lines Change");
         perform(new UndoableSetIldaDrawLines (this, visible));
+    }
+}
+
+void FrameEditor::setDrawGrid (bool draw)
+{
+    if (getRefDrawGrid() != draw)
+    {
+        beginNewTransaction ("Grid Visible Change");
+        perform(new UndoableSetRefDrawGrid (this, draw));
     }
 }
 
@@ -466,3 +489,13 @@ void FrameEditor::_setIldaDrawLines (bool draw)
         sendActionMessage (EditorActions::ildaDrawLinesChanged);
     }
 }
+
+void FrameEditor::_setDrawGrid (bool draw)
+{
+    if (getRefDrawGrid() != draw)
+    {
+        refDrawGrid = draw;
+        sendActionMessage (EditorActions::refDrawGridChanged);
+    }
+}
+

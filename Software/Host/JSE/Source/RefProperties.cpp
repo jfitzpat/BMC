@@ -33,6 +33,12 @@ RefProperties::RefProperties (FrameEditor* editor)
     layerVisible->setButtonText ("Visible");
     layerVisible->addListener (this);
 
+    drawGrid.reset (new juce::ToggleButton ("drawGrid"));
+    addAndMakeVisible (drawGrid.get());
+    drawGrid->setTooltip ("Make the grid visible or invisible.");
+    drawGrid->setButtonText ("Grid");
+    drawGrid->addListener (this);
+
     imageFileLabel.reset (new juce::Label ("imageFileLabel",
                                            "<None>"));
     addAndMakeVisible (imageFileLabel.get());
@@ -48,6 +54,12 @@ RefProperties::RefProperties (FrameEditor* editor)
     selectImageButton->setTooltip ("Select the background image file to display.");
     selectImageButton->setButtonText ("Select Image");
     selectImageButton->addListener (this);
+
+    clearImageButton.reset (new juce::TextButton ("clearImageButton"));
+    addAndMakeVisible (clearImageButton.get());
+    clearImageButton->setTooltip ("Clear the background image.");
+    clearImageButton->setButtonText ("Clear");
+    clearImageButton->addListener (this);
 
     backgroundAlpha.reset (new juce::Slider ("backgroundAlpha"));
     addAndMakeVisible (backgroundAlpha.get());
@@ -123,9 +135,11 @@ void RefProperties::paint (juce::Graphics& g)
 
 void RefProperties::resized()
 {
-    layerVisible->setBounds (16, 16, 150, 24);
+    layerVisible->setBounds (16, 16, 90, 24);
+    drawGrid->setBounds (106, 16, 90, 24);
     imageFileLabel->setBounds (10, 48, 182, 24);
-    selectImageButton->setBounds (16, 72, 166, 24);
+    selectImageButton->setBounds (16, 72, 100, 24);
+    clearImageButton->setBounds (16 + 100 + 8, 72, 58, 24);
     backgroundAlpha->setBounds (16, 112, 166, 40);
     backgroundScale->setBounds (16, 160, 166, 40);
     backgroundRotation->setBounds (16, 208, 166, 40);
@@ -137,13 +151,13 @@ void RefProperties::resized()
 void RefProperties::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     if (buttonThatWasClicked == layerVisible.get())
-    {
         frameEditor->setRefVisible (layerVisible->getToggleState());
-    }
+    else if (buttonThatWasClicked == drawGrid.get())
+        frameEditor->setDrawGrid (drawGrid->getToggleState());
     else if (buttonThatWasClicked == selectImageButton.get())
-    {
         frameEditor->selectImage();
-    }
+    else if (buttonThatWasClicked == clearImageButton.get())
+        frameEditor->clearImage();
 }
 
 //==============================================================================
@@ -167,8 +181,16 @@ void RefProperties::actionListenerCallback (const String& message)
 {
     if (message == EditorActions::refVisibilityChanged)
         layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
+    else if (message == EditorActions::refDrawGridChanged)
+        drawGrid->setToggleState (frameEditor->getRefDrawGrid(), dontSendNotification);
     else if (message == EditorActions::backgroundImageChanged)
-        imageFileLabel->setText (frameEditor->getImageFile().getFileName(), dontSendNotification);
+    {
+        String s = frameEditor->getImageFile().getFileName();
+        if (s.length())
+            imageFileLabel->setText(s, dontSendNotification);
+        else
+            imageFileLabel->setText("<none>", dontSendNotification);
+    }
     else if (message == EditorActions::refOpacityChanged)
         backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100, dontSendNotification);
     else if (message == EditorActions::backgroundImageAdjusted)
@@ -186,6 +208,7 @@ void RefProperties::actionListenerCallback (const String& message)
 void RefProperties::refresh()
 {
     layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
+    drawGrid->setToggleState (frameEditor->getRefDrawGrid(), dontSendNotification);
     
     String s = frameEditor->getImageFile().getFileName();
     if (s.length())

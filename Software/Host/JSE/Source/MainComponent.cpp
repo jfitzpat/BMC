@@ -72,8 +72,8 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    toolBar->setBounds (0, 0, 200, 160);
-    frameList->setBounds (0, 160, 200, getHeight() - 160);
+    toolBar->setBounds (0, 0, 200, 97);
+    frameList->setBounds (0, 97, 200, getHeight() - 97);
     laserControls->setBounds (getWidth() - 200, 0, 200, 97);
     editProperties->setBounds (getWidth() - 200, 97, 200, getHeight() - 97);
     mainEditor->setBounds (200, 0, getWidth() - 400, getHeight());
