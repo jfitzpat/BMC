@@ -47,9 +47,10 @@ void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, flo
                 {
                     g.setColour (Colour (point.red, point.blue, point.green));
                     
-                    g.fillRect((point.x.w + 32768) * wScale,
+                    // We put in the dots for beam images, etc.
+                    g.fillEllipse((point.x.w + 32768) * wScale,
                                 (32768 - point.y.w) * hScale,
-                                lineSize, lineSize);
+                                  lineSize / 2.0, lineSize / 2.0);
 
                     g.drawLine ((float)(point.x.w + 32768) * wScale,
                                 (float)(32768 - point.y.w) * hScale,
