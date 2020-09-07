@@ -42,16 +42,18 @@ public:
     bool getIldaVisible() { return ildaVisible; }
     bool getRefVisible() { return refVisible; }
     
-    File getImageFile();
-    const Image* getImage();
+    File getImageFile() {return currentFrame->getImageFile(); }
+    
+    const Image* getImage() { return currentFrame->getBackgroundImage(); }
     float getRefOpacity() { return refOpacity; }
     bool getRefDrawGrid() { return refDrawGrid; }
-    float getImageScale();
-    float getImageRotation();
-    float getImageXoffset();
-    float getImageYoffset();
+    float getImageScale() { return currentFrame->getImageScale(); }
+    float getImageRotation() { return currentFrame->getImageRotation(); }
+    float getImageXoffset() { return currentFrame->getImageXoffset(); }
+    float getImageYoffset() { return currentFrame->getImageYoffset(); }
     
     const ReferenceCountedArray<Frame>& getFrames() { return Frames; }
+    uint16 getFrameCount() { return Frames.size(); }
     uint16 getFrameIndex() { return frameIndex; }
     
     uint16 getPointCount() { return currentFrame->getPointCount(); }
@@ -85,7 +87,9 @@ public:
     
     void setIldaShowBlanked (bool show);
     void setIldaDrawLines (bool show);
-    
+
+    void setFrameIndex (uint16 index);
+
     // Destructive Version (invoked by UndoManager)
     void _setActiveLayer (Layer layer);
     void _setSketchVisible (bool visible);

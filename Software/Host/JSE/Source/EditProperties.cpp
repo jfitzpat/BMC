@@ -59,7 +59,7 @@ void EditProperties::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     
     g.setColour (juce::Colours::grey);
-    g.drawLine(0, 0, 0, getHeight(), 1);
+    g.drawRect (getLocalBounds().removeFromLeft(1), 1);
 }
 
 void EditProperties::resized()

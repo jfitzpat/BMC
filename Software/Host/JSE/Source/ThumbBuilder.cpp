@@ -21,7 +21,7 @@
 
 void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, float lineSize)
 {
-    thumb = Image(Image::RGB, width, height, true);
+    thumb = Image(Image::ARGB, width, height, true);
     
     Graphics g (thumb);
     float wScale = width / 65536.0;
@@ -46,6 +46,11 @@ void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, flo
                 if (! (point.status & Frame::BlankedPoint))
                 {
                     g.setColour (Colour (point.red, point.blue, point.green));
+                    
+                    g.fillRect((point.x.w + 32768) * wScale,
+                                (32768 - point.y.w) * hScale,
+                                lineSize, lineSize);
+
                     g.drawLine ((float)(point.x.w + 32768) * wScale,
                                 (float)(32768 - point.y.w) * hScale,
                                 (float)(nextPoint.x.w + 32768) * wScale,

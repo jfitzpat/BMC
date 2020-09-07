@@ -374,3 +374,28 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableSetFrameIndex : public UndoableAction
+{
+public:
+    UndoableSetFrameIndex (FrameEditor* editor, uint16 index)
+    : newIndex (index), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldIndex = frameEditor->getFrameIndex();
+        frameEditor->_setFrameIndex (newIndex);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setFrameIndex (oldIndex);
+        return true;
+    }
+    
+private:
+    uint16 oldIndex;
+    uint16 newIndex;
+    FrameEditor* frameEditor;
+};
+

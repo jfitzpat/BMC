@@ -25,17 +25,34 @@
 //==============================================================================
 /*
 */
-class FrameList  : public juce::Component
+class FrameList  : public Component,
+                   public ListBoxModel,
+                   public ActionListener
 {
 public:
     FrameList (FrameEditor* frame);
     ~FrameList() override;
-
+    
+    //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    //==============================================================================
+    int getNumRows() override;
+
+    void paintListBoxItem (int rowNumber,
+                           Graphics& g,
+                           int width, int height,
+                           bool rowIsSelected) override;
+
+    void selectedRowsChanged (int lastRowSelected) override;
+
+    //==============================================================================
+    void actionListenerCallback (const String& message) override;
+
 private:
     FrameEditor* frameEditor;
+    std::unique_ptr<ListBox> frameList;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameList)
 };

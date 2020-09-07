@@ -83,19 +83,8 @@ void FrameEditor::setRefVisible (bool visible)
     }
 }
 
-File FrameEditor::getImageFile()
-{
-    if (currentFrame == nullptr)
-        return File();
-    
-    return currentFrame->getImageFile();
-}
-
 void FrameEditor::selectImage()
 {
-    if (currentFrame == nullptr)
-        return;
-    
     FileChooser myChooser ("Choose Image to Load...",
                            File::getSpecialLocation (File::userDocumentsDirectory),
                            "*.png,*.jpg,*.jpeg,*.gif");
@@ -120,23 +109,12 @@ void FrameEditor::selectImage()
 
 void FrameEditor::clearImage()
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (currentFrame->getBackgroundImage() != nullptr)
     {
         File f;
         beginNewTransaction ("Clear Background Change");
         perform(new UndoableSetImage (this, f));
     }
-}
-
-const Image* FrameEditor::getImage()
-{
-    if (currentFrame == nullptr)
-        return nullptr;
-    else
-        return currentFrame->getBackgroundImage();
 }
 
 void FrameEditor::setRefOpacity (float opacity)
@@ -156,19 +134,8 @@ void FrameEditor::setRefOpacity (float opacity)
     }
 }
 
-float FrameEditor::getImageScale()
-{
-    if (currentFrame == nullptr)
-        return 1.0;
-    
-    return currentFrame->getImageScale();
-}
-
 void FrameEditor::setImageScale (float scale)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (scale < 0.01)
         scale = 0.01;
     else if (scale > 2.00)
@@ -184,19 +151,8 @@ void FrameEditor::setImageScale (float scale)
     }
 }
 
-float FrameEditor::getImageRotation()
-{
-    if (currentFrame == nullptr)
-        return 0.0;
-    
-    return currentFrame->getImageRotation();
-}
-
 void FrameEditor::setImageRotation (float rot)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (rot < 0)
         rot = 0;
     else if (rot > 359.9)
@@ -212,19 +168,8 @@ void FrameEditor::setImageRotation (float rot)
     }
 }
 
-float FrameEditor::getImageXoffset()
-{
-    if (currentFrame == nullptr)
-        return 0.0;
-    
-    return currentFrame->getImageXoffset();
-}
-
 void FrameEditor::setImageXoffset (float off)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (off < -100)
         off = -100;
     else if (off > 100)
@@ -240,19 +185,8 @@ void FrameEditor::setImageXoffset (float off)
     }
 }
 
-float FrameEditor::getImageYoffset()
-{
-    if (currentFrame == nullptr)
-        return 0.0;
-    
-    return currentFrame->getImageYoffset();
-}
-
 void FrameEditor::setImageYoffset (float off)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (off < -100)
         off = -100;
     else if (off > 100)
@@ -319,6 +253,15 @@ void FrameEditor::setDrawGrid (bool draw)
     }
 }
 
+void FrameEditor::setFrameIndex (uint16 index)
+{
+    if (getFrameIndex() != index)
+    {
+        beginNewTransaction ("Select Frame");
+        perform(new UndoableSetFrameIndex (this, index));
+    }
+}
+
 //==============================================================================
 void FrameEditor::_setActiveLayer (Layer layer)
 {
@@ -358,9 +301,6 @@ void FrameEditor::_setRefVisible (bool visible)
 
 bool FrameEditor::_setImage (File& file)
 {
-    if (currentFrame == nullptr)
-        return false;
-    
     // A little sneaky, if the file went invalid, fail
     // But if it was an empty file to begin with, use it
     Image i = ImageFileFormat::loadFrom (file);
@@ -391,9 +331,6 @@ void FrameEditor::_setRefOpacity (float opacity)
 
 void FrameEditor::_setImageScale (float scale)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (scale < 0.01)
         scale = 0.01;
     else if (scale > 2.00)
@@ -408,9 +345,6 @@ void FrameEditor::_setImageScale (float scale)
 
 void FrameEditor::_setImageRotation (float rot)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (rot < 0)
         rot = 0;
     else if (rot > 359.9)
@@ -425,9 +359,6 @@ void FrameEditor::_setImageRotation (float rot)
 
 void FrameEditor::_setImageXoffset (float off)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (off < -100)
         off = -100;
     else if (off > 100)
@@ -442,9 +373,6 @@ void FrameEditor::_setImageXoffset (float off)
 
 void FrameEditor::_setImageYoffset (float off)
 {
-    if (currentFrame == nullptr)
-        return;
-    
     if (off < -100)
         off = -100;
     else if (off > 100)
@@ -469,6 +397,8 @@ void FrameEditor::_setFrameIndex (uint16 index)
         index = 0;
     
     currentFrame = Frames[index];
+    frameIndex = index;
+    
     sendActionMessage (EditorActions::frameIndexChanged);
 }
 
