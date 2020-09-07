@@ -55,6 +55,9 @@ public:
     bool getPoint (uint16 index, XYPoint& point);
     void addPoint (XYPoint& point);
     
+    void buildThumbNail (int width = 150, int height = 150, float lineSize = 1.0);
+    const Image& getThumbNail() { return thumbNail; }
+    
     // Make a counting pointer of our type
     using Ptr = ReferenceCountedObjectPtr<Frame>;
     
@@ -67,4 +70,6 @@ private:
     float imageYoffset;
     
     Array<XYPoint> framePoints;
+    
+    Image thumbNail;
 };

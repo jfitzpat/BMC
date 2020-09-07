@@ -17,6 +17,7 @@
     limitations under the License.
 */
 
+#include "ThumbBuilder.h"
 #include "Frame.h"
 
 //==============================================================================
@@ -47,3 +48,7 @@ void Frame::addPoint (XYPoint& point)
     framePoints.add (point);
 }
 
+void Frame::buildThumbNail (int width, int height, float lineSize)
+{
+    ThumbBuilder::build (this, thumbNail, width, height, lineSize);
+}

@@ -171,7 +171,10 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
 
         // Don't store palletes!
         if (header.format != 2)
+        {
+            frame->buildThumbNail();
             frameArray.add (frame);
+        }
     }
     while (1);
 

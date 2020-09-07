@@ -42,7 +42,7 @@ void MainEditor::paint (juce::Graphics& g)
 {
     // Black background
     g.fillAll (Colours::black);
-        
+    
     // Outline working area
     g.setColour (Colours::grey);
     g.drawRect (activeArea, 1);

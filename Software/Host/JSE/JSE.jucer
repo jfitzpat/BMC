@@ -9,6 +9,9 @@
         <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
           <FILE id="CDG5yg" name="IldaLoader.cpp" compile="1" resource="0" file="Source/IldaLoader.cpp"/>
           <FILE id="fKoseL" name="IldaLoader.h" compile="0" resource="0" file="Source/IldaLoader.h"/>
+          <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
+                file="Source/ThumbBuilder.cpp"/>
+          <FILE id="QR21o4" name="ThumbBuilder.h" compile="0" resource="0" file="Source/ThumbBuilder.h"/>
         </GROUP>
         <GROUP id="{1E02FE6E-4294-6982-39BF-7F9B70C87DB0}" name="Property Pages">
           <FILE id="Ink4QW" name="IldaProperties.cpp" compile="1" resource="0"

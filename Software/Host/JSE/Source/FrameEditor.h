@@ -63,6 +63,9 @@ public:
     bool getIldaShowBlanked() { return ildaShowBlanked; }
     bool getIldaDrawLines() { return ildaDrawLines; }
     
+    const Image& getCurrentThumbNail() { return currentFrame->getThumbNail(); }
+    const Image& getThumbNail (uint16 index) { return Frames[index]->getThumbNail(); }
+    
     // Undoable Commands
     void setActiveLayer (Layer layer);
     void setSketchVisible (bool visible);
