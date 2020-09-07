@@ -43,7 +43,7 @@ public:
     {
         fileNew = 1,
         fileOpen,
-        fileClose,
+        appExit,
         editUndo,
         editRedo,
         helpWebSite

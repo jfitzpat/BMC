@@ -48,7 +48,13 @@ MainComponent::MainComponent()
 
     Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
     if (r.getWidth() >= 1200 && r.getHeight() >= 800)
-        setSize (1200, 800);
+    {
+        #ifdef JUCE_WINDOWS
+            setSize(1200 - getLookAndFeel().getDefaultMenuBarHeight(), 800);
+        #else
+            setSize (1200, 800);
+        #endif
+    }
     else
         setSize(r.getWidth(), r.getHeight());
 }
@@ -72,6 +78,7 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
+    Logger::outputDebugString("w: " + String(getWidth()) + " h: " + String(getHeight()));
     toolBar->setBounds (0, 0, 200, 97);
     frameList->setBounds (0, 97, 200, getHeight() - 97);
     laserControls->setBounds (getWidth() - 200, 0, 200, 97);
@@ -94,7 +101,10 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::fileNew);
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::fileOpen);
-        menu.addCommandItem (&commandManager, CommandIDs::fileClose);
+        #if JUCE_WINDOWS
+            menu.addSeparator();
+            menu.addCommandItem(&commandManager, CommandIDs::appExit);
+        #endif
     }
     else if (menuIndex == 1)
     {
@@ -123,6 +133,7 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
 {
     Array<CommandID> commands { CommandIDs::fileNew,
                                 CommandIDs::fileOpen,
+                                CommandIDs::appExit,
                                 CommandIDs::editUndo,
                                 CommandIDs::editRedo,
                                 CommandIDs::helpWebSite };
@@ -140,6 +151,9 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::fileOpen:
             result.setInfo ("Open", "Open an existing file...", "Menu", 0);
             result.addDefaultKeypress('o', ModifierKeys::commandModifier);
+            break;
+        case CommandIDs::appExit:
+            result.setInfo("Exit", "Exit the application...", "Menu", 0);
             break;
         case CommandIDs::editUndo:
             result.addDefaultKeypress('z', ModifierKeys::commandModifier);
@@ -190,6 +204,10 @@ bool MainComponent::perform (const InvocationInfo& info)
             
         case CommandIDs::fileOpen:
             frameEditor->loadFile();
+            break;
+
+        case CommandIDs::appExit:
+            juce::JUCEApplication::getInstance()->systemRequestedQuit();
             break;
     }
     return true;
