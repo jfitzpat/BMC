@@ -21,6 +21,9 @@
 #include <JuceHeader.h>
 #include "MainEditor.h"
 
+const float DotPitch = 20.0;
+const float CenterPitch = 10.0;
+
 //==============================================================================
 MainEditor::MainEditor (FrameEditor* frame)
 {
@@ -41,11 +44,13 @@ void MainEditor::paint (juce::Graphics& g)
     g.fillAll (Colours::black);
         
     // Outline working area
-    g.setColour (juce::Colours::grey);
+    g.setColour (Colours::grey);
     g.drawRect (activeArea, 1);
     
     if (frameEditor->getRefVisible() && frameEditor->getRefDrawGrid())
     {
+        // Draw the cross hair, we calculate in float so that it will
+        // scale well
         Line<float> vline ((float)activeArea.getCentreX(),
                            (float)activeArea.getY(),
                            (float)activeArea.getCentreX(),
@@ -61,6 +66,26 @@ void MainEditor::paint (juce::Graphics& g)
         
         g.drawDashedLine (hline, dashes, 2);
         g.drawDashedLine (vline, dashes, 2);
+        
+        g.setColour (Colours::darkgrey);
+        
+        // Draw the dots
+        float dotpitch = (float)activeArea.getWidth() / DotPitch;
+        for (float y = 1; y < DotPitch; ++y)
+        {
+            if (y != CenterPitch)
+            {
+                for (float x = 1; x < DotPitch; ++x)
+                {
+                    if (x != CenterPitch)
+                    {
+                        g.fillRect ((float)activeArea.getX() + (x * dotpitch) -1,
+                                    (float)activeArea.getY() + (y * dotpitch) -1,
+                                    2.0, 2.0);
+                    }
+                }
+            }
+        }
     }
 }
 

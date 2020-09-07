@@ -498,4 +498,3 @@ void FrameEditor::_setDrawGrid (bool draw)
         sendActionMessage (EditorActions::refDrawGridChanged);
     }
 }
-
