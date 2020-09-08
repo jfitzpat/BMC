@@ -81,6 +81,9 @@ void FrameList::paintListBoxItem (int rowNumber,
                  Rectangle<float>::leftTopRightBottom (0, 0, (float)width, (float)height),
                  0);
     
+    g.setColour (Colour (0x30000000));
+    g.fillRect (0, height-22, width, 22);
+    
     g.setColour (Colours::white);
     g.setFont (12);
     g.drawText ("Frame " + String(rowNumber + 1), 0, height-22, width, 22, Justification::centred);
