@@ -164,15 +164,15 @@ void RefProperties::buttonClicked (juce::Button* buttonThatWasClicked)
 void RefProperties::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     if (sliderThatWasMoved == backgroundAlpha.get())
-        frameEditor->setRefOpacity (backgroundAlpha->getValue() / 100.0);
+        frameEditor->setRefOpacity ((float)backgroundAlpha->getValue() / 100.0f);
     else if (sliderThatWasMoved == backgroundScale.get())
-        frameEditor->setImageScale (backgroundScale->getValue() / 100.0);
+        frameEditor->setImageScale ((float)backgroundScale->getValue() / 100.0f);
     else if (sliderThatWasMoved == backgroundRotation.get())
-        frameEditor->setImageRotation (backgroundRotation->getValue());
+        frameEditor->setImageRotation ((float)backgroundRotation->getValue());
     else if (sliderThatWasMoved == backgroundXoffset.get())
-        frameEditor->setImageXoffset (backgroundXoffset->getValue());
+        frameEditor->setImageXoffset ((float)backgroundXoffset->getValue());
     else if (sliderThatWasMoved == backgroundYoffset.get())
-        frameEditor->setImageYoffset (backgroundYoffset->getValue());
+        frameEditor->setImageYoffset ((float)backgroundYoffset->getValue());
             
 }
 

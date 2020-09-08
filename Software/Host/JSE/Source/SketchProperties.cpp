@@ -55,7 +55,7 @@ void SketchProperties::resized()
 
 }
 
-void SketchProperties::actionListenerCallback (const String& message)
+void SketchProperties::actionListenerCallback (const String& /* message */)
 {
-    
+
 }

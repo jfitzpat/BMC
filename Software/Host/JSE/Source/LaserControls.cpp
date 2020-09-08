@@ -43,7 +43,7 @@ void LaserControls::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
     g.setColour (juce::Colours::grey);
-    g.drawLine(0, 0, 0, getHeight(), 1);
+    g.drawLine(0, 0, 0, (float)getHeight(), 1);
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
@@ -58,7 +58,7 @@ void LaserControls::resized()
 
 }
 
-void LaserControls::actionListenerCallback (const String& message)
+void LaserControls::actionListenerCallback (const String& /*message*/)
 {
     
 }

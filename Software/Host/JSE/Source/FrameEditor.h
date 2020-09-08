@@ -53,7 +53,7 @@ public:
     float getImageYoffset() { return currentFrame->getImageYoffset(); }
     
     const ReferenceCountedArray<Frame>& getFrames() { return Frames; }
-    uint16 getFrameCount() { return Frames.size(); }
+    uint16 getFrameCount() { return (uint16)Frames.size(); }
     uint16 getFrameIndex() { return frameIndex; }
     
     uint16 getPointCount() { return currentFrame->getPointCount(); }

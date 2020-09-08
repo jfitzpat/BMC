@@ -118,7 +118,7 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     return menu;
 }
 
-void MainComponent::actionListenerCallback (const String& message)
+void MainComponent::actionListenerCallback (const String& /*message*/)
 {
     commandManager.commandStatusChanged();
 }

@@ -24,10 +24,10 @@ void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, flo
     thumb = Image(Image::ARGB, width, height, true);
     
     Graphics g (thumb);
-    float wScale = width / 65536.0;
-    float hScale = height / 65536.0;
+    float wScale = width / 65536.0f;
+    float hScale = height / 65536.0f;
     
-    for (auto n = 0; n < frame->getPointCount(); ++n)
+    for (uint16 n = 0; n < frame->getPointCount(); ++n)
     {
         Frame::XYPoint point;
         
@@ -50,7 +50,7 @@ void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, flo
                     // We put in the dots for beam images, etc.
                     g.fillEllipse((point.x.w + 32768) * wScale,
                                 (32768 - point.y.w) * hScale,
-                                  lineSize / 2.0, lineSize / 2.0);
+                                  lineSize / 2.0f, lineSize / 2.0f);
 
                     g.drawLine ((float)(point.x.w + 32768) * wScale,
                                 (float)(32768 - point.y.w) * hScale,

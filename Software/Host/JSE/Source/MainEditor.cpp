@@ -61,7 +61,7 @@ void MainEditor::paint (juce::Graphics& g)
                            (float)activeArea.getX() + activeArea.getWidth(),
                            (float)(activeArea.getCentreY()));
 
-        float segments = (float)activeArea.getWidth() / 73.0;
+        float segments = (float)activeArea.getWidth() / 73.0f;
         float dashes[] = { segments, segments };
         
         g.drawDashedLine (hline, dashes, 2);
@@ -103,18 +103,18 @@ void MainEditor::resized()
     // Scale our working area to fit on screen, but still
     // draw in full ILDA space
     float scale = (float)activeArea.getHeight() / 65536.0f;
-    float invScale = 1.0 / scale;
+    float invScale = 1.0f / scale;
     
     workingArea->setTransform (AffineTransform::scale (scale));
     
-    workingArea->setBounds (activeArea.getX() * invScale,
-                            activeArea.getY() * invScale,
+    workingArea->setBounds ((int)(activeArea.getX() * invScale),
+                            (int)(activeArea.getY() * invScale),
                             65536, 65536);
     workingArea->setActiveScale (scale);
     workingArea->setActiveInvScale (invScale);
 }
 
-void MainEditor::actionListenerCallback (const String& message)
+void MainEditor::actionListenerCallback (const String& /*message*/)
 {
     
 }
@@ -154,19 +154,19 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
             float iscale = frameEditor->getImageScale();
             
             if (w > h)
-                scale = iscale * 65536.0 / w;
+                scale = iscale * 65536.0f / w;
             else
-                scale = iscale * 65536.0 / h;
+                scale = iscale * 65536.0f / h;
 
-            float x = 32768 - (w * scale / 2) +
-                (frameEditor->getImageXoffset() / 100.0 * 65536.0);
-            float y = 32768 - (h * scale / 2) +
-                (frameEditor->getImageYoffset() / 100.0 * 65536.0);
+            float x = 32768.0f - (w * scale / 2) +
+                (frameEditor->getImageXoffset() / 100.0f * 65536.0f);
+            float y = 32768.0f - (h * scale / 2) +
+                (frameEditor->getImageYoffset() / 100.0f * 65536.0f);
 
             AffineTransform t = \
-                AffineTransform::rotation (frameEditor->getImageRotation() * MathConstants<float>::pi / 180.0,
-                    w / 2.0,
-                    h / 2.0) \
+                AffineTransform::rotation (frameEditor->getImageRotation() * MathConstants<float>::pi / 180.0f,
+                    w / 2.0f,
+                    h / 2.0f) \
                 .followedBy (AffineTransform::scale (scale)) \
                 .followedBy (AffineTransform::translation(x, y));
             
@@ -177,10 +177,10 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
     // ILDA points
     if (frameEditor->getIldaVisible())
     {
-        float dotSize = 3.0 * activeInvScale;
-        float halfDotSize = dotSize / 2.0;
+        float dotSize = 3.0f * activeInvScale;
+        float halfDotSize = dotSize / 2.0f;
         
-        for (auto n = 0; n < frameEditor->getPointCount(); ++n)
+        for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
         {
             Frame::XYPoint point;
             

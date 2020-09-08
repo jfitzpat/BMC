@@ -34,7 +34,7 @@ public:
     
     virtual ~PropTabbedComponent() {;}
     
-    void currentTabChanged (int newTabIndex, const String & newTabName) override
+    void currentTabChanged (int newTabIndex, const String & /* newTabName */) override
     {
         frameEditor->setActiveLayer ((FrameEditor::Layer) newTabIndex);
     }

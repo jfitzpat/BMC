@@ -136,10 +136,10 @@ void FrameEditor::setRefOpacity (float opacity)
 
 void FrameEditor::setImageScale (float scale)
 {
-    if (scale < 0.01)
-        scale = 0.01;
-    else if (scale > 2.00)
-        scale = 2.00;
+    if (scale < 0.01f)
+        scale = 0.01f;
+    else if (scale > 2.00f)
+        scale = 2.00f;
     
     if (scale != currentFrame->getImageScale())
     {
@@ -153,10 +153,10 @@ void FrameEditor::setImageScale (float scale)
 
 void FrameEditor::setImageRotation (float rot)
 {
-    if (rot < 0)
-        rot = 0;
-    else if (rot > 359.9)
-        rot = 359.9;
+    if (rot < 0.0f)
+        rot = 0.0f;
+    else if (rot > 359.9f)
+        rot = 359.9f;
     
     if (rot != currentFrame->getImageRotation())
     {
@@ -331,10 +331,10 @@ void FrameEditor::_setRefOpacity (float opacity)
 
 void FrameEditor::_setImageScale (float scale)
 {
-    if (scale < 0.01)
-        scale = 0.01;
-    else if (scale > 2.00)
-        scale = 2.00;
+    if (scale < 0.01f)
+        scale = 0.01f;
+    else if (scale > 2.00f)
+        scale = 2.00f;
     
     if (scale != currentFrame->getImageScale())
     {
@@ -345,10 +345,10 @@ void FrameEditor::_setImageScale (float scale)
 
 void FrameEditor::_setImageRotation (float rot)
 {
-    if (rot < 0)
-        rot = 0;
-    else if (rot > 359.9)
-        rot = 359.9;
+    if (rot < 0.0f)
+        rot = 0.0f;
+    else if (rot > 359.9f)
+        rot = 359.9f;
     
     if (rot != currentFrame->getImageRotation())
     {

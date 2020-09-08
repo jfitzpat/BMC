@@ -58,7 +58,7 @@ void EditToolBar::resized()
 
 }
 
-void EditToolBar::actionListenerCallback (const String& message)
+void EditToolBar::actionListenerCallback (const String& /* message */)
 {
     
 }

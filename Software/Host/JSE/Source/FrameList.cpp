@@ -78,7 +78,7 @@ void FrameList::paintListBoxItem (int rowNumber,
     g.fillAll (getLookAndFeel().findColour (ListBox::backgroundColourId));
     
     g.drawImage (frameEditor->getThumbNail ((uint16)rowNumber),
-                 Rectangle<float>::leftTopRightBottom (0, 0, width, height),
+                 Rectangle<float>::leftTopRightBottom (0, 0, (float)width, (float)height),
                  0);
     
     g.setColour (Colours::white);
@@ -95,7 +95,7 @@ void FrameList::paintListBoxItem (int rowNumber,
 void FrameList::selectedRowsChanged (int lastRowSelected)
 {
     if (lastRowSelected >= 0)
-        frameEditor->setFrameIndex (lastRowSelected);
+        frameEditor->setFrameIndex ((uint16)lastRowSelected);
 }
 
 //==============================================================================
