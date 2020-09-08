@@ -20,6 +20,8 @@
 #include <JuceHeader.h>
 #include "MainComponent.h"
 
+static PopupMenu appleExtraMenu;
+
 //==============================================================================
 class JSEApplication  : public juce::JUCEApplication
 {
@@ -91,7 +93,8 @@ public:
             #endif
 
             #if JUCE_MAC
-             MenuBarModel::setMacMainMenu (main);
+             appleExtraMenu = main->getExtraAppleMenu();
+             MenuBarModel::setMacMainMenu (main, &appleExtraMenu);
             #else
              setMenuBar(main);
             #endif

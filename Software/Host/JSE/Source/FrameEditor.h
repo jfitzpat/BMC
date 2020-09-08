@@ -37,6 +37,8 @@ public:
     } Layer;
 
     // Polling
+    bool getDirtyFlag() { return dirtyFlag; }
+    
     Layer getActiveLayer() { return activeLayer; }
     bool getSketchVisible() { return sketchVisible; }
     bool getIldaVisible() { return ildaVisible; }
@@ -84,6 +86,7 @@ public:
     void setImageYoffset (float off);
 
     void loadFile();
+    void newFile();
     
     void setIldaShowBlanked (bool show);
     void setIldaDrawLines (bool show);
@@ -111,6 +114,7 @@ public:
     void _setIldaDrawLines (bool draw);
 
 private:
+    bool dirtyFlag;
     Layer activeLayer;
     bool sketchVisible;
     bool ildaVisible;

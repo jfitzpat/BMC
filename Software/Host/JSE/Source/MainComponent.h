@@ -46,7 +46,9 @@ public:
         appExit,
         editUndo,
         editRedo,
-        helpWebSite
+        helpWebSite,
+        appAbout,
+        appPreferences
     };
 
     //==============================================================================
@@ -61,6 +63,8 @@ public:
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int menuIndex, const String& /*menuName*/) override;
     void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override {}
+    
+    PopupMenu getExtraAppleMenu();
  
     //==============================================================================
     void actionListenerCallback (const String& message) override;

@@ -45,7 +45,7 @@ void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, flo
             {
                 if (! (point.status & Frame::BlankedPoint))
                 {
-                    g.setColour (Colour (point.red, point.blue, point.green));
+                    g.setColour (Colour (point.red, point.green, point.blue));
                     
                     // We put in the dots for beam images, etc.
                     g.fillEllipse((point.x.w + 32768) * wScale,

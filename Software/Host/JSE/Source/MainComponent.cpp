@@ -103,6 +103,8 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::fileOpen);
         #if JUCE_WINDOWS
             menu.addSeparator();
+            menu.addCommandItem(&commandManager, CommandIDs::appPreferences);
+            menu.addSeparator();
             menu.addCommandItem(&commandManager, CommandIDs::appExit);
         #endif
     }
@@ -114,7 +116,22 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     else if (menuIndex == 2)
     {
         menu.addCommandItem (&commandManager, CommandIDs::helpWebSite);
+        #if JUCE_WINDOWS
+            menu.addCommandItem (&commandManager, CommmandIDs::appAbout);
+        #endif
     }
+    return menu;
+}
+
+PopupMenu MainComponent::getExtraAppleMenu()
+{
+    PopupMenu menu;
+    
+    menu.addCommandItem (&commandManager, CommandIDs::appAbout);
+    menu.addSeparator();
+    menu.addCommandItem (&commandManager, CommandIDs::appPreferences);
+    menu.addSeparator();
+    
     return menu;
 }
 
@@ -136,7 +153,10 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::appExit,
                                 CommandIDs::editUndo,
                                 CommandIDs::editRedo,
-                                CommandIDs::helpWebSite };
+                                CommandIDs::helpWebSite,
+                                CommandIDs::appAbout,
+                                CommandIDs::appPreferences };
+    
     c.addArray (commands);
 }
 
@@ -184,8 +204,15 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             }
             break;
         case CommandIDs::helpWebSite:
-            result.setInfo ("BMC Website", "Open the BMC Website", "Menu", 0);
+            result.setInfo ("BMC Website...", "Open the BMC Website", "Menu", 0);
             break;
+        case CommandIDs::appAbout:
+            result.setInfo ("About...", "Info about the application", "Menu", 0);
+            break;
+        case CommandIDs::appPreferences:
+            result.setInfo ("Preferences...", "Set app preferences", "Menu", 0);
+            break;
+
         default:
             break;
     }
@@ -204,6 +231,44 @@ bool MainComponent::perform (const InvocationInfo& info)
             
         case CommandIDs::fileOpen:
             frameEditor->loadFile();
+            break;
+
+        case CommandIDs::fileNew:
+            frameEditor->newFile();
+            break;
+            
+        case CommandIDs::helpWebSite:
+            {
+                URL url ("http://scrootch.me/bmc");
+                if (url.isWellFormed())
+                    url.launchInDefaultBrowser();
+            }
+            break;
+        
+        case CommandIDs::appAbout:
+            {
+                String s = "Version: " + String(ProjectInfo::versionString);
+                // Alpha or Beta?
+                if (! (ProjectInfo::versionNumber & 0xFF0000))
+                {
+                    if ((ProjectInfo::versionNumber & 0xFF00) == 0x100)
+                        s += " (Pre-Alpha " + String (ProjectInfo::versionNumber & 0xFF) + ")";
+                    else if ((ProjectInfo::versionNumber & 0xFF00) == 0x200)
+                        s += " (Alpha " + String (ProjectInfo::versionNumber & 0xFF) + ")";
+                    else if ((ProjectInfo::versionNumber & 0xFF00) == 0x300)
+                        s += " (Beta " + String (ProjectInfo::versionNumber & 0xFF) + ")";
+                }
+                s += "\rCopyright 2020 Scrootch.me!";
+                AlertWindow::showMessageBox(AlertWindow::InfoIcon, "About JSE",
+                                            s, "ok");
+            }
+            break;
+            
+        case CommandIDs::appPreferences:
+            {
+                AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Preferences",
+                                            "Placeholder for Preferences Dialog", "ok");
+            }
             break;
 
         case CommandIDs::appExit:

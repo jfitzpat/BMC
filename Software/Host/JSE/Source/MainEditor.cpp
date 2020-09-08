@@ -198,7 +198,8 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                 }
                 else
                 {
-                    g.setColour (Colour (point.red, point.blue, point.green));
+                    
+                    g.setColour (Colour (point.red, point.green, point.blue));
                     g.fillEllipse(point.x.w + (32768 - halfDotSize), (32768 - halfDotSize) - point.y.w, dotSize, dotSize);
                 }
                 
@@ -229,7 +230,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                         }
                         else
                         {
-                            g.setColour (Colour (point.red, point.blue, point.green));
+                            g.setColour (Colour (point.red, point.green, point.blue));
                             g.drawLine ((float)(point.x.w + 32768),
                                         (float)(32768 - point.y.w),
                                         (float)(nextPoint.x.w + 32768),

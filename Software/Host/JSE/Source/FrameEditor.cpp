@@ -25,7 +25,8 @@
 
 //==============================================================================
 FrameEditor::FrameEditor()
-    : activeLayer (sketch),
+    : dirtyFlag (false),
+      activeLayer (sketch),
       sketchVisible (true),
       ildaVisible (true),
       ildaShowBlanked (true),
@@ -204,26 +205,42 @@ void FrameEditor::setImageYoffset (float off)
 
 void FrameEditor::loadFile()
 {
-   FileChooser myChooser ("ILDA file to Load...",
+    // !!!! Check Dirty!
+    FileChooser myChooser ("ILDA file to Load...",
                           File::getSpecialLocation (File::userDocumentsDirectory),
                           "*.ild");
 
-   if (myChooser.browseForFileToOpen())
-   {
-       File f = myChooser.getResult();
+    if (myChooser.browseForFileToOpen())
+    {
+        File f = myChooser.getResult();
 
-       ReferenceCountedArray<Frame> frames;
-       if (! IldaLoader::load (frames, f))
-       {
+        ReferenceCountedArray<Frame> frames;
+        if (! IldaLoader::load (frames, f))
+        {
            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
                                        "An error occurred loading the selected ILDA file.", "ok");
-       }
-       else
-       {
+        }
+        else
+        {
            beginNewTransaction ("Load File");
            perform(new UndoableLoadFile (this, frames));
-       }
-   }
+        }
+    }
+}
+
+void FrameEditor::newFile()
+{
+    // !!!! Check Dirty!
+    
+    // Don't bother if we are already a new file
+    if (getFrameCount() == 1 && getPointCount() == 0)
+        return;
+    
+    ReferenceCountedArray<Frame> frames;
+    frames.add (new Frame());
+    
+    beginNewTransaction ("New File");
+    perform (new UndoableLoadFile (this, frames));
 }
 
 void FrameEditor::setIldaShowBlanked (bool visible)
