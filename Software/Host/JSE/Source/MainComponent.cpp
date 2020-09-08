@@ -117,7 +117,7 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     {
         menu.addCommandItem (&commandManager, CommandIDs::helpWebSite);
         #if JUCE_WINDOWS
-            menu.addCommandItem (&commandManager, CommmandIDs::appAbout);
+            menu.addCommandItem (&commandManager, CommandIDs::appAbout);
         #endif
     }
     return menu;
