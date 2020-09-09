@@ -99,8 +99,8 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
 
                 newPoint.z.w = 0;
 
-                // Store status
-                newPoint.status = in1.status;
+                // Store status (minus last frame indicator!)
+                newPoint.status = (in1.status & 0x7F);
 
                 // Lookup and store colors
                 newPoint.red = IldaColors[in1.colorIdx].red;
@@ -129,8 +129,8 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
                 newPoint.z.b[1] = in4.z.b[0];
                 newPoint.z.b[0] = in4.z.b[1];
 
-                // Store status
-                newPoint.status = in4.status;
+                // Store status (minus last frame indicator!)
+                newPoint.status = (in4.status & 0x7F);
 
                 // Store colors
                 newPoint.red = in4.red;
@@ -152,8 +152,8 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
 
                 newPoint.z.w = 0;
 
-                // Store status
-                newPoint.status = in5.status;
+                // Store status (minus last frame indicator!)
+                newPoint.status = (in5.status & 0x7F);
 
                 // Store colors
                 newPoint.red = in5.red;
@@ -169,7 +169,7 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
 
         if (n != rCount) break;
 
-        // Don't store palletes!
+        // Don't store palettes!
         if (header.format != 2)
         {
             frame->buildThumbNail();
