@@ -46,6 +46,8 @@ public:
         appExit,
         editUndo,
         editRedo,
+        editSelectAll,
+        editClearSelection,
         helpWebSite,
         appAbout,
         appPreferences

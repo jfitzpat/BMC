@@ -27,26 +27,41 @@
 */
 class IldaProperties  : public Component,
                         public Button::Listener,
+                        public TextEditor::Listener,
                         public ActionListener
 {
 public:
     IldaProperties (FrameEditor* editor);
     ~IldaProperties() override;
 
+    //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    //==============================================================================
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
+    //==============================================================================
     void actionListenerCallback (const String& message) override;
 
-    void refresh();
+    //==============================================================================
+    void textEditorReturnKeyPressed (TextEditor& editor) override;
+    void textEditorEscapeKeyPressed (TextEditor& editor) override;
+    void textEditorFocusLost (TextEditor& editor) override;
     
 private:
+    void updatePointDisplay();
+    void updateSelection();
+    
+    void refresh();
+
     FrameEditor* frameEditor;
     std::unique_ptr<ToggleButton> layerVisible;
     std::unique_ptr<ToggleButton> showBlanking;
     std::unique_ptr<ToggleButton> drawLines;
+    std::unique_ptr<Label> pointLabel;
+    std::unique_ptr<Label> selectionLabel;
+    std::unique_ptr<TextEditor> currentSelection;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

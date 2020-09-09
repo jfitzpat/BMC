@@ -399,3 +399,27 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableSetIldaSelection : public UndoableAction
+{
+public:
+    UndoableSetIldaSelection (FrameEditor* editor, const SparseSet<uint>& select)
+    : newSelect (select), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldSelect = frameEditor->getIldaSelection();
+        frameEditor->_setIldaSelection (newSelect);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setIldaSelection (oldSelect);
+        return true;
+    }
+    
+private:
+    SparseSet<uint> oldSelect;
+    SparseSet<uint> newSelect;
+    FrameEditor* frameEditor;
+};

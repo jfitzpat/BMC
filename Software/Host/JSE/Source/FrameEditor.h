@@ -39,6 +39,8 @@ public:
     // Polling
     bool getDirtyFlag() { return dirtyFlag; }
     
+    uint getScanRate() { return scanRate; }
+    
     Layer getActiveLayer() { return activeLayer; }
     bool getSketchVisible() { return sketchVisible; }
     bool getIldaVisible() { return ildaVisible; }
@@ -66,6 +68,7 @@ public:
 
     bool getIldaShowBlanked() { return ildaShowBlanked; }
     bool getIldaDrawLines() { return ildaDrawLines; }
+    const SparseSet<uint>& getIldaSelection() { return ildaSelection; }
     
     const Image& getCurrentThumbNail() { return currentFrame->getThumbNail(); }
     const Image& getThumbNail (uint16 index) { return Frames[index]->getThumbNail(); }
@@ -87,11 +90,15 @@ public:
 
     void loadFile();
     void newFile();
+    void selectAll();
+    void clearSelection();
     
     void setIldaShowBlanked (bool show);
     void setIldaDrawLines (bool show);
 
     void setFrameIndex (uint16 index);
+
+    void setIldaSelection (const SparseSet<uint>& selection);
 
     // Destructive Version (invoked by UndoManager)
     void _setActiveLayer (Layer layer);
@@ -112,9 +119,11 @@ public:
 
     void _setIldaShowBlanked (bool show);
     void _setIldaDrawLines (bool draw);
+    void _setIldaSelection (const SparseSet<uint>& selection);
 
 private:
     bool dirtyFlag;
+    uint scanRate;
     Layer activeLayer;
     bool sketchVisible;
     bool ildaVisible;
@@ -128,6 +137,7 @@ private:
     ReferenceCountedArray<Frame> Frames;
     Frame::Ptr currentFrame;
 
+    SparseSet<uint> ildaSelection;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
@@ -146,4 +156,5 @@ namespace EditorActions
     const String frameIndexChanged ("FIC");
     const String ildaShowBlankChanged ("SBC");
     const String ildaDrawLinesChanged ("DLC");
+    const String ildaSelectionChanged ("ISC");
 }

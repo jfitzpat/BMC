@@ -26,6 +26,7 @@
 //==============================================================================
 FrameEditor::FrameEditor()
     : dirtyFlag (false),
+      scanRate (30000),
       activeLayer (sketch),
       sketchVisible (true),
       ildaVisible (true),
@@ -37,7 +38,7 @@ FrameEditor::FrameEditor()
       frameIndex (0)
 {
     Frames.add (new Frame());
-    currentFrame = Frames[frameIndex];
+    currentFrame = Frames[frameIndex];    
 }
 
 FrameEditor::~FrameEditor()
@@ -55,8 +56,6 @@ void FrameEditor::setActiveLayer (Layer layer)
         perform(new UndoableSetLayer (this, layer));
     }
 }
-
-//==============================================================================
 void FrameEditor::setSketchVisible (bool visible)
 {
     if (visible != sketchVisible)
@@ -82,6 +81,25 @@ void FrameEditor::setRefVisible (bool visible)
         beginNewTransaction ("Background Visible Change");
         perform(new UndoableSetRefVisibility (this, visible));
     }
+}
+
+void FrameEditor::selectAll()
+{
+    if (getActiveLayer() == ilda)
+    {
+        if (getPointCount())
+        {
+            SparseSet<uint> s;
+            s.addRange (Range<uint> (0, getPointCount()));
+            setIldaSelection (s);
+        }
+    }
+}
+
+void FrameEditor::clearSelection()
+{
+    if (getActiveLayer() == ilda)
+        setIldaSelection (SparseSet<uint>());
 }
 
 void FrameEditor::selectImage()
@@ -217,13 +235,14 @@ void FrameEditor::loadFile()
         ReferenceCountedArray<Frame> frames;
         if (! IldaLoader::load (frames, f))
         {
-           AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
-                                       "An error occurred loading the selected ILDA file.", "ok");
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
+                                        "An error occurred loading the selected ILDA  file.", "ok");
         }
         else
         {
-           beginNewTransaction ("Load File");
-           perform(new UndoableLoadFile (this, frames));
+            beginNewTransaction ("Load File");
+            perform (new UndoableSetIldaSelection (this, SparseSet<uint>()));
+            perform(new UndoableLoadFile (this, frames));
         }
     }
 }
@@ -240,6 +259,7 @@ void FrameEditor::newFile()
     frames.add (new Frame());
     
     beginNewTransaction ("New File");
+    perform (new UndoableSetIldaSelection (this, SparseSet<uint>()));
     perform (new UndoableLoadFile (this, frames));
 }
 
@@ -275,7 +295,20 @@ void FrameEditor::setFrameIndex (uint16 index)
     if (getFrameIndex() != index)
     {
         beginNewTransaction ("Select Frame");
+        perform (new UndoableSetIldaSelection (this, SparseSet<uint>()));
         perform(new UndoableSetFrameIndex (this, index));
+    }
+}
+
+void FrameEditor::setIldaSelection (const SparseSet<uint>& selection)
+{
+    if (selection.getTotalRange().getEnd() > getPointCount())
+        return;
+    
+    if (selection != ildaSelection)
+    {
+        beginNewTransaction ("Selection Change");
+        perform (new UndoableSetIldaSelection (this, selection));
     }
 }
 
@@ -443,5 +476,17 @@ void FrameEditor::_setDrawGrid (bool draw)
     {
         refDrawGrid = draw;
         sendActionMessage (EditorActions::refDrawGridChanged);
+    }
+}
+
+void FrameEditor::_setIldaSelection (const SparseSet<uint>& selection)
+{
+    if (selection.getTotalRange().getEnd() > getPointCount())
+        return;
+    
+    if (selection != ildaSelection)
+    {
+        ildaSelection = selection;
+        sendActionMessage (EditorActions::ildaSelectionChanged);
     }
 }

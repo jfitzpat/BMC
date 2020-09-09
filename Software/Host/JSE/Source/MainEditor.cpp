@@ -179,6 +179,8 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
     {
         float dotSize = 3.0f * activeInvScale;
         float halfDotSize = dotSize / 2.0f;
+        float selectSize = 6.0f * activeInvScale;
+        float halfSelectSize = selectSize / 2.0f;
         
         for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
         {
@@ -194,13 +196,28 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                         g.setColour (Colours::darkgrey);
                         g.drawEllipse((float)(point.x.w + (32768 - halfDotSize)),
                                    (float)((32768 - halfDotSize) - point.y.w), dotSize, dotSize, activeInvScale);
+                        
+                        if (frameEditor->getIldaSelection().contains (n) &&
+                            frameEditor->getActiveLayer() == FrameEditor::ilda)
+                        {
+                            g.setColour (Colours::lightblue);
+                            g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
+                                       (float)((32768 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
+                        }
                     }
                 }
                 else
                 {
-                    
                     g.setColour (Colour (point.red, point.green, point.blue));
                     g.fillEllipse(point.x.w + (32768 - halfDotSize), (32768 - halfDotSize) - point.y.w, dotSize, dotSize);
+                    
+                    if (frameEditor->getIldaSelection().contains (n) &&
+                        frameEditor->getActiveLayer() == FrameEditor::ilda)
+                    {
+                        g.setColour (Colours::whitesmoke);
+                        g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
+                                   (float)((32768 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
+                    }
                 }
                 
                 // Draw lines
@@ -269,5 +286,9 @@ void MainEditor::WorkingArea::actionListenerCallback (const String& message)
     else if (message == EditorActions::ildaDrawLinesChanged)
         repaint();
     else if (message == EditorActions::refDrawGridChanged)
+        repaint();
+    else if (message == EditorActions::layerChanged)
+        repaint();
+    else if (message == EditorActions::ildaSelectionChanged)
         repaint();
 }

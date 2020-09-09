@@ -110,6 +110,9 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     {
         menu.addCommandItem (&commandManager, CommandIDs::editUndo);
         menu.addCommandItem (&commandManager, CommandIDs::editRedo);
+        menu.addSeparator();
+        menu.addCommandItem (&commandManager, CommandIDs::editSelectAll);
+        menu.addCommandItem (&commandManager, CommandIDs::editClearSelection);
     }
     else if (menuIndex == 2)
     {
@@ -151,6 +154,8 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::appExit,
                                 CommandIDs::editUndo,
                                 CommandIDs::editRedo,
+                                CommandIDs::editSelectAll,
+                                CommandIDs::editClearSelection,
                                 CommandIDs::helpWebSite,
                                 CommandIDs::appAbout,
                                 CommandIDs::appPreferences };
@@ -201,6 +206,14 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
                 result.setActive(false);
             }
             break;
+        case CommandIDs::editSelectAll:
+            result.setInfo ("Select All", "Select entire layer", "Menu", 0);
+            result.addDefaultKeypress('a', ModifierKeys::commandModifier);
+            break;
+        case CommandIDs::editClearSelection:
+            result.setInfo ("Deselect", "Clear current selection", "Menu", 0);
+            result.addDefaultKeypress('d', ModifierKeys::commandModifier);
+            break;
         case CommandIDs::helpWebSite:
             result.setInfo ("BMC Website...", "Open the BMC Website", "Menu", 0);
             break;
@@ -225,6 +238,13 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::editRedo:
             frameEditor->redo();
+            break;
+            
+        case CommandIDs::editSelectAll:
+            frameEditor->selectAll();
+            break;
+        case CommandIDs::editClearSelection:
+            frameEditor->clearSelection();
             break;
             
         case CommandIDs::fileOpen:
