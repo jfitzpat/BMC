@@ -44,8 +44,6 @@ MainComponent::MainComponent()
     // this lets the command manager use keypresses that arrive in our window to send out commands
     addKeyListener (commandManager.getKeyMappings());
 
-    setWantsKeyboardFocus(true);
-
     Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
     if (r.getWidth() >= 1200 && r.getHeight() >= 800)
     {

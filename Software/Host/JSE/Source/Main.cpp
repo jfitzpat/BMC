@@ -100,6 +100,11 @@ public:
             #endif
             
             setVisible (true);
+            
+            // Force activation of the child
+            // This fixes a quirk if you use the OS X native
+            // menu without ever having clicked on the app
+            Timer::callAfterDelay (300, [this] { getContentComponent()->grabKeyboardFocus(); });
         }
 
         ~MainWindow()
@@ -110,7 +115,7 @@ public:
               MenuBarModel::setMacMainMenu (nullptr);
             #endif
         }
-
+        
         void closeButtonPressed() override
         {
             // This is called when the user tries to close this window. Here, we'll just
