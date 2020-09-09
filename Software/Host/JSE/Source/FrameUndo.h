@@ -402,7 +402,7 @@ private:
 class UndoableSetIldaSelection : public UndoableAction
 {
 public:
-    UndoableSetIldaSelection (FrameEditor* editor, const SparseSet<uint>& select)
+    UndoableSetIldaSelection (FrameEditor* editor, const SparseSet<uint16>& select)
     : newSelect (select), frameEditor (editor) {;}
     
     bool perform() override
@@ -419,7 +419,7 @@ public:
     }
     
 private:
-    SparseSet<uint> oldSelect;
-    SparseSet<uint> newSelect;
+    SparseSet<uint16> oldSelect;
+    SparseSet<uint16> newSelect;
     FrameEditor* frameEditor;
 };

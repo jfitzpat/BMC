@@ -125,7 +125,7 @@ void IldaProperties::textEditorReturnKeyPressed (TextEditor& editor)
 {
     if (&editor == currentSelection.get())
     {
-        SparseSet<uint> selection;
+        SparseSet<uint16> selection;
         
         String s = editor.getText().removeCharacters(" ")
                     .replaceCharacter(':', '-')
@@ -149,7 +149,7 @@ void IldaProperties::textEditorReturnKeyPressed (TextEditor& editor)
                     end = start + 1;
                 
                 if (start >= 0 && end > start && end <= frameEditor->getPointCount())
-                    selection.addRange (Range<uint>(start, end));
+                    selection.addRange (Range<uint16>((uint16)start, (uint16)end));
             } while (s.length());
         }
         
@@ -193,7 +193,7 @@ void IldaProperties::updatePointDisplay()
     auto p = frameEditor->getPointCount();
     if (p)
     {
-        float frameRate = frameEditor->getScanRate() / p;
+        float frameRate = (float)frameEditor->getScanRate() / (float)p;
         
         if (frameRate < 15.0)
             pointLabel->setColour (Label::textColourId, juce::Colours::yellow);
@@ -232,7 +232,7 @@ void IldaProperties::updateSelection()
             
             for (auto n = 0; n < s.getNumRanges(); ++n)
             {
-                Range<uint> r = s.getRange (n);
+                Range<uint16> r = s.getRange (n);
 
                 if (sString.length())
                     sString += ", ";

@@ -89,8 +89,8 @@ void FrameEditor::selectAll()
     {
         if (getPointCount())
         {
-            SparseSet<uint> s;
-            s.addRange (Range<uint> (0, getPointCount()));
+            SparseSet<uint16> s;
+            s.addRange (Range<uint16> (0, getPointCount()));
             setIldaSelection (s);
         }
     }
@@ -99,7 +99,7 @@ void FrameEditor::selectAll()
 void FrameEditor::clearSelection()
 {
     if (getActiveLayer() == ilda)
-        setIldaSelection (SparseSet<uint>());
+        setIldaSelection (SparseSet<uint16>());
 }
 
 void FrameEditor::selectImage()
@@ -241,7 +241,7 @@ void FrameEditor::loadFile()
         else
         {
             beginNewTransaction ("Load File");
-            perform (new UndoableSetIldaSelection (this, SparseSet<uint>()));
+            perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
             perform(new UndoableLoadFile (this, frames));
         }
     }
@@ -259,7 +259,7 @@ void FrameEditor::newFile()
     frames.add (new Frame());
     
     beginNewTransaction ("New File");
-    perform (new UndoableSetIldaSelection (this, SparseSet<uint>()));
+    perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
     perform (new UndoableLoadFile (this, frames));
 }
 
@@ -295,12 +295,12 @@ void FrameEditor::setFrameIndex (uint16 index)
     if (getFrameIndex() != index)
     {
         beginNewTransaction ("Select Frame");
-        perform (new UndoableSetIldaSelection (this, SparseSet<uint>()));
+        perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform(new UndoableSetFrameIndex (this, index));
     }
 }
 
-void FrameEditor::setIldaSelection (const SparseSet<uint>& selection)
+void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
 {
     if (selection.getTotalRange().getEnd() > getPointCount())
         return;
@@ -479,7 +479,7 @@ void FrameEditor::_setDrawGrid (bool draw)
     }
 }
 
-void FrameEditor::_setIldaSelection (const SparseSet<uint>& selection)
+void FrameEditor::_setIldaSelection (const SparseSet<uint16>& selection)
 {
     if (selection.getTotalRange().getEnd() > getPointCount())
         return;
