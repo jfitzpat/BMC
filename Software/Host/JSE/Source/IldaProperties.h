@@ -52,6 +52,7 @@ public:
 private:
     void updatePointDisplay();
     void updateSelection();
+    void adjustSelection (int offset);
     
     void refresh();
 
@@ -62,6 +63,8 @@ private:
     std::unique_ptr<Label> pointLabel;
     std::unique_ptr<Label> selectionLabel;
     std::unique_ptr<TextEditor> currentSelection;
+    std::unique_ptr<TextButton> decSelection;
+    std::unique_ptr<TextButton> incSelection;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };
