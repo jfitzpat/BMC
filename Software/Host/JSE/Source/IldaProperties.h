@@ -65,6 +65,15 @@ private:
     std::unique_ptr<TextEditor> currentSelection;
     std::unique_ptr<TextButton> decSelection;
     std::unique_ptr<TextButton> incSelection;
+    std::unique_ptr<Label> xLabel;
+    std::unique_ptr<Label> yLabel;
+    std::unique_ptr<Label> zLabel;
+    std::unique_ptr<TextEditor> selectionX;
+    std::unique_ptr<TextEditor> selectionY;
+    std::unique_ptr<TextEditor> selectionZ;
+    std::unique_ptr<TextEditor> selectionR;
+    std::unique_ptr<TextEditor> selectionG;
+    std::unique_ptr<TextEditor> selectionB;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

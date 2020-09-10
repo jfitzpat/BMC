@@ -85,6 +85,69 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     incSelection->setButtonText ("+");
     incSelection->addListener (this);
 
+    xLabel.reset (new Label ("xLabel", "X"));
+    addAndMakeVisible (xLabel.get());
+    xLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    xLabel->setJustificationType (juce::Justification::centred);
+    xLabel->setEditable (false, false, false);
+    xLabel->setColour (Label::textColourId, juce::Colours::grey);
+    xLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    yLabel.reset (new Label ("yLabel", "Y"));
+    addAndMakeVisible (yLabel.get());
+    yLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    yLabel->setJustificationType (juce::Justification::centred);
+    yLabel->setEditable (false, false, false);
+    yLabel->setColour (Label::textColourId, juce::Colours::grey);
+    yLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+    
+    zLabel.reset (new Label ("zLabel", "Z"));
+    addAndMakeVisible (zLabel.get());
+    zLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    zLabel->setJustificationType (juce::Justification::centred);
+    zLabel->setEditable (false, false, false);
+    zLabel->setColour (Label::textColourId, juce::Colours::grey);
+    zLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+    
+    selectionX.reset (new TextEditor ("selectionX"));
+    addAndMakeVisible (selectionX.get());
+    selectionX->setMultiLine (false);
+    selectionX->setReturnKeyStartsNewLine (false);
+    selectionX->setReadOnly (false);
+    selectionX->setScrollbarsShown (true);
+    selectionX->setCaretVisible (true);
+    selectionX->setPopupMenuEnabled (true);
+    selectionX->setColour (TextEditor::textColourId, Colours::white);
+    selectionX->setTooltip ("X coordinate of selected point(s).");
+    selectionX->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-"), true);
+    selectionX->addListener (this);
+
+    selectionY.reset (new TextEditor ("selectionY"));
+    addAndMakeVisible (selectionY.get());
+    selectionY->setMultiLine (false);
+    selectionY->setReturnKeyStartsNewLine (false);
+    selectionY->setReadOnly (false);
+    selectionY->setScrollbarsShown (true);
+    selectionY->setCaretVisible (true);
+    selectionY->setPopupMenuEnabled (true);
+    selectionY->setColour (TextEditor::textColourId, Colours::white);
+    selectionY->setTooltip ("Y coordinate of selected point(s).");
+    selectionY->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-"), true);
+    selectionY->addListener (this);
+
+    selectionZ.reset (new TextEditor ("selectionZ"));
+    addAndMakeVisible (selectionZ.get());
+    selectionZ->setMultiLine (false);
+    selectionZ->setReturnKeyStartsNewLine (false);
+    selectionZ->setReadOnly (false);
+    selectionZ->setScrollbarsShown (true);
+    selectionZ->setCaretVisible (true);
+    selectionZ->setPopupMenuEnabled (true);
+    selectionZ->setColour (TextEditor::textColourId, Colours::white);
+    selectionZ->setTooltip ("Z coordinate of selected point(s).");
+    selectionZ->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-"), true);
+    selectionZ->addListener (this);
+
     refresh();
 }
 
@@ -97,6 +160,15 @@ IldaProperties::~IldaProperties()
     selectionLabel = nullptr;
     incSelection = nullptr;
     decSelection = nullptr;
+    xLabel = nullptr;
+    yLabel = nullptr;
+    zLabel = nullptr;
+    selectionX = nullptr;
+    selectionY = nullptr;
+    selectionZ = nullptr;
+    selectionR = nullptr;
+    selectionG = nullptr;
+    selectionB = nullptr;
 }
 
 //==============================================================================
@@ -116,6 +188,12 @@ void IldaProperties::resized()
     currentSelection->setBounds (16, 160, getWidth() - 32, 24);
     decSelection->setBounds (16, 188, 40, 20);
     incSelection->setBounds (58, 188, 40, 20);
+    xLabel->setBounds(16, 216, 54, 12);
+    yLabel->setBounds(16 + 56, 216, 54, 12);
+    zLabel->setBounds(16 + 112, 216, 54, 12);
+    selectionX->setBounds (16, 232, 54, 24);
+    selectionY->setBounds (16 + 56, 232, 54, 24);
+    selectionZ->setBounds (16 + 112, 232, 54, 24);
 }
 
 //==============================================================================
