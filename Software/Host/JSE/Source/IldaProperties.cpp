@@ -108,7 +108,31 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     zLabel->setEditable (false, false, false);
     zLabel->setColour (Label::textColourId, juce::Colours::grey);
     zLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
-    
+
+    rLabel.reset (new Label ("rLabel", "R"));
+    addAndMakeVisible (rLabel.get());
+    rLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    rLabel->setJustificationType (juce::Justification::centred);
+    rLabel->setEditable (false, false, false);
+    rLabel->setColour (Label::textColourId, juce::Colours::grey);
+    rLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    gLabel.reset (new Label ("gLabel", "G"));
+    addAndMakeVisible (gLabel.get());
+    gLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    gLabel->setJustificationType (juce::Justification::centred);
+    gLabel->setEditable (false, false, false);
+    gLabel->setColour (Label::textColourId, juce::Colours::grey);
+    gLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    bLabel.reset (new Label ("bLabel", "B"));
+    addAndMakeVisible (bLabel.get());
+    bLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    bLabel->setJustificationType (juce::Justification::centred);
+    bLabel->setEditable (false, false, false);
+    bLabel->setColour (Label::textColourId, juce::Colours::grey);
+    bLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
     selectionX.reset (new TextEditor ("selectionX"));
     addAndMakeVisible (selectionX.get());
     selectionX->setMultiLine (false);
@@ -119,7 +143,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionX->setPopupMenuEnabled (true);
     selectionX->setColour (TextEditor::textColourId, Colours::white);
     selectionX->setTooltip ("X coordinate of selected point(s).");
-    selectionX->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-"), true);
+    selectionX->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     selectionX->addListener (this);
 
     selectionY.reset (new TextEditor ("selectionY"));
@@ -132,7 +156,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionY->setPopupMenuEnabled (true);
     selectionY->setColour (TextEditor::textColourId, Colours::white);
     selectionY->setTooltip ("Y coordinate of selected point(s).");
-    selectionY->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-"), true);
+    selectionY->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     selectionY->addListener (this);
 
     selectionZ.reset (new TextEditor ("selectionZ"));
@@ -145,8 +169,47 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionZ->setPopupMenuEnabled (true);
     selectionZ->setColour (TextEditor::textColourId, Colours::white);
     selectionZ->setTooltip ("Z coordinate of selected point(s).");
-    selectionZ->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-"), true);
+    selectionZ->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     selectionZ->addListener (this);
+
+    selectionR.reset (new TextEditor ("selectionR"));
+    addAndMakeVisible (selectionR.get());
+    selectionR->setMultiLine (false);
+    selectionR->setReturnKeyStartsNewLine (false);
+    selectionR->setReadOnly (false);
+    selectionR->setScrollbarsShown (true);
+    selectionR->setCaretVisible (true);
+    selectionR->setPopupMenuEnabled (true);
+    selectionR->setColour (TextEditor::textColourId, Colours::white);
+    selectionR->setTooltip ("Red level of selected point(s).");
+    selectionR->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
+    selectionR->addListener (this);
+
+    selectionG.reset (new TextEditor ("selectionG"));
+    addAndMakeVisible (selectionG.get());
+    selectionG->setMultiLine (false);
+    selectionG->setReturnKeyStartsNewLine (false);
+    selectionG->setReadOnly (false);
+    selectionG->setScrollbarsShown (true);
+    selectionG->setCaretVisible (true);
+    selectionG->setPopupMenuEnabled (true);
+    selectionG->setColour (TextEditor::textColourId, Colours::white);
+    selectionG->setTooltip ("Green level of selected point(s).");
+    selectionG->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
+    selectionG->addListener (this);
+
+    selectionB.reset (new TextEditor ("selectionB"));
+    addAndMakeVisible (selectionB.get());
+    selectionB->setMultiLine (false);
+    selectionB->setReturnKeyStartsNewLine (false);
+    selectionB->setReadOnly (false);
+    selectionB->setScrollbarsShown (true);
+    selectionB->setCaretVisible (true);
+    selectionB->setPopupMenuEnabled (true);
+    selectionB->setColour (TextEditor::textColourId, Colours::white);
+    selectionB->setTooltip ("Blue level of selected point(s).");
+    selectionB->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
+    selectionB->addListener (this);
 
     refresh();
 }
@@ -163,6 +226,9 @@ IldaProperties::~IldaProperties()
     xLabel = nullptr;
     yLabel = nullptr;
     zLabel = nullptr;
+    rLabel = nullptr;
+    gLabel = nullptr;
+    bLabel = nullptr;
     selectionX = nullptr;
     selectionY = nullptr;
     selectionZ = nullptr;
@@ -194,6 +260,12 @@ void IldaProperties::resized()
     selectionX->setBounds (16, 232, 54, 24);
     selectionY->setBounds (16 + 56, 232, 54, 24);
     selectionZ->setBounds (16 + 112, 232, 54, 24);
+    rLabel->setBounds(16, 264, 54, 12);
+    gLabel->setBounds(16 + 56, 264, 54, 12);
+    bLabel->setBounds(16 + 112, 264, 54, 12);
+    selectionR->setBounds (16, 280, 54, 24);
+    selectionG->setBounds (16 + 56, 280, 54, 24);
+    selectionB->setBounds (16 + 112, 280, 54, 24);
 }
 
 //==============================================================================
@@ -338,6 +410,15 @@ void IldaProperties::updateSelection()
         currentSelection->setEnabled (false);
         decSelection->setEnabled (false);
         incSelection->setEnabled (false);
+        xLabel->setColour (Label::textColourId, juce::Colours::grey);
+        yLabel->setColour (Label::textColourId, juce::Colours::grey);
+        zLabel->setColour (Label::textColourId, juce::Colours::grey);
+        rLabel->setColour (Label::textColourId, juce::Colours::grey);
+        gLabel->setColour (Label::textColourId, juce::Colours::grey);
+        bLabel->setColour (Label::textColourId, juce::Colours::grey);
+        selectionX->setEnabled (false); selectionY->setEnabled (false);
+        selectionZ->setEnabled (false); selectionR->setEnabled (false);
+        selectionG->setEnabled (false); selectionB->setEnabled (false);
     }
     else
     {
@@ -349,15 +430,34 @@ void IldaProperties::updateSelection()
             currentSelection->setText (String());
             decSelection->setEnabled (false);
             incSelection->setEnabled (false);
+            xLabel->setColour (Label::textColourId, juce::Colours::grey);
+            yLabel->setColour (Label::textColourId, juce::Colours::grey);
+            zLabel->setColour (Label::textColourId, juce::Colours::grey);
+            rLabel->setColour (Label::textColourId, juce::Colours::grey);
+            gLabel->setColour (Label::textColourId, juce::Colours::grey);
+            bLabel->setColour (Label::textColourId, juce::Colours::grey);
+            selectionX->setText (String()); selectionY->setText (String());
+            selectionZ->setText (String()); selectionR->setText (String());
+            selectionG->setText (String()); selectionB->setText (String());
+            selectionX->setEnabled (false); selectionY->setEnabled (false);
+            selectionZ->setEnabled (false); selectionR->setEnabled (false);
+            selectionG->setEnabled (false); selectionB->setEnabled (false);
         }
         else
         {
             String sString;
+            bool mx = false;    bool my = false;
+            bool mz = false;    bool mr = false;
+            bool mg = false;    bool mb = false;
+            
+            Frame::XYPoint lastPoint;
             
             for (auto n = 0; n < s.getNumRanges(); ++n)
             {
+                // Get the range
                 Range<uint16> r = s.getRange (n);
 
+                // Build the string
                 if (sString.length())
                     sString += ", ";
                 
@@ -365,11 +465,46 @@ void IldaProperties::updateSelection()
                 
                 if (r.getLength() > 1)
                     sString += "-" + String(r.getEnd());
+                
+                // Check values
+                if (n == 0)
+                    frameEditor->getPoint (r.getStart(), lastPoint);
+                
+                Frame::XYPoint newPoint;
+                
+                for (auto i = 0; i < r.getLength(); ++i)
+                {
+                    frameEditor->getPoint (r.getStart() + i, newPoint);
+                    
+                    mx |= newPoint.x.w != lastPoint.x.w;
+                    my |= newPoint.y.w != lastPoint.y.w;
+                    mz |= newPoint.z.w != lastPoint.z.w;
+                    mr |= newPoint.red != lastPoint.red;
+                    mg |= newPoint.green != lastPoint.green;
+                    mb |= newPoint.blue != lastPoint.blue;
+                }
             }
             
             currentSelection->setText (sString);
             decSelection->setEnabled (true);
             incSelection->setEnabled (true);
+            xLabel->setColour (Label::textColourId, juce::Colours::white);
+            yLabel->setColour (Label::textColourId, juce::Colours::white);
+            zLabel->setColour (Label::textColourId, juce::Colours::white);
+            rLabel->setColour (Label::textColourId, juce::Colours::white);
+            gLabel->setColour (Label::textColourId, juce::Colours::white);
+            bLabel->setColour (Label::textColourId, juce::Colours::white);
+            selectionX->setEnabled (true); selectionY->setEnabled (true);
+            selectionZ->setEnabled (true); selectionR->setEnabled (true);
+            selectionG->setEnabled (true); selectionB->setEnabled (true);
+            
+            selectionX->setText ( mx ? "*" : String (lastPoint.x.w));
+            selectionY->setText ( my ? "*" : String (lastPoint.y.w));
+            selectionZ->setText ( mz ? "*" : String (lastPoint.z.w));
+            selectionR->setText ( mr ? "*" : String (lastPoint.red));
+            selectionG->setText ( mg ? "*" : String (lastPoint.green));
+            selectionB->setText ( mb ? "*" : String (lastPoint.blue));
+
         }
     }
 }

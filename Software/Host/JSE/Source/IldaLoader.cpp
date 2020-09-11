@@ -163,6 +163,14 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
             else
                 break;
             
+            // Normalize blanked as black
+            if (newPoint.status & ILDA_BLANK)
+            {
+                newPoint.red = 0;
+                newPoint.green = 0;
+                newPoint.blue = 0;
+            }
+            
             // Store the point
             frame->addPoint (newPoint);
         }

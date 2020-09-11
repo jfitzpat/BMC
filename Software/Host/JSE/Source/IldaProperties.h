@@ -68,6 +68,9 @@ private:
     std::unique_ptr<Label> xLabel;
     std::unique_ptr<Label> yLabel;
     std::unique_ptr<Label> zLabel;
+    std::unique_ptr<Label> rLabel;
+    std::unique_ptr<Label> gLabel;
+    std::unique_ptr<Label> bLabel;
     std::unique_ptr<TextEditor> selectionX;
     std::unique_ptr<TextEditor> selectionY;
     std::unique_ptr<TextEditor> selectionZ;
