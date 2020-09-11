@@ -70,6 +70,9 @@ public:
     bool getIldaDrawLines() { return ildaDrawLines; }
     const SparseSet<uint16>& getIldaSelection() { return ildaSelection; }
     
+    void getIldaSelectedPoints (Array<Frame::XYPoint>& points);
+    void getIldaPoints (const SparseSet<uint16>& selection, Array<Frame::XYPoint>& points);
+
     const Image& getCurrentThumbNail() { return currentFrame->getThumbNail(); }
     const Image& getThumbNail (uint16 index) { return Frames[index]->getThumbNail(); }
     
@@ -100,6 +103,14 @@ public:
 
     void setIldaSelection (const SparseSet<uint16>& selection);
 
+    void setIldaSelectedX (int16 newX);
+    void setIldaSelectedY (int16 newY);
+    void setIldaSelectedZ (int16 newZ);
+    void setIldaSelectedR (uint8 newR);
+    void setIldaSelectedG (uint8 newR);
+    void setIldaSelectedB (uint8 newR);
+    void setIldaSelectedRGB (const Colour& newColor);
+    
     // Destructive Version (invoked by UndoManager)
     void _setActiveLayer (Layer layer);
     void _setSketchVisible (bool visible);
@@ -120,6 +131,9 @@ public:
     void _setIldaShowBlanked (bool show);
     void _setIldaDrawLines (bool draw);
     void _setIldaSelection (const SparseSet<uint16>& selection);
+
+    void _setIldaPoints (const SparseSet<uint16>& selection,
+                         const Array<Frame::XYPoint>& points);
 
 private:
     bool dirtyFlag;
@@ -142,19 +156,21 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
 
+// Keep the broadcast messages short and unique
 namespace EditorActions
 {
     const String layerChanged ("LC");
-    const String sketchVisibilityChanged ("SVC");
-    const String ildaVisibilityChanged ("IVC");
-    const String refVisibilityChanged ("RVC");
-    const String backgroundImageChanged ("BIC");
-    const String refOpacityChanged("ROC");
-    const String refDrawGridChanged("RGC");
-    const String backgroundImageAdjusted ("BIA");
-    const String framesChanged ("FC");
-    const String frameIndexChanged ("FIC");
-    const String ildaShowBlankChanged ("SBC");
-    const String ildaDrawLinesChanged ("DLC");
-    const String ildaSelectionChanged ("ISC");
+    const String sketchVisibilityChanged    ("SVC");
+    const String ildaVisibilityChanged      ("IVC");
+    const String refVisibilityChanged       ("RVC");
+    const String backgroundImageChanged     ("BIC");
+    const String refOpacityChanged          ("ROC");
+    const String refDrawGridChanged         ("RGC");
+    const String backgroundImageAdjusted    ("BIA");
+    const String framesChanged              ("FC");
+    const String frameIndexChanged          ("FIC");
+    const String ildaShowBlankChanged       ("SBC");
+    const String ildaDrawLinesChanged       ("DLC");
+    const String ildaSelectionChanged       ("ISC");
+    const String ildaPointsChanged          ("IPC");
 }

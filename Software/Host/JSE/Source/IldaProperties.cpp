@@ -252,8 +252,8 @@ void IldaProperties::resized()
     pointLabel->setBounds (16, 112, getWidth() - 32, 24);
     selectionLabel->setBounds (16, 144, getWidth() - 32, 12);
     currentSelection->setBounds (16, 160, getWidth() - 32, 24);
-    decSelection->setBounds (16, 188, 40, 20);
-    incSelection->setBounds (58, 188, 40, 20);
+    decSelection->setBounds (59, 188, 40, 20);
+    incSelection->setBounds (101, 188, 40, 20);
     xLabel->setBounds(16, 216, 54, 12);
     yLabel->setBounds(16 + 56, 216, 54, 12);
     zLabel->setBounds(16 + 112, 216, 54, 12);
@@ -306,6 +306,8 @@ void IldaProperties::actionListenerCallback (const String& message)
     else if (message == EditorActions::frameIndexChanged)
         refresh();
     else if (message == EditorActions::ildaSelectionChanged)
+        updateSelection();
+    else if (message == EditorActions::ildaPointsChanged)
         updateSelection();
 }
 
@@ -363,17 +365,57 @@ void IldaProperties::textEditorReturnKeyPressed (TextEditor& editor)
         frameEditor->setIldaSelection (selection);
         layerVisible->grabKeyboardFocus();
     }
+    else if (&editor == selectionX.get())
+    {
+        if (! selectionX->getText().containsChar ('*'))
+            frameEditor->setIldaSelectedX ((int16) selectionX->getText().getIntValue());
+
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == selectionY.get())
+    {
+        if (! selectionY->getText().containsChar ('*'))
+            frameEditor->setIldaSelectedY ((int16) selectionY->getText().getIntValue());
+
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == selectionZ.get())
+    {
+        if (! selectionZ->getText().containsChar ('*'))
+            frameEditor->setIldaSelectedZ ((int16) selectionZ->getText().getIntValue());
+
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == selectionR.get())
+    {
+        if (! selectionR->getText().containsChar ('*'))
+            frameEditor->setIldaSelectedR ((uint8) selectionR->getText().getIntValue());
+
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == selectionG.get())
+    {
+        if (! selectionG->getText().containsChar ('*'))
+            frameEditor->setIldaSelectedG ((uint8) selectionG->getText().getIntValue());
+
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == selectionB.get())
+    {
+        if (! selectionB->getText().containsChar ('*'))
+            frameEditor->setIldaSelectedB ((uint8) selectionB->getText().getIntValue());
+
+        layerVisible->grabKeyboardFocus();
+    }
 }
 
-void IldaProperties::textEditorEscapeKeyPressed (TextEditor& editor)
+void IldaProperties::textEditorEscapeKeyPressed (TextEditor&)
 {
-    if (&editor == currentSelection.get())
         layerVisible->grabKeyboardFocus();
 }
 
-void IldaProperties::textEditorFocusLost (TextEditor& editor)
+void IldaProperties::textEditorFocusLost (TextEditor&)
 {
-    if (&editor == currentSelection.get())
         updateSelection();
 }
 
@@ -472,7 +514,7 @@ void IldaProperties::updateSelection()
                 
                 Frame::XYPoint newPoint;
                 
-                for (auto i = 0; i < r.getLength(); ++i)
+                for (uint16 i = 0; i < r.getLength(); ++i)
                 {
                     frameEditor->getPoint (r.getStart() + i, newPoint);
                     

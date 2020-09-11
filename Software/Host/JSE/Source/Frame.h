@@ -54,6 +54,7 @@ public:
     
     bool getPoint (uint16 index, XYPoint& point);
     void addPoint (XYPoint& point);
+    void replacePoint (uint16 index, const XYPoint& newPoint);
     
     void buildThumbNail (int width = 150, int height = 150, float lineSize = 1.0);
     const Image& getThumbNail() { return thumbNail; }

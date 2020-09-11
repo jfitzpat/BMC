@@ -423,3 +423,31 @@ private:
     SparseSet<uint16> newSelect;
     FrameEditor* frameEditor;
 };
+
+class UndoableSetIldaPoints : public UndoableAction
+{
+    public:
+        UndoableSetIldaPoints (FrameEditor* editor,
+                               const SparseSet<uint16>& select,
+                               const Array<Frame::XYPoint> points)
+        : selection (select), newPoints (points), frameEditor (editor) {;}
+        
+        bool perform() override
+        {
+            frameEditor->getIldaPoints (selection, oldPoints);
+            frameEditor->_setIldaPoints (selection, newPoints);
+            return true;
+        }
+        
+        bool undo() override
+        {
+            frameEditor->_setIldaPoints (selection, oldPoints);
+            return true;
+        }
+        
+    private:
+        SparseSet<uint16> selection;
+        Array<Frame::XYPoint> oldPoints;
+        Array<Frame::XYPoint> newPoints;
+        FrameEditor* frameEditor;
+};

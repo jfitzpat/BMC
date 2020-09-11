@@ -46,6 +46,43 @@ FrameEditor::~FrameEditor()
     currentFrame = nullptr;
 }
 
+//==============================================================================
+void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
+{
+    points.clear();
+    
+    for (auto n = 0; n < ildaSelection.getNumRanges(); ++n)
+    {
+        Range<uint16> r = ildaSelection.getRange (n);
+        
+        for (uint16 i = 0; i < r.getLength(); ++i)
+        {
+            Frame::XYPoint point;
+            
+            getPoint (r.getStart() + i, point);
+            points.add (point);
+        }
+    }
+}
+
+void FrameEditor::getIldaPoints (const SparseSet<uint16>& selection,
+                                 Array<Frame::XYPoint>& points)
+{
+    points.clear();
+    
+    for (auto n = 0; n < selection.getNumRanges(); ++n)
+    {
+        Range<uint16> r = selection.getRange (n);
+        
+        for (uint16 i = 0; i < r.getLength(); ++i)
+        {
+            Frame::XYPoint point;
+            
+            getPoint (r.getStart() + i, point);
+            points.add (point);
+        }
+    }
+}
 
 //==============================================================================
 void FrameEditor::setActiveLayer (Layer layer)
@@ -90,7 +127,33 @@ void FrameEditor::selectAll()
         if (getPointCount())
         {
             SparseSet<uint16> s;
-            s.addRange (Range<uint16> (0, getPointCount()));
+
+            // Grab all?
+            if (ildaShowBlanked)
+                s.addRange (Range<uint16> (0, getPointCount()));
+            else
+            {
+                // Walk all the points and find ranges of visible
+                for (uint16 n = 0; n < getPointCount(); ++n)
+                {
+                    Frame::XYPoint point;
+                    currentFrame->getPoint (n, point);
+                    if (! (point.status & Frame::BlankedPoint))
+                    {
+                        uint16 start = n;
+                        
+                        for (; n < getPointCount(); ++n)
+                        {
+                            currentFrame->getPoint (n, point);
+                            if (point.status & Frame::BlankedPoint)
+                                break;
+                        }
+                        
+                        s.addRange (Range<uint16> (start, n));
+                    }
+                }
+            }
+            
             setIldaSelection (s);
         }
     }
@@ -312,6 +375,120 @@ void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
     }
 }
 
+void FrameEditor::setIldaSelectedX (int16 newX)
+{
+    Array<Frame::XYPoint> points;
+    
+    getIldaSelectedPoints (points);
+    
+    if (! points.size())
+        return;
+    
+    for (auto n = 0; n < points.size(); ++n)
+        points.getReference (n).x.w = newX;
+    
+    beginNewTransaction ("Point X Change");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
+void FrameEditor::setIldaSelectedY (int16 newY)
+{
+    Array<Frame::XYPoint> points;
+    
+    getIldaSelectedPoints (points);
+    
+    if (! points.size())
+        return;
+    
+    for (auto n = 0; n < points.size(); ++n)
+        points.getReference (n).y.w = newY;
+    
+    beginNewTransaction ("Point Y Change");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
+void FrameEditor::setIldaSelectedZ (int16 newZ)
+{
+    Array<Frame::XYPoint> points;
+    
+    getIldaSelectedPoints (points);
+    
+    if (! points.size())
+        return;
+    
+    for (auto n = 0; n < points.size(); ++n)
+        points.getReference (n).z.w = newZ;
+    
+    beginNewTransaction ("Point Z Change");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
+void FrameEditor::setIldaSelectedR (uint8 newR)
+{
+    Array<Frame::XYPoint> points;
+    
+    getIldaSelectedPoints (points);
+    
+    if (! points.size())
+        return;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        points.getReference (n).red = newR;
+        if (points[n].red == 0 && points[n].green == 0 && points[n].blue == 0)
+            points.getReference (n).status = Frame::BlankedPoint;
+        else
+            points.getReference (n).status = 0;
+    }
+    
+    beginNewTransaction ("Point Red Change");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
+void FrameEditor::setIldaSelectedG (uint8 newG)
+{
+    Array<Frame::XYPoint> points;
+    
+    getIldaSelectedPoints (points);
+    
+    if (! points.size())
+        return;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        points.getReference (n).green = newG;
+        if (points[n].red == 0 && points[n].green == 0 && points[n].blue == 0)
+            points.getReference (n).status = Frame::BlankedPoint;
+        else
+            points.getReference (n).status = 0;
+    }
+    
+    beginNewTransaction ("Point Green Change");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
+void FrameEditor::setIldaSelectedB (uint8 newB)
+{
+    Array<Frame::XYPoint> points;
+    
+    getIldaSelectedPoints (points);
+    
+    if (! points.size())
+        return;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        points.getReference (n).blue = newB;
+        if (points[n].red == 0 && points[n].green == 0 && points[n].blue == 0)
+            points.getReference (n).status = Frame::BlankedPoint;
+        else
+            points.getReference (n).status = 0;
+    }
+    
+    beginNewTransaction ("Point Blue Change");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
 //==============================================================================
 void FrameEditor::_setActiveLayer (Layer layer)
 {
@@ -490,3 +667,23 @@ void FrameEditor::_setIldaSelection (const SparseSet<uint16>& selection)
         sendActionMessage (EditorActions::ildaSelectionChanged);
     }
 }
+
+void FrameEditor::_setIldaPoints (const SparseSet<uint16>& selection,
+                                  const Array<Frame::XYPoint>& points)
+{
+    auto pindex = 0;
+    
+    if (selection.isEmpty())
+        return;
+    
+    for (auto n = 0; n < selection.getNumRanges(); ++n)
+    {
+        Range<uint16> r = selection.getRange (n);
+        
+        for (uint16 i = 0; i < r.getLength(); ++i)
+            currentFrame->replacePoint (r.getStart() + i, points[pindex++]);
+    }
+    
+    sendActionMessage (EditorActions::ildaPointsChanged);
+}
+

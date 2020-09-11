@@ -48,6 +48,15 @@ void Frame::addPoint (XYPoint& point)
     framePoints.add (point);
 }
 
+void Frame::replacePoint (uint16 index, const XYPoint& newPoint)
+{
+    if (index >= framePoints.size())
+        return;
+    
+    framePoints.remove (index);
+    framePoints.insert (index, newPoint);
+}
+
 void Frame::buildThumbNail (int width, int height, float lineSize)
 {
     ThumbBuilder::build (this, thumbNail, width, height, lineSize);
