@@ -22,6 +22,7 @@
 
 //==============================================================================
 IldaProperties::IldaProperties (FrameEditor* editor)
+    : selectionColour (Colours::transparentBlack)
 {
     frameEditor = editor;
     frameEditor->addActionListener (this);
@@ -210,6 +211,11 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionB->setTooltip ("Blue level of selected point(s).");
     selectionB->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
     selectionB->addListener (this);
+    
+    colorButton.reset (new ColourButton ());
+    addAndMakeVisible (colorButton.get());
+    colorButton->setTooltip ("Select color for selected point(s).");
+    colorButton->addChangeListener (this);
 
     refresh();
 }
@@ -266,6 +272,7 @@ void IldaProperties::resized()
     selectionR->setBounds (16, 280, 54, 24);
     selectionG->setBounds (16 + 56, 280, 54, 24);
     selectionB->setBounds (16 + 112, 280, 54, 24);
+    colorButton->setBounds (79, 308, 40, 20);
 }
 
 //==============================================================================
@@ -309,6 +316,16 @@ void IldaProperties::actionListenerCallback (const String& message)
         updateSelection();
     else if (message == EditorActions::ildaPointsChanged)
         updateSelection();
+}
+
+void IldaProperties::changeListenerCallback (ChangeBroadcaster* source)
+{
+    if (source == colorButton.get())
+    {
+        Colour c = colorButton->findColour (TextButton::buttonColourId);
+        if (c != selectionColour)
+            frameEditor->setIldaSelectedRGB (c);
+    }
 }
 
 //==============================================================================
@@ -461,6 +478,8 @@ void IldaProperties::updateSelection()
         selectionX->setEnabled (false); selectionY->setEnabled (false);
         selectionZ->setEnabled (false); selectionR->setEnabled (false);
         selectionG->setEnabled (false); selectionB->setEnabled (false);
+        colorButton->setEnabled (false);
+        colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
     }
     else
     {
@@ -484,6 +503,9 @@ void IldaProperties::updateSelection()
             selectionX->setEnabled (false); selectionY->setEnabled (false);
             selectionZ->setEnabled (false); selectionR->setEnabled (false);
             selectionG->setEnabled (false); selectionB->setEnabled (false);
+            colorButton->setEnabled (false);
+            colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
+
         }
         else
         {
@@ -546,7 +568,14 @@ void IldaProperties::updateSelection()
             selectionR->setText ( mr ? "*" : String (lastPoint.red));
             selectionG->setText ( mg ? "*" : String (lastPoint.green));
             selectionB->setText ( mb ? "*" : String (lastPoint.blue));
-
+            
+            colorButton->setEnabled (true);
+            if (mr || mg || mb)
+                selectionColour = Colours::transparentBlack;
+            else
+                selectionColour = Colour (lastPoint.red, lastPoint.green, lastPoint.blue);
+            
+            colorButton->setColour (TextButton::buttonColourId, selectionColour);
         }
     }
 }

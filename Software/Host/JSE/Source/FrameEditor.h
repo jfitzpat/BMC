@@ -36,10 +36,16 @@ public:
         reference
     } Layer;
 
-    // Polling
-    bool getDirtyFlag() { return dirtyFlag; }
+
+    // Dirty/Clean mechanism
+    uint32 getDirtyCounter() { return dirtyCounter; }
+    void setDirtyCounter (uint32 count);
+    void incDirtyCounter();
+    void decDirtyCounter();
     
+    // Polling
     uint32 getScanRate() { return scanRate; }
+    const File& getLoadedFile() { return loadedFile; }
     
     Layer getActiveLayer() { return activeLayer; }
     bool getSketchVisible() { return sketchVisible; }
@@ -109,9 +115,10 @@ public:
     void setIldaSelectedR (uint8 newR);
     void setIldaSelectedG (uint8 newR);
     void setIldaSelectedB (uint8 newR);
-    void setIldaSelectedRGB (const Colour& newColor);
+    void setIldaSelectedRGB (const Colour newColor);
     
     // Destructive Version (invoked by UndoManager)
+    void _setLoadedFile (const File& file) { loadedFile = file; }
     void _setActiveLayer (Layer layer);
     void _setSketchVisible (bool visible);
     void _setIldaVisible (bool visible);
@@ -136,7 +143,8 @@ public:
                          const Array<Frame::XYPoint>& points);
 
 private:
-    bool dirtyFlag;
+    File loadedFile;
+    uint32 dirtyCounter;
     uint32 scanRate;
     Layer activeLayer;
     bool sketchVisible;
@@ -159,7 +167,8 @@ private:
 // Keep the broadcast messages short and unique
 namespace EditorActions
 {
-    const String layerChanged ("LC");
+    const String dirtyStatusChanged         ("DSC");
+    const String layerChanged               ("LC");
     const String sketchVisibilityChanged    ("SVC");
     const String ildaVisibilityChanged      ("IVC");
     const String refVisibilityChanged       ("RVC");

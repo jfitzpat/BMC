@@ -55,6 +55,8 @@ MainComponent::MainComponent()
     }
     else
         setSize(r.getWidth(), r.getHeight());
+    
+    Timer::callAfterDelay (300, [this] { actionListenerCallback(EditorActions::framesChanged); });
 }
 
 MainComponent::~MainComponent()
@@ -99,6 +101,11 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::fileNew);
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::fileOpen);
+        menu.addSeparator();
+        menu.addCommandItem (&commandManager, CommandIDs::fileSave);
+        menu.addCommandItem (&commandManager, CommandIDs::fileSaveAs);
+        menu.addCommandItem (&commandManager, CommandIDs::fileExport);
+
         #if JUCE_WINDOWS
             menu.addSeparator();
             menu.addCommandItem(&commandManager, CommandIDs::appPreferences);
@@ -136,9 +143,36 @@ PopupMenu MainComponent::getExtraAppleMenu()
     return menu;
 }
 
-void MainComponent::actionListenerCallback (const String& /*message*/)
+bool MainComponent::isFileDirty()
+{
+    if (frameEditor->getDirtyCounter())
+        return true;
+    
+    return false;
+}
+
+void MainComponent::actionListenerCallback (const String& message)
 {
     commandManager.commandStatusChanged();
+    
+    if (message == EditorActions::framesChanged ||
+        message == EditorActions::dirtyStatusChanged)
+    {
+        DocumentWindow* w = dynamic_cast<DocumentWindow*>(getTopLevelComponent());
+        if (w)
+        {
+            String name (ProjectInfo::projectName);
+            name += " - ";
+            if (frameEditor->getDirtyCounter())
+                name += "*";
+            if (frameEditor->getLoadedFile().getFileName().length())
+                name += frameEditor->getLoadedFile().getFileName();
+            else
+                name += "<New File>";
+            
+            w->setName (name);
+        }
+    }
 }
 
 //==============================================================================
@@ -151,6 +185,9 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
 {
     Array<CommandID> commands { CommandIDs::fileNew,
                                 CommandIDs::fileOpen,
+                                CommandIDs::fileSave,
+                                CommandIDs::fileSaveAs,
+                                CommandIDs::fileExport,
                                 CommandIDs::appExit,
                                 CommandIDs::editUndo,
                                 CommandIDs::editRedo,
@@ -175,8 +212,22 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Open", "Open an existing file...", "Menu", 0);
             result.addDefaultKeypress('o', ModifierKeys::commandModifier);
             break;
+        case CommandIDs::fileSave:
+            result.setInfo ("Save", "Save changes to the current file", "Menu", 0);
+            result.addDefaultKeypress('s', ModifierKeys::commandModifier);
+            result.setActive (isFileDirty());
+            break;
+            
+        case CommandIDs::fileSaveAs:
+            result.setInfo ("Save As...", "Save to a new file", "Menu", 0);
+            break;
+            
+        case CommandIDs::fileExport:
+            result.setInfo ("Export ILDA File...", "Save to an ILDA file", "Menu", 0);
+            break;
+            
         case CommandIDs::appExit:
-            result.setInfo("Exit", "Exit the application...", "Menu", 0);
+            result.setInfo("Exit", "Exit the application", "Menu", 0);
             break;
         case CommandIDs::editUndo:
             result.addDefaultKeypress('z', ModifierKeys::commandModifier);

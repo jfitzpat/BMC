@@ -20,6 +20,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "ColourButton.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -28,7 +29,8 @@
 class IldaProperties  : public Component,
                         public Button::Listener,
                         public TextEditor::Listener,
-                        public ActionListener
+                        public ActionListener,
+                        public ChangeListener
 {
 public:
     IldaProperties (FrameEditor* editor);
@@ -45,6 +47,9 @@ public:
     void actionListenerCallback (const String& message) override;
 
     //==============================================================================
+    void changeListenerCallback (ChangeBroadcaster* source) override;
+
+    //==============================================================================
     void textEditorReturnKeyPressed (TextEditor& editor) override;
     void textEditorEscapeKeyPressed (TextEditor& editor) override;
     void textEditorFocusLost (TextEditor& editor) override;
@@ -57,6 +62,7 @@ private:
     void refresh();
 
     FrameEditor* frameEditor;
+    Colour selectionColour;
     std::unique_ptr<ToggleButton> layerVisible;
     std::unique_ptr<ToggleButton> showBlanking;
     std::unique_ptr<ToggleButton> drawLines;
@@ -77,6 +83,7 @@ private:
     std::unique_ptr<TextEditor> selectionR;
     std::unique_ptr<TextEditor> selectionG;
     std::unique_ptr<TextEditor> selectionB;
+    std::unique_ptr<ColourButton> colorButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

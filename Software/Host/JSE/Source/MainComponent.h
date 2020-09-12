@@ -43,6 +43,9 @@ public:
     {
         fileNew = 1,
         fileOpen,
+        fileSave,
+        fileSaveAs,
+        fileExport,
         appExit,
         editUndo,
         editRedo,
@@ -67,7 +70,8 @@ public:
     void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override {}
     
     PopupMenu getExtraAppleMenu();
- 
+    bool isFileDirty();
+    
     //==============================================================================
     void actionListenerCallback (const String& message) override;
 

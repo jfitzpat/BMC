@@ -8,6 +8,9 @@
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">
         <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
+          <FILE id="gswGuO" name="ColourButton.cpp" compile="1" resource="0"
+                file="Source/ColourButton.cpp"/>
+          <FILE id="xoFsB2" name="ColourButton.h" compile="0" resource="0" file="Source/ColourButton.h"/>
           <FILE id="CDG5yg" name="IldaLoader.cpp" compile="1" resource="0" file="Source/IldaLoader.cpp"/>
           <FILE id="fKoseL" name="IldaLoader.h" compile="0" resource="0" file="Source/IldaLoader.h"/>
           <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
@@ -66,6 +69,7 @@
         <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2019>
     <XCODE_MAC targetFolder="Builds/MacOSX">
@@ -79,6 +83,7 @@
         <MODULEPATH id="juce_events" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
@@ -88,6 +93,7 @@
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
   </MODULES>
   <LIVE_SETTINGS>
     <OSX/>

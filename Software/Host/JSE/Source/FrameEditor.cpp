@@ -25,7 +25,7 @@
 
 //==============================================================================
 FrameEditor::FrameEditor()
-    : dirtyFlag (false),
+    : dirtyCounter (0),
       scanRate (30000),
       activeLayer (sketch),
       sketchVisible (true),
@@ -44,6 +44,32 @@ FrameEditor::FrameEditor()
 FrameEditor::~FrameEditor()
 {
     currentFrame = nullptr;
+}
+
+//==============================================================================
+void FrameEditor::setDirtyCounter (uint32 count)
+{
+    dirtyCounter = count;
+    sendActionMessage (EditorActions::dirtyStatusChanged);
+}
+
+void FrameEditor::incDirtyCounter()
+{
+    dirtyCounter++;
+
+    if (dirtyCounter == 1)
+        sendActionMessage (EditorActions::dirtyStatusChanged);
+}
+
+void FrameEditor::decDirtyCounter()
+{
+    if (dirtyCounter)
+    {
+        dirtyCounter--;
+        
+        if (! dirtyCounter)
+            sendActionMessage (EditorActions::dirtyStatusChanged);
+    }
 }
 
 //==============================================================================
@@ -286,7 +312,12 @@ void FrameEditor::setImageYoffset (float off)
 
 void FrameEditor::loadFile()
 {
-    // !!!! Check Dirty!
+    // Check Dirty!
+    if (dirtyCounter)
+        if (! AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Unsaved Changes!",
+                                    "Are you sure you want to proceed without saving?", "proceed", "cancel"))
+            return;
+
     FileChooser myChooser ("ILDA file to Load...",
                           File::getSpecialLocation (File::userDocumentsDirectory),
                           "*.ild");
@@ -305,15 +336,19 @@ void FrameEditor::loadFile()
         {
             beginNewTransaction ("Load File");
             perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
-            perform(new UndoableLoadFile (this, frames));
+            perform(new UndoableLoadFile (this, frames, f));
         }
     }
 }
 
 void FrameEditor::newFile()
 {
-    // !!!! Check Dirty!
-    
+    // Check Dirty!
+    if (dirtyCounter)
+        if (! AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Unsaved Changes!",
+                                    "Are you sure you want to proceed without saving?", "proceed", "cancel"))
+            return;
+
     // Don't bother if we are already a new file
     if (getFrameCount() == 1 && getPointCount() == 0)
         return;
@@ -323,7 +358,7 @@ void FrameEditor::newFile()
     
     beginNewTransaction ("New File");
     perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
-    perform (new UndoableLoadFile (this, frames));
+    perform (new UndoableLoadFile (this, frames, File()));
 }
 
 void FrameEditor::setIldaShowBlanked (bool visible)
@@ -357,6 +392,8 @@ void FrameEditor::setFrameIndex (uint16 index)
 {
     if (getFrameIndex() != index)
     {
+        currentFrame->buildThumbNail();
+        
         beginNewTransaction ("Select Frame");
         perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform(new UndoableSetFrameIndex (this, index));
@@ -488,6 +525,32 @@ void FrameEditor::setIldaSelectedB (uint8 newB)
     beginNewTransaction ("Point Blue Change");
     perform (new UndoableSetIldaPoints (this, ildaSelection, points));
 }
+
+void FrameEditor::setIldaSelectedRGB (const Colour newColor)
+{
+    Array<Frame::XYPoint> points;
+    
+    getIldaSelectedPoints (points);
+    
+    if (! points.size())
+        return;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        points.getReference (n).red = newColor.getRed();
+        points.getReference (n).green = newColor.getGreen();
+        points.getReference (n).blue = newColor.getBlue();
+        
+        if (points[n].red == 0 && points[n].green == 0 && points[n].blue == 0)
+            points.getReference (n).status = Frame::BlankedPoint;
+        else
+            points.getReference (n).status = 0;
+    }
+    
+    beginNewTransaction ("Point Color Change");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
 
 //==============================================================================
 void FrameEditor::_setActiveLayer (Layer layer)

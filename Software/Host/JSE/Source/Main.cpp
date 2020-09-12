@@ -53,6 +53,16 @@ public:
     {
         // This is called when the app is being asked to quit: you can ignore this
         // request and let the app carry on running, or call quit() to allow the app to close.
+        
+        MainComponent* main = dynamic_cast<MainComponent*>(mainWindow->getContentComponent());
+        
+        if (main)
+        {
+            if (main->isFileDirty())
+                if (! AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Unsaved Changes!",
+                                            "Are you sure you want to quit?", "quit", "cancel"))
+                    return;
+        }
         quit();
     }
 

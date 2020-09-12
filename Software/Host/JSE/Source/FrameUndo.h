@@ -130,12 +130,14 @@ public:
     
     bool perform() override
     {
+        frameEditor->incDirtyCounter();
         oldFile = frameEditor->getImageFile();
         return frameEditor->_setImage (newFile);
     }
     
     bool undo() override
     {
+        frameEditor->decDirtyCounter();
         return frameEditor->_setImage (oldFile);
     }
     
@@ -153,6 +155,7 @@ public:
     
     bool perform() override
     {
+        frameEditor->incDirtyCounter();
         oldAlpha = frameEditor->getRefOpacity();
         frameEditor->_setRefOpacity (newAlpha);
         return true;
@@ -161,6 +164,7 @@ public:
     bool undo() override
     {
         frameEditor->_setRefOpacity (oldAlpha);
+        frameEditor->decDirtyCounter();
         return true;
     }
     
@@ -178,6 +182,7 @@ public:
     
     bool perform() override
     {
+        frameEditor->incDirtyCounter();
         oldScale = frameEditor->getImageScale();
         frameEditor->_setImageScale (newScale);
         return true;
@@ -186,6 +191,7 @@ public:
     bool undo() override
     {
         frameEditor->_setImageScale (oldScale);
+        frameEditor->decDirtyCounter();
         return true;
     }
     
@@ -203,6 +209,7 @@ public:
     
     bool perform() override
     {
+        frameEditor->incDirtyCounter();
         oldRot = frameEditor->getImageRotation();
         frameEditor->_setImageRotation(newRot);
         return true;
@@ -211,6 +218,7 @@ public:
     bool undo() override
     {
         frameEditor->_setImageRotation (oldRot);
+        frameEditor->decDirtyCounter();
         return true;
     }
     
@@ -228,6 +236,7 @@ public:
     
     bool perform() override
     {
+        frameEditor->incDirtyCounter();
         oldRot = frameEditor->getImageXoffset();
         frameEditor->_setImageXoffset(newRot);
         return true;
@@ -236,6 +245,7 @@ public:
     bool undo() override
     {
         frameEditor->_setImageXoffset (oldRot);
+        frameEditor->decDirtyCounter();
         return true;
     }
     
@@ -253,6 +263,7 @@ public:
     
     bool perform() override
     {
+        frameEditor->incDirtyCounter();
         oldRot = frameEditor->getImageYoffset();
         frameEditor->_setImageYoffset(newRot);
         return true;
@@ -261,6 +272,7 @@ public:
     bool undo() override
     {
         frameEditor->_setImageYoffset (oldRot);
+        frameEditor->decDirtyCounter();
         return true;
     }
     
@@ -273,29 +285,38 @@ private:
 class UndoableLoadFile : public UndoableAction
 {
 public:
-    UndoableLoadFile (FrameEditor* editor, const ReferenceCountedArray<Frame> frames)
-    : newFrames (frames), frameEditor (editor) {;}
+    UndoableLoadFile (FrameEditor* editor, const ReferenceCountedArray<Frame> frames, const File& file)
+    : newFrames (frames), newFile (file), frameEditor (editor) {;}
     
     bool perform() override
     {
         oldIndex = frameEditor->getFrameIndex();
         oldFrames = frameEditor->getFrames();
+        oldFile = frameEditor->getLoadedFile();
+        oldDirtyCounter = frameEditor->getDirtyCounter();
+        frameEditor->_setLoadedFile (newFile);
         frameEditor->_setFrames (newFrames);
         frameEditor->_setFrameIndex (0);
+        frameEditor->setDirtyCounter (0);
         return true;
     }
     
     bool undo() override
     {
+        frameEditor->_setLoadedFile (oldFile);
         frameEditor->_setFrames (oldFrames);
         frameEditor->_setFrameIndex (oldIndex);
+        frameEditor->setDirtyCounter (oldDirtyCounter);
         return true;
     }
     
 private:
     uint16 oldIndex;
     ReferenceCountedArray<Frame> oldFrames;
+    uint32 oldDirtyCounter;
+    File oldFile;
     ReferenceCountedArray<Frame> newFrames;
+    File newFile;
     FrameEditor* frameEditor;
 };
 
@@ -434,6 +455,7 @@ class UndoableSetIldaPoints : public UndoableAction
         
         bool perform() override
         {
+            frameEditor->incDirtyCounter();
             frameEditor->getIldaPoints (selection, oldPoints);
             frameEditor->_setIldaPoints (selection, newPoints);
             return true;
@@ -442,6 +464,7 @@ class UndoableSetIldaPoints : public UndoableAction
         bool undo() override
         {
             frameEditor->_setIldaPoints (selection, oldPoints);
+            frameEditor->decDirtyCounter();
             return true;
         }
         
