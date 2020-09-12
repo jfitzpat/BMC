@@ -125,25 +125,25 @@ private:
 class UndoableSetImage : public UndoableAction
 {
 public:
-    UndoableSetImage (FrameEditor* editor, File& file)
+    UndoableSetImage (FrameEditor* editor, const MemoryBlock& file)
     : newFile (file), frameEditor (editor) {;}
     
     bool perform() override
     {
         frameEditor->incDirtyCounter();
-        oldFile = frameEditor->getImageFile();
-        return frameEditor->_setImage (newFile);
+        oldFile = frameEditor->getImageData();
+        return frameEditor->_setImageData (newFile);
     }
     
     bool undo() override
     {
         frameEditor->decDirtyCounter();
-        return frameEditor->_setImage (oldFile);
+        return frameEditor->_setImageData (oldFile);
     }
     
 private:
-    File oldFile;
-    File newFile;
+    MemoryBlock oldFile;
+    MemoryBlock newFile;
     FrameEditor* frameEditor;
 };
 

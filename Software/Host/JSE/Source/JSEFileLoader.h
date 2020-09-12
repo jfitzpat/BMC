@@ -1,6 +1,6 @@
 /*
-    IldaLoader.h
-    Load an ILDA file as an array of Frame objects
+    JSEFileLoader.h
+    Load a jse file as an array of Frame objects
  
     Copyright 2020 Scrootch.me!
 
@@ -22,7 +22,7 @@
 #include <JuceHeader.h>
 #include "Frame.h"
 
-class IldaLoader
+class JSEFileLoader
 {
 public:
     static bool load (ReferenceCountedArray<Frame>& frameArray, File& file);

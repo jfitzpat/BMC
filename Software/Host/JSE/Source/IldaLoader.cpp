@@ -1,6 +1,6 @@
 /*
     IldaLoader.cpp
-    Load and ILDA file as an array of Frame objects
+    Load an ILDA file as an array of Frame objects
  
     Copyright 2020 Scrootch.me!
 

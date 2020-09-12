@@ -30,10 +30,9 @@ public:
     Frame();
     ~Frame();
     
-    File getImageFile() { return imageFile; }
-    void setImageFile (const File& newFile) { imageFile = newFile; }
     const Image* getBackgroundImage() { return backgroundImage.get(); }
-    void setOwnedBackgroundImage (Image* image) { backgroundImage.reset (image); }
+    void setImageData (const MemoryBlock& data);
+    const MemoryBlock& getImageData() { return imageData; }
     
     float getImageScale()               { return imageScale; }
     void setImageScale (float scale)    { imageScale = scale; }
@@ -63,8 +62,8 @@ public:
     using Ptr = ReferenceCountedObjectPtr<Frame>;
     
 private:
-    File imageFile;
     std::unique_ptr<Image> backgroundImage;
+    MemoryBlock imageData;
     float imageScale;
     float imageRotation;
     float imageXoffset;

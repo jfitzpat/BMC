@@ -19,6 +19,8 @@
 
 #include <JuceHeader.h>
 #include "IldaLoader.h"
+#include "JSEFileSaver.h"
+#include "JSEFileLoader.h"
 #include "FrameEditor.h"
 
 #include "FrameUndo.h"      // UndoableTask classes
@@ -69,6 +71,49 @@ void FrameEditor::decDirtyCounter()
         
         if (! dirtyCounter)
             sendActionMessage (EditorActions::dirtyStatusChanged);
+    }
+}
+
+//==============================================================================
+void FrameEditor::fileSave()
+{
+    File f = getLoadedFile();
+    
+    if ((! f.getFileName().length()) || (f.getFileExtension() == ".ild"))
+    {
+        fileSaveAs();
+        return;
+    }
+        
+    if (! JSEFileSaver::save (this, f))
+    {
+        AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
+                                   "An error occurred saving the file!", "ok");
+    }
+    else
+        setDirtyCounter (0);
+}
+
+void FrameEditor::fileSaveAs()
+{
+    FileChooser myChooser ("Choose File to Save As...",
+                           File::getSpecialLocation (File::userDocumentsDirectory),
+                           "*.jse");
+
+    if (myChooser.browseForFileToSave (true))
+    {
+        File f = myChooser.getResult();
+        if (! JSEFileSaver::save (this, f))
+        {
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
+                                       "An error occurred saving the file!", "ok");
+        }
+        else
+        {
+            clearUndoHistory();
+            _setLoadedFile (f);
+            setDirtyCounter(0);
+        }
     }
 }
 
@@ -209,8 +254,11 @@ void FrameEditor::selectImage()
         }
         else
         {
+            
             beginNewTransaction ("Background Image Change");
-            perform(new UndoableSetImage (this, f));
+            MemoryBlock b;
+            f.loadFileAsData (b);
+            perform(new UndoableSetImage (this, b));
         }
     }
 }
@@ -219,9 +267,8 @@ void FrameEditor::clearImage()
 {
     if (currentFrame->getBackgroundImage() != nullptr)
     {
-        File f;
         beginNewTransaction ("Clear Background Change");
-        perform(new UndoableSetImage (this, f));
+        perform(new UndoableSetImage (this, MemoryBlock()));
     }
 }
 
@@ -318,19 +365,26 @@ void FrameEditor::loadFile()
                                     "Are you sure you want to proceed without saving?", "proceed", "cancel"))
             return;
 
-    FileChooser myChooser ("ILDA file to Load...",
+    FileChooser myChooser ("File to Load...",
                           File::getSpecialLocation (File::userDocumentsDirectory),
-                          "*.ild");
+                          "*.jse,*.ild");
 
     if (myChooser.browseForFileToOpen())
     {
         File f = myChooser.getResult();
 
         ReferenceCountedArray<Frame> frames;
-        if (! IldaLoader::load (frames, f))
+        bool b = false;
+        
+        if (f.getFileExtension() == ".ild")
+            b = IldaLoader::load (frames, f);
+        else
+            b = JSEFileLoader::load (frames, f);
+        
+        if (! b)
         {
             AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
-                                        "An error occurred loading the selected ILDA  file.", "ok");
+                                        "An error occurred loading the selected file.", "ok");
         }
         else
         {
@@ -350,7 +404,7 @@ void FrameEditor::newFile()
             return;
 
     // Don't bother if we are already a new file
-    if (getFrameCount() == 1 && getPointCount() == 0)
+    if (getFrameCount() == 1 && (! loadedFile.getFileName().length() && (! dirtyCounter)))
         return;
     
     ReferenceCountedArray<Frame> frames;
@@ -589,20 +643,11 @@ void FrameEditor::_setRefVisible (bool visible)
     }
 }
 
-bool FrameEditor::_setImage (File& file)
+bool FrameEditor::_setImageData (const MemoryBlock& file)
 {
-    // A little sneaky, if the file went invalid, fail
-    // But if it was an empty file to begin with, use it
-    Image i = ImageFileFormat::loadFrom (file);
-    if (i.isValid() || file.getFullPathName().length() == 0)
-    {
-        currentFrame->setImageFile (file);
-        currentFrame->setOwnedBackgroundImage (new Image(i));
-        sendActionMessage (EditorActions::backgroundImageChanged);
-        return true;
-    }
-    
-    return false;
+    currentFrame->setImageData (file);
+    sendActionMessage (EditorActions::backgroundImageChanged);
+    return true;
 }
 
 void FrameEditor::_setRefOpacity (float opacity)

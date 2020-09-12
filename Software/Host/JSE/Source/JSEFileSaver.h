@@ -1,6 +1,6 @@
 /*
-    IldaLoader.h
-    Load an ILDA file as an array of Frame objects
+    JSEFileSaver.h
+    Save a JSE JSON file
  
     Copyright 2020 Scrootch.me!
 
@@ -20,10 +20,15 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "Frame.h"
+#include "FrameEditor.h"
 
-class IldaLoader
+class JSEFileSaver
 {
 public:
-    static bool load (ReferenceCountedArray<Frame>& frameArray, File& file);
+    static bool save (FrameEditor* editor, File& file);
+    
+private:
+    static FrameEditor* frameEditor;
+    static var frameToObj (uint16 frameIndex);
+    static var pointToObj (uint16 frameIndex, uint16 pointIndex);
 };

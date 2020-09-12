@@ -290,7 +290,6 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::editRedo:
             frameEditor->redo();
             break;
-            
         case CommandIDs::editSelectAll:
             frameEditor->selectAll();
             break;
@@ -301,9 +300,14 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::fileOpen:
             frameEditor->loadFile();
             break;
-
         case CommandIDs::fileNew:
             frameEditor->newFile();
+            break;
+        case CommandIDs::fileSave:
+            frameEditor->fileSave();
+            break;
+        case CommandIDs::fileSaveAs:
+            frameEditor->fileSaveAs();
             break;
             
         case CommandIDs::helpWebSite:

@@ -33,6 +33,13 @@ Frame::~Frame()
 {
 }
 
+void Frame::setImageData (const MemoryBlock& data)
+{
+    imageData = data;
+    Image i = ImageFileFormat::loadFrom(imageData.getData(), imageData.getSize());
+    backgroundImage.reset (new Image(i));
+}
+
 //==============================================================================
 bool Frame::getPoint (uint16 index, XYPoint& point)
 {

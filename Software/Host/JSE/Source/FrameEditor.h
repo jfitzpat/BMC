@@ -43,6 +43,10 @@ public:
     void incDirtyCounter();
     void decDirtyCounter();
     
+    // Save/Export
+    void fileSave();
+    void fileSaveAs();
+    
     // Polling
     uint32 getScanRate() { return scanRate; }
     const File& getLoadedFile() { return loadedFile; }
@@ -52,7 +56,7 @@ public:
     bool getIldaVisible() { return ildaVisible; }
     bool getRefVisible() { return refVisible; }
     
-    File getImageFile() {return currentFrame->getImageFile(); }
+    const MemoryBlock& getImageData() {return currentFrame->getImageData(); }
     
     const Image* getImage() { return currentFrame->getBackgroundImage(); }
     float getRefOpacity() { return refOpacity; }
@@ -124,7 +128,7 @@ public:
     void _setIldaVisible (bool visible);
     void _setRefVisible (bool visible);
 
-    bool _setImage (File& file);
+    bool _setImageData (const MemoryBlock& file);
     void _setRefOpacity (float opacity);
     void _setDrawGrid (bool draw);
     void _setImageScale (float scale);

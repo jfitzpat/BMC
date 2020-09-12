@@ -9,8 +9,18 @@
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">
         <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
           <FILE id="xoFsB2" name="ColourButton.h" compile="0" resource="0" file="Source/ColourButton.h"/>
+          <FILE id="CRErzo" name="IldaExporter.cpp" compile="1" resource="0"
+                file="Source/IldaExporter.cpp"/>
+          <FILE id="T65gnl" name="IldaExporter.h" compile="0" resource="0" file="Source/IldaExporter.h"/>
           <FILE id="CDG5yg" name="IldaLoader.cpp" compile="1" resource="0" file="Source/IldaLoader.cpp"/>
           <FILE id="fKoseL" name="IldaLoader.h" compile="0" resource="0" file="Source/IldaLoader.h"/>
+          <FILE id="HwiI00" name="JSEFile.h" compile="0" resource="0" file="Source/JSEFile.h"/>
+          <FILE id="pfvLkX" name="JSEFileLoader.cpp" compile="1" resource="0"
+                file="Source/JSEFileLoader.cpp"/>
+          <FILE id="sHHkni" name="JSEFileLoader.h" compile="0" resource="0" file="Source/JSEFileLoader.h"/>
+          <FILE id="P4h0wJ" name="JSEFileSaver.cpp" compile="1" resource="0"
+                file="Source/JSEFileSaver.cpp"/>
+          <FILE id="cb1uL4" name="JSEFileSaver.h" compile="0" resource="0" file="Source/JSEFileSaver.h"/>
           <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
                 file="Source/ThumbBuilder.cpp"/>
           <FILE id="QR21o4" name="ThumbBuilder.h" compile="0" resource="0" file="Source/ThumbBuilder.h"/>

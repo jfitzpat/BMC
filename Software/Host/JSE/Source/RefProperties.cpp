@@ -39,16 +39,6 @@ RefProperties::RefProperties (FrameEditor* editor)
     drawGrid->setButtonText ("Grid");
     drawGrid->addListener (this);
 
-    imageFileLabel.reset (new juce::Label ("imageFileLabel",
-                                           "<None>"));
-    addAndMakeVisible (imageFileLabel.get());
-    imageFileLabel->setTooltip (TRANS("Filename of background image."));
-    imageFileLabel->setFont (juce::Font (10.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    imageFileLabel->setJustificationType (juce::Justification::centredLeft);
-    imageFileLabel->setEditable (false, false, false);
-    imageFileLabel->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    imageFileLabel->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
     selectImageButton.reset (new juce::TextButton ("selectImageButton"));
     addAndMakeVisible (selectImageButton.get());
     selectImageButton->setTooltip ("Select the background image file to display.");
@@ -117,7 +107,6 @@ RefProperties::RefProperties (FrameEditor* editor)
 RefProperties::~RefProperties()
 {
     layerVisible = nullptr;
-    imageFileLabel = nullptr;
     selectImageButton = nullptr;
     backgroundAlpha = nullptr;
     backgroundScale = nullptr;
@@ -137,14 +126,13 @@ void RefProperties::resized()
 {
     layerVisible->setBounds (16, 16, 90, 24);
     drawGrid->setBounds (106, 16, 90, 24);
-    imageFileLabel->setBounds (10, 48, 182, 24);
-    selectImageButton->setBounds (16, 72, 100, 24);
-    clearImageButton->setBounds (16 + 100 + 8, 72, 58, 24);
-    backgroundAlpha->setBounds (16, 112, 166, 40);
-    backgroundScale->setBounds (16, 160, 166, 40);
-    backgroundRotation->setBounds (16, 208, 166, 40);
-    backgroundXoffset->setBounds (16, 256, 166, 40);
-    backgroundYoffset->setBounds (16, 304, 166, 40);
+    selectImageButton->setBounds (16, 52, 100, 24);
+    clearImageButton->setBounds (16 + 100 + 8, 52, 58, 24);
+    backgroundAlpha->setBounds (16, 92, 166, 40);
+    backgroundScale->setBounds (16, 140, 166, 40);
+    backgroundRotation->setBounds (16, 188, 166, 40);
+    backgroundXoffset->setBounds (16, 236, 166, 40);
+    backgroundYoffset->setBounds (16, 284, 166, 40);
 }
 
 //==============================================================================
@@ -183,14 +171,6 @@ void RefProperties::actionListenerCallback (const String& message)
         layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
     else if (message == EditorActions::refDrawGridChanged)
         drawGrid->setToggleState (frameEditor->getRefDrawGrid(), dontSendNotification);
-    else if (message == EditorActions::backgroundImageChanged)
-    {
-        String s = frameEditor->getImageFile().getFileName();
-        if (s.length())
-            imageFileLabel->setText(s, dontSendNotification);
-        else
-            imageFileLabel->setText("<none>", dontSendNotification);
-    }
     else if (message == EditorActions::refOpacityChanged)
         backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100, dontSendNotification);
     else if (message == EditorActions::backgroundImageAdjusted)
@@ -209,13 +189,7 @@ void RefProperties::refresh()
 {
     layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
     drawGrid->setToggleState (frameEditor->getRefDrawGrid(), dontSendNotification);
-    
-    String s = frameEditor->getImageFile().getFileName();
-    if (s.length())
-        imageFileLabel->setText(s, dontSendNotification);
-    else
-        imageFileLabel->setText("<none>", dontSendNotification);
-    
+        
     backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100.0, dontSendNotification);
     backgroundScale->setValue (frameEditor->getImageScale() * 100.0, dontSendNotification);
     backgroundRotation->setValue (frameEditor->getImageRotation(), dontSendNotification);
