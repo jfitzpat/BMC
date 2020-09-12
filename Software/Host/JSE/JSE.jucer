@@ -8,8 +8,6 @@
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">
         <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
-          <FILE id="gswGuO" name="ColourButton.cpp" compile="1" resource="0"
-                file="Source/ColourButton.cpp"/>
           <FILE id="xoFsB2" name="ColourButton.h" compile="0" resource="0" file="Source/ColourButton.h"/>
           <FILE id="CDG5yg" name="IldaLoader.cpp" compile="1" resource="0" file="Source/IldaLoader.cpp"/>
           <FILE id="fKoseL" name="IldaLoader.h" compile="0" resource="0" file="Source/IldaLoader.h"/>
