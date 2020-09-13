@@ -258,7 +258,7 @@ void FrameEditor::selectImage()
 {
     FileChooser myChooser ("Choose Image to Load...",
                            File::getSpecialLocation (File::userDocumentsDirectory),
-                           "*.png,*.jpg,*.jpeg,*.gif");
+                           "*.png;*.jpg;*.jpeg;*.gif");
  
     if (myChooser.browseForFileToOpen())
     {
@@ -385,7 +385,7 @@ void FrameEditor::loadFile()
 
     FileChooser myChooser ("File to Load...",
                           File::getSpecialLocation (File::userDocumentsDirectory),
-                          "*.jse,*.ild");
+                          "*.jse;*.ild");
 
     if (myChooser.browseForFileToOpen())
     {
