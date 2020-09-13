@@ -375,6 +375,35 @@ void FrameEditor::setImageYoffset (float off)
     }
 }
 
+void FrameEditor::loadFile (File& file)
+{
+    // Check Dirty!
+    if (dirtyCounter)
+        if (! AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Unsaved Changes!",
+                                    "Are you sure you want to proceed without saving?", "proceed", "cancel"))
+            return;
+
+    ReferenceCountedArray<Frame> frames;
+    bool b = false;
+    
+    if (file.getFileExtension() == ".ild")
+        b = IldaLoader::load (frames, file);
+    else
+        b = JSEFileLoader::load (frames, file);
+    
+    if (! b)
+    {
+        AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
+                                    "An error occurred loading the selected file.", "ok");
+    }
+    else
+    {
+        beginNewTransaction ("Load File");
+        perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
+        perform(new UndoableLoadFile (this, frames, file));
+    }
+}
+
 void FrameEditor::loadFile()
 {
     // Check Dirty!

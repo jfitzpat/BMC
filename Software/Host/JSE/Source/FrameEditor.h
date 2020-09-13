@@ -103,6 +103,8 @@ public:
     void setImageYoffset (float off);
 
     void loadFile();
+    void loadFile (File& file);
+    
     void newFile();
     void selectAll();
     void clearSelection();

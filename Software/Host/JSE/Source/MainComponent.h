@@ -53,7 +53,8 @@ public:
         editClearSelection,
         helpWebSite,
         appAbout,
-        appPreferences
+        appPreferences,
+        clearRecentFiles
     };
 
     //==============================================================================
@@ -67,7 +68,7 @@ public:
     //==============================================================================
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int menuIndex, const String& /*menuName*/) override;
-    void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override {}
+    void menuItemSelected (int menuItemID, int topLevelMenuIndex) override;
     
     PopupMenu getExtraAppleMenu();
     bool isFileDirty();
@@ -86,6 +87,9 @@ public:
 private:
     //==============================================================================
     TooltipWindow toolTipWindow;
+    
+    std::unique_ptr<PropertiesFile> propertiesFile;
+    std::unique_ptr<RecentlyOpenedFilesList> recentFileList;
     
     std::unique_ptr<FrameEditor> frameEditor;
     std::unique_ptr<EditToolBar> toolBar;

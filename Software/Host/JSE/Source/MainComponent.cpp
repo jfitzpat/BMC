@@ -19,9 +19,29 @@
 
 #include "MainComponent.h"
 
+// Keys for our properties files
+#define KEY_RECENT_FILES "RecentFiles"
+
+// Base ID for recent file menu
+#define RECENT_BASE_ID (200)
+
 //==============================================================================
 MainComponent::MainComponent()
 {
+    // Properties File
+    PropertiesFile::Options options;
+    options.applicationName = "JSE";
+    options.folderName = "me.scrootch.jse";
+    options.filenameSuffix = ".settings";
+    options.osxLibrarySubFolder = "Application Support";
+        
+    propertiesFile.reset (new PropertiesFile (options));
+    
+    // Recent Files
+    recentFileList.reset (new RecentlyOpenedFilesList());
+    recentFileList->restoreFromString (propertiesFile->getValue(KEY_RECENT_FILES));
+    recentFileList->removeNonExistentFiles();
+    
     // Shared frame editor worker class
     frameEditor.reset (new FrameEditor());
     frameEditor->addActionListener (this);
@@ -61,6 +81,13 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
+    // Save our recent files changes
+    propertiesFile->setValue (KEY_RECENT_FILES, recentFileList->toString());
+    propertiesFile->saveIfNeeded();
+    
+    recentFileList = nullptr;
+    propertiesFile = nullptr;
+    
     frameList = nullptr;
     toolBar = nullptr;
     laserControls = nullptr;
@@ -101,6 +128,19 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::fileNew);
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::fileOpen);
+
+        PopupMenu recentFilesMenu;
+        if (recentFileList->getNumFiles())
+        {
+            recentFileList->createPopupMenuItems(recentFilesMenu,
+                                                 RECENT_BASE_ID, true, false);
+            recentFilesMenu.addSeparator();
+            recentFilesMenu.addCommandItem(&commandManager, CommandIDs::clearRecentFiles);
+            menu.addSubMenu ("Open Recent", recentFilesMenu);
+        }
+        else
+            menu.addSubMenu ("Open Recent", recentFilesMenu, false);
+        
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::fileSave);
         menu.addCommandItem (&commandManager, CommandIDs::fileSaveAs);
@@ -131,6 +171,21 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     return menu;
 }
 
+void MainComponent::menuItemSelected (int menuItemID, int /*topLevelMenuIndex*/)
+{
+    if (menuItemID >= RECENT_BASE_ID)
+    {
+        File f = recentFileList->getFile (menuItemID - RECENT_BASE_ID);
+        if (f.getFullPathName() != frameEditor->getLoadedFile().getFullPathName())
+        {
+            frameEditor->loadFile (f);
+            if (frameEditor->getLoadedFile().getFileName().length())
+                recentFileList->addFile (frameEditor->getLoadedFile());
+        }
+    }
+}
+
+//==============================================================================
 PopupMenu MainComponent::getExtraAppleMenu()
 {
     PopupMenu menu;
@@ -151,6 +206,7 @@ bool MainComponent::isFileDirty()
     return false;
 }
 
+//==============================================================================
 void MainComponent::actionListenerCallback (const String& message)
 {
     commandManager.commandStatusChanged();
@@ -195,7 +251,8 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::editClearSelection,
                                 CommandIDs::helpWebSite,
                                 CommandIDs::appAbout,
-                                CommandIDs::appPreferences };
+                                CommandIDs::appPreferences,
+                                CommandIDs::clearRecentFiles };
     
     c.addArray (commands);
 }
@@ -217,15 +274,15 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress('s', ModifierKeys::commandModifier);
             result.setActive (isFileDirty());
             break;
-            
         case CommandIDs::fileSaveAs:
             result.setInfo ("Save As...", "Save to a new file", "Menu", 0);
             break;
-            
         case CommandIDs::fileExport:
             result.setInfo ("Export ILDA File...", "Save to an ILDA file", "Menu", 0);
             break;
-            
+        case CommandIDs::clearRecentFiles:
+            result.setInfo ("Clear Menu","Clear recent file list", "Menu", 0);
+            break;
         case CommandIDs::appExit:
             result.setInfo("Exit", "Exit the application", "Menu", 0);
             break;
@@ -299,18 +356,28 @@ bool MainComponent::perform (const InvocationInfo& info)
             
         case CommandIDs::fileOpen:
             frameEditor->loadFile();
+            if (frameEditor->getLoadedFile().getFileName().length())
+                recentFileList->addFile (frameEditor->getLoadedFile());
             break;
         case CommandIDs::fileNew:
             frameEditor->newFile();
             break;
         case CommandIDs::fileSave:
             frameEditor->fileSave();
+            if (frameEditor->getLoadedFile().getFileName().length())
+                recentFileList->addFile (frameEditor->getLoadedFile());
             break;
         case CommandIDs::fileSaveAs:
             frameEditor->fileSaveAs();
+            if (frameEditor->getLoadedFile().getFileName().length())
+                recentFileList->addFile (frameEditor->getLoadedFile());
             break;
         case CommandIDs::fileExport:
             frameEditor->fileIldaExport();
+            break;
+            
+        case CommandIDs::clearRecentFiles:
+            recentFileList->clear();
             break;
             
         case CommandIDs::helpWebSite:
