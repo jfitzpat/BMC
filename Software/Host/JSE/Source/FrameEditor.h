@@ -46,6 +46,7 @@ public:
     // Save/Export
     void fileSave();
     void fileSaveAs();
+    void fileIldaExport();
     
     // Polling
     uint32 getScanRate() { return scanRate; }

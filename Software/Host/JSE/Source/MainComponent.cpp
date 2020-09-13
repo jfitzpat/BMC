@@ -309,6 +309,9 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::fileSaveAs:
             frameEditor->fileSaveAs();
             break;
+        case CommandIDs::fileExport:
+            frameEditor->fileIldaExport();
+            break;
             
         case CommandIDs::helpWebSite:
             {

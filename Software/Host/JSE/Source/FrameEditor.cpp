@@ -21,6 +21,7 @@
 #include "IldaLoader.h"
 #include "JSEFileSaver.h"
 #include "JSEFileLoader.h"
+#include "IldaExporter.h"
 #include "FrameEditor.h"
 
 #include "FrameUndo.h"      // UndoableTask classes
@@ -113,6 +114,23 @@ void FrameEditor::fileSaveAs()
             clearUndoHistory();
             _setLoadedFile (f);
             setDirtyCounter(0);
+        }
+    }
+}
+
+void FrameEditor::fileIldaExport()
+{
+    FileChooser myChooser ("Choose File to Export to...",
+                           File::getSpecialLocation (File::userDocumentsDirectory),
+                           "*.ild");
+
+    if (myChooser.browseForFileToSave (true))
+    {
+        File f = myChooser.getResult();
+        if (! IldaExporter::save (Frames, f))
+        {
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "File Error",
+                                       "An error occurred saving the file!", "ok");
         }
     }
 }
