@@ -67,7 +67,7 @@ bool IldaExporter::save (ReferenceCountedArray<Frame>& frameArray, File& file)
         // Now records
         if (frameArray[n]->getPointCount())
         {
-            for (auto i = 0; i < frameArray[n]->getPointCount(); ++i)
+            for (uint16 i = 0; i < frameArray[n]->getPointCount(); ++i)
             {
                 Frame::XYPoint in;
                 

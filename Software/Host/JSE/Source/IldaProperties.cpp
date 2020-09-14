@@ -515,7 +515,8 @@ void IldaProperties::updateSelection()
             bool mg = false;    bool mb = false;
             
             Frame::XYPoint lastPoint;
-            
+            zerostruct(lastPoint);  // Clear stupid VS warning
+
             for (auto n = 0; n < s.getNumRanges(); ++n)
             {
                 // Get the range

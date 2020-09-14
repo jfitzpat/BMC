@@ -266,7 +266,7 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress('n', ModifierKeys::commandModifier);
             break;
         case CommandIDs::fileOpen:
-            result.setInfo ("Open", "Open an existing file...", "Menu", 0);
+            result.setInfo ("Open...", "Open an existing file...", "Menu", 0);
             result.addDefaultKeypress('o', ModifierKeys::commandModifier);
             break;
         case CommandIDs::fileSave:
@@ -392,14 +392,15 @@ bool MainComponent::perform (const InvocationInfo& info)
             {
                 String s = "Version: " + String(ProjectInfo::versionString);
                 // Alpha or Beta?
-                if (! (ProjectInfo::versionNumber & 0xFF0000))
+                uint32 version = ProjectInfo::versionNumber;
+                if (! (version & 0xFF0000))
                 {
-                    if ((ProjectInfo::versionNumber & 0xFF00) == 0x100)
-                        s += " (Pre-Alpha " + String (ProjectInfo::versionNumber & 0xFF) + ")";
-                    else if ((ProjectInfo::versionNumber & 0xFF00) == 0x200)
-                        s += " (Alpha " + String (ProjectInfo::versionNumber & 0xFF) + ")";
-                    else if ((ProjectInfo::versionNumber & 0xFF00) == 0x300)
-                        s += " (Beta " + String (ProjectInfo::versionNumber & 0xFF) + ")";
+                    if ((version & 0xFF00) == 0x100)
+                        s += " (Pre-Alpha " + String (version & 0xFF) + ")";
+                    else if ((version & 0xFF00) == 0x200)
+                        s += " (Alpha " + String (version & 0xFF) + ")";
+                    else if ((version & 0xFF00) == 0x300)
+                        s += " (Beta " + String (version & 0xFF) + ")";
                 }
                 s += "\rCopyright 2020 Scrootch.me!";
                 AlertWindow::showMessageBox(AlertWindow::InfoIcon, "About JSE",

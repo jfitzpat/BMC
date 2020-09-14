@@ -32,7 +32,7 @@ bool JSEFileSaver::save (FrameEditor* editor, File& file)
     fileObj->setProperty (JSEFile::FrameCount, frameEditor->getFrameCount());
     
     var frames;
-    for (auto n = 0; n < frameEditor->getFrameCount(); ++n)
+    for (uint16 n = 0; n < frameEditor->getFrameCount(); ++n)
         frames.append (frameToObj (n));
     
     fileObj->setProperty (JSEFile::Frames, frames);
@@ -72,7 +72,7 @@ var JSEFileSaver::frameToObj (uint16 frameIndex)
     obj->setProperty (JSEFile::PointCount, frameEditor->getFrames()[frameIndex]->getPointCount());
     
     var points;
-    for (auto i = 0; i < frameEditor->getFrames()[frameIndex]->getPointCount(); ++i)
+    for (uint16 i = 0; i < frameEditor->getFrames()[frameIndex]->getPointCount(); ++i)
         points.append (pointToObj (frameIndex, i));
     
     obj->setProperty (JSEFile::Points, points);

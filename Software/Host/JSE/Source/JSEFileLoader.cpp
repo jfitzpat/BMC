@@ -38,8 +38,8 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
         return false;
     
     // !!!! Message?
-    int n = fileObj.getDynamicObject()->getProperty (JSEFile::FileVersion);
-    if (n != JSE_FILE_VERSION)
+    int fv = fileObj.getDynamicObject()->getProperty (JSEFile::FileVersion);
+    if (fv != JSE_FILE_VERSION)
         return false;
     
     var frames = fileObj.getDynamicObject()->getProperty (JSEFile::Frames);
@@ -81,13 +81,13 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
                 if (pointData == nullptr)
                     return false;
                 
-                point.x.w = (int)pointData->getProperty (JSEFile::PointX);
-                point.y.w = (int)pointData->getProperty (JSEFile::PointY);
-                point.z.w = (int)pointData->getProperty (JSEFile::PointZ);
-                point.red = (int)pointData->getProperty (JSEFile::PointRed);
-                point.green = (int)pointData->getProperty (JSEFile::PointGreen);
-                point.blue = (int)pointData->getProperty (JSEFile::PointBlue);
-                point.status= (int)pointData->getProperty (JSEFile::PointStatus);
+                point.x.w = (uint16)(int)pointData->getProperty (JSEFile::PointX);
+                point.y.w = (uint16)(int)pointData->getProperty (JSEFile::PointY);
+                point.z.w = (uint16)(int)pointData->getProperty (JSEFile::PointZ);
+                point.red = (uint8)(int)pointData->getProperty (JSEFile::PointRed);
+                point.green = (uint8)(int)pointData->getProperty (JSEFile::PointGreen);
+                point.blue = (uint8)(int)pointData->getProperty (JSEFile::PointBlue);
+                point.status= (uint8)(int)pointData->getProperty (JSEFile::PointStatus);
                 
                 // Store the point
                 frame->addPoint (point);

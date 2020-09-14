@@ -55,10 +55,11 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
         if (!rCount) break;
 
         int n;
+        Frame::XYPoint newPoint;
+        zerostruct(newPoint);   // Clear stupid Visual Studio warning
+
         for (n = 0; n < rCount; ++n)
         {
-            Frame::XYPoint newPoint;
-
             // We have 5 different handlers for the 5 different
             // ILDA data formats (ugh)
             if (header.format == 0)
@@ -162,7 +163,7 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
             }
             else
                 break;
-            
+
             // Normalize blanked as black
             if (newPoint.status & ILDA_BLANK)
             {
