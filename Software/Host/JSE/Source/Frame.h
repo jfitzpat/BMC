@@ -28,12 +28,15 @@ class Frame : public ReferenceCountedObject
 {
 public:
     Frame();
+    Frame (const Frame&t);
     ~Frame();
     
     const Image* getBackgroundImage() { return backgroundImage.get(); }
     void setImageData (const MemoryBlock& data);
     const MemoryBlock& getImageData() { return imageData; }
     
+    float getImageOpacity()             { return imageOpacity; }
+    void setImageOpacity (float opacity) { imageOpacity = opacity;}
     float getImageScale()               { return imageScale; }
     void setImageScale (float scale)    { imageScale = scale; }
     float getImageRotation()            { return imageRotation; }
@@ -64,6 +67,7 @@ public:
 private:
     std::unique_ptr<Image> backgroundImage;
     MemoryBlock imageData;
+    float imageOpacity;
     float imageScale;
     float imageRotation;
     float imageXoffset;

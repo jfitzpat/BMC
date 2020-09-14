@@ -21,6 +21,7 @@ namespace JSEFile
     const Identifier Frames         ("Frames");
     const Identifier ImageFileSize  ("ImageFileSize");
     const Identifier ImageFile      ("ImageFile");
+    const Identifier ImageOpacity   ("ImageOpacity");
     const Identifier ImageScale     ("ImageScale");
     const Identifier ImageRotation  ("ImageRotation");
     const Identifier ImageXOffset   ("ImageXOffset");

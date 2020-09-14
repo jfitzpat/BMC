@@ -156,14 +156,14 @@ public:
     bool perform() override
     {
         frameEditor->incDirtyCounter();
-        oldAlpha = frameEditor->getRefOpacity();
-        frameEditor->_setRefOpacity (newAlpha);
+        oldAlpha = frameEditor->getImageOpacity();
+        frameEditor->_setImageOpacity (newAlpha);
         return true;
     }
     
     bool undo() override
     {
-        frameEditor->_setRefOpacity (oldAlpha);
+        frameEditor->_setImageOpacity (oldAlpha);
         frameEditor->decDirtyCounter();
         return true;
     }
@@ -418,6 +418,87 @@ private:
     uint16 oldIndex;
     uint16 newIndex;
     FrameEditor* frameEditor;
+};
+
+class UndoableDeleteFrame : public UndoableAction
+{
+    public:
+        UndoableDeleteFrame (FrameEditor* editor, uint16 index)
+        : delIndex (index), frameEditor (editor) {;}
+        
+        bool perform() override
+        {
+            frameEditor->incDirtyCounter();
+            oldIndex = frameEditor->getFrameIndex();
+            oldFrame = frameEditor->getFrame();
+            frameEditor->_deleteFrame (delIndex);
+            return true;
+        }
+        
+        bool undo() override
+        {
+            frameEditor->_insertFrame (oldIndex, oldFrame);
+            frameEditor->decDirtyCounter();
+            return true;
+        }
+        
+    private:
+        uint16 oldIndex;
+        Frame::Ptr oldFrame;
+        uint16 delIndex;
+        FrameEditor* frameEditor;
+};
+
+class UndoableNewFrame : public UndoableAction
+{
+    public:
+        UndoableNewFrame (FrameEditor* editor)
+        : frameEditor (editor) {;}
+        
+        bool perform() override
+        {
+            frameEditor->incDirtyCounter();
+            index = frameEditor->getFrameIndex() + 1;
+            frameEditor->_newFrame();
+            return true;
+        }
+        
+        bool undo() override
+        {
+            frameEditor->_deleteFrame (index);
+            frameEditor->decDirtyCounter();
+            return true;
+        }
+        
+    private:
+        uint16 index;
+        FrameEditor* frameEditor;
+};
+
+class UndoableDupFrame : public UndoableAction
+{
+    public:
+        UndoableDupFrame (FrameEditor* editor)
+        : frameEditor (editor) {;}
+        
+        bool perform() override
+        {
+            frameEditor->incDirtyCounter();
+            index = frameEditor->getFrameIndex() + 1;
+            frameEditor->_dupFrame();
+            return true;
+        }
+        
+        bool undo() override
+        {
+            frameEditor->_deleteFrame (index);
+            frameEditor->decDirtyCounter();
+            return true;
+        }
+        
+    private:
+        uint16 index;
+        FrameEditor* frameEditor;
 };
 
 class UndoableSetIldaSelection : public UndoableAction

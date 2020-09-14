@@ -65,6 +65,7 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
             frame->setImageData (b);
         }
         
+        frame->setImageOpacity (frameData->getProperty (JSEFile::ImageOpacity));
         frame->setImageScale (frameData->getProperty (JSEFile::ImageScale));
         frame->setImageRotation (frameData->getProperty (JSEFile::ImageRotation));
         frame->setImageXoffset (frameData->getProperty (JSEFile::ImageXOffset));

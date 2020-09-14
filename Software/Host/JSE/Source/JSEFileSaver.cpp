@@ -64,6 +64,7 @@ var JSEFileSaver::frameToObj (uint16 frameIndex)
     
     obj->setProperty (JSEFile::ImageFile, frameEditor->getFrames()[frameIndex]->getImageData().toBase64Encoding());
 
+    obj->setProperty (JSEFile::ImageOpacity, frameEditor->getFrames()[frameIndex]->getImageOpacity());
     obj->setProperty (JSEFile::ImageScale, frameEditor->getFrames()[frameIndex]->getImageScale());
     obj->setProperty (JSEFile::ImageRotation, frameEditor->getFrames()[frameIndex]->getImageRotation());
     obj->setProperty (JSEFile::ImageXOffset, frameEditor->getFrames()[frameIndex]->getImageXoffset());

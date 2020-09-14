@@ -160,6 +160,10 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::editSelectAll);
         menu.addCommandItem (&commandManager, CommandIDs::editClearSelection);
+        menu.addSeparator();
+        menu.addCommandItem (&commandManager, CommandIDs::newFrame);
+        menu.addCommandItem (&commandManager, CommandIDs::duplicateFrame);
+        menu.addCommandItem (&commandManager, CommandIDs::deleteFrame);
     }
     else if (menuIndex == 2)
     {
@@ -249,6 +253,9 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::editRedo,
                                 CommandIDs::editSelectAll,
                                 CommandIDs::editClearSelection,
+                                CommandIDs::deleteFrame,
+                                CommandIDs::newFrame,
+                                CommandIDs::duplicateFrame,
                                 CommandIDs::helpWebSite,
                                 CommandIDs::appAbout,
                                 CommandIDs::appPreferences,
@@ -314,6 +321,17 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
                 result.setActive(false);
             }
             break;
+        case CommandIDs::deleteFrame:
+            result.setInfo ("Delete Frame", "Delete the current frame", "Menu", 0);
+            result.setActive (frameEditor->getFrameCount() > 1);
+            break;
+        case CommandIDs::newFrame:
+            result.setInfo ("New Frame", "Insert a new frame", "Menu", 0);
+            break;
+        case CommandIDs::duplicateFrame:
+            result.setInfo ("Duplicate Frame", "Duplicate selected frame", "Menu", 0);
+            break;
+
         case CommandIDs::editSelectAll:
             result.setInfo ("Select All", "Select entire layer", "Menu", 0);
             result.addDefaultKeypress('a', ModifierKeys::commandModifier);
@@ -353,7 +371,16 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::editClearSelection:
             frameEditor->clearSelection();
             break;
-            
+        case CommandIDs::deleteFrame:
+            frameEditor->deleteFrame (frameEditor->getFrameIndex());
+            break;
+        case CommandIDs::newFrame:
+            frameEditor->newFrame();
+            break;
+        case CommandIDs::duplicateFrame:
+            frameEditor->dupFrame();
+            break;
+
         case CommandIDs::fileOpen:
             frameEditor->loadFile();
             if (frameEditor->getLoadedFile().getFileName().length())

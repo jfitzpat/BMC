@@ -152,7 +152,7 @@ void RefProperties::buttonClicked (juce::Button* buttonThatWasClicked)
 void RefProperties::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     if (sliderThatWasMoved == backgroundAlpha.get())
-        frameEditor->setRefOpacity ((float)backgroundAlpha->getValue() / 100.0f);
+        frameEditor->setImageOpacity ((float)backgroundAlpha->getValue() / 100.0f);
     else if (sliderThatWasMoved == backgroundScale.get())
         frameEditor->setImageScale ((float)backgroundScale->getValue() / 100.0f);
     else if (sliderThatWasMoved == backgroundRotation.get())
@@ -172,7 +172,7 @@ void RefProperties::actionListenerCallback (const String& message)
     else if (message == EditorActions::refDrawGridChanged)
         drawGrid->setToggleState (frameEditor->getRefDrawGrid(), dontSendNotification);
     else if (message == EditorActions::refOpacityChanged)
-        backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100, dontSendNotification);
+        backgroundAlpha->setValue (frameEditor->getImageOpacity() * 100, dontSendNotification);
     else if (message == EditorActions::backgroundImageAdjusted)
     {
         backgroundScale->setValue (frameEditor->getImageScale() * 100.0, dontSendNotification);
@@ -190,7 +190,7 @@ void RefProperties::refresh()
     layerVisible->setToggleState (frameEditor->getRefVisible(), dontSendNotification);
     drawGrid->setToggleState (frameEditor->getRefDrawGrid(), dontSendNotification);
         
-    backgroundAlpha->setValue (frameEditor->getRefOpacity() * 100.0, dontSendNotification);
+    backgroundAlpha->setValue (frameEditor->getImageOpacity() * 100.0, dontSendNotification);
     backgroundScale->setValue (frameEditor->getImageScale() * 100.0, dontSendNotification);
     backgroundRotation->setValue (frameEditor->getImageRotation(), dontSendNotification);
     backgroundXoffset->setValue (frameEditor->getImageXoffset(), dontSendNotification);

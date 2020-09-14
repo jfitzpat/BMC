@@ -144,7 +144,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
     // Background Image
     if (frameEditor->getRefVisible())
     {
-        g.setOpacity (frameEditor->getRefOpacity());
+        g.setOpacity (frameEditor->getImageOpacity());
         const Image* i = frameEditor->getImage();
         if (i != nullptr)
         {

@@ -290,7 +290,7 @@ void FrameEditor::clearImage()
     }
 }
 
-void FrameEditor::setRefOpacity (float opacity)
+void FrameEditor::setImageOpacity (float opacity)
 {
     if (opacity < 0)
         opacity = 0;
@@ -501,6 +501,32 @@ void FrameEditor::setFrameIndex (uint16 index)
     }
 }
 
+void FrameEditor::deleteFrame (uint16 index)
+{
+    if ((Frames.size() > 1) && (index < Frames.size()))
+    {
+        beginNewTransaction ("Delete Frame");
+        perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
+        perform (new UndoableDeleteFrame (this, index));
+    }
+}
+
+void FrameEditor::newFrame()
+{
+    beginNewTransaction ("New Frame");
+    uint16 sel = getFrameIndex() + 1;
+    perform (new UndoableNewFrame (this));
+    perform (new UndoableSetFrameIndex (this, sel));
+}
+
+void FrameEditor::dupFrame()
+{
+    beginNewTransaction ("Duplicate Frame");
+    uint16 sel = getFrameIndex() + 1;
+    perform (new UndoableDupFrame (this));
+    perform (new UndoableSetFrameIndex (this, sel));
+}
+
 void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
 {
     if (selection.getTotalRange().getEnd() > getPointCount())
@@ -697,7 +723,7 @@ bool FrameEditor::_setImageData (const MemoryBlock& file)
     return true;
 }
 
-void FrameEditor::_setRefOpacity (float opacity)
+void FrameEditor::_setImageOpacity (float opacity)
 {
     if (opacity < 0)
         opacity = 0;
@@ -706,7 +732,7 @@ void FrameEditor::_setRefOpacity (float opacity)
     
     if (opacity != refOpacity)
     {
-        refOpacity = opacity;
+        currentFrame->setImageOpacity (opacity);
         sendActionMessage (EditorActions::refOpacityChanged);
     }
 }
@@ -782,6 +808,38 @@ void FrameEditor::_setFrameIndex (uint16 index)
     frameIndex = index;
     
     sendActionMessage (EditorActions::frameIndexChanged);
+}
+
+void FrameEditor::_deleteFrame (uint16 index)
+{
+    if ((Frames.size() > 1) && (index < Frames.size()))
+    {
+        Frames.remove (index);
+        sendActionMessage (EditorActions::framesChanged);
+    }
+}
+
+void FrameEditor::_insertFrame (uint16 index, Frame::Ptr frame)
+{
+    if (index < Frames.size())
+    {
+        Frames.insert(index, frame);
+        sendActionMessage (EditorActions::framesChanged);
+    }
+}
+
+void FrameEditor::_newFrame()
+{
+    Frames.insert (getFrameIndex() + 1, new Frame());
+    sendActionMessage (EditorActions::framesChanged);
+}
+
+void FrameEditor::_dupFrame()
+{
+    Frame::Ptr oldFrame = getFrame();
+    Frame::Ptr newFrame = new Frame (*oldFrame.get());
+    Frames.insert (getFrameIndex() + 1, newFrame);
+    sendActionMessage (EditorActions::framesChanged);
 }
 
 void FrameEditor::_setIldaShowBlanked (bool show)

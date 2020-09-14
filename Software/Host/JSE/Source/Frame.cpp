@@ -22,11 +22,27 @@
 
 //==============================================================================
 Frame::Frame()
-: imageScale(1.0),
-  imageRotation(0.0),
-  imageXoffset(0.0),
-  imageYoffset(0.0)
+: imageOpacity (1.0),
+  imageScale (1.0),
+  imageRotation (0.0),
+  imageXoffset (0.0),
+  imageYoffset (0.0)
 {
+}
+
+Frame::Frame (const Frame& frame)
+{
+    imageOpacity = frame.imageOpacity;
+    imageScale = frame.imageScale;
+    imageRotation = frame.imageRotation;
+    imageXoffset = frame.imageXoffset;
+    imageYoffset = frame.imageYoffset;
+    framePoints = frame.framePoints;
+    thumbNail = frame.thumbNail;
+    imageData = frame.imageData;
+
+    Image i = ImageFileFormat::loadFrom(imageData.getData(), imageData.getSize());
+    backgroundImage.reset (new Image(i));
 }
 
 Frame::~Frame()

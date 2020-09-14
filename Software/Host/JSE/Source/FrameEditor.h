@@ -60,8 +60,8 @@ public:
     const MemoryBlock& getImageData() {return currentFrame->getImageData(); }
     
     const Image* getImage() { return currentFrame->getBackgroundImage(); }
-    float getRefOpacity() { return refOpacity; }
     bool getRefDrawGrid() { return refDrawGrid; }
+    float getImageOpacity() { return currentFrame->getImageOpacity(); }
     float getImageScale() { return currentFrame->getImageScale(); }
     float getImageRotation() { return currentFrame->getImageRotation(); }
     float getImageXoffset() { return currentFrame->getImageXoffset(); }
@@ -70,6 +70,8 @@ public:
     const ReferenceCountedArray<Frame>& getFrames() { return Frames; }
     uint16 getFrameCount() { return (uint16)Frames.size(); }
     uint16 getFrameIndex() { return frameIndex; }
+    Frame::Ptr getFrame ( uint16 index ) { return Frames[index]; };
+    Frame::Ptr getFrame () { return getFrame (getFrameIndex()); }
     
     uint16 getPointCount() { return currentFrame->getPointCount(); }
     bool getPoint (uint16 index, Frame::XYPoint& point)
@@ -95,8 +97,8 @@ public:
     
     void selectImage();
     void clearImage();
-    void setRefOpacity (float opacity);
     void setDrawGrid (bool draw);
+    void setImageOpacity (float opacity);
     void setImageScale (float scale);
     void setImageRotation (float rot);
     void setImageXoffset (float off);
@@ -113,7 +115,10 @@ public:
     void setIldaDrawLines (bool show);
 
     void setFrameIndex (uint16 index);
-
+    void deleteFrame (uint16 index);
+    void newFrame();
+    void dupFrame();
+    
     void setIldaSelection (const SparseSet<uint16>& selection);
 
     void setIldaSelectedX (int16 newX);
@@ -132,8 +137,8 @@ public:
     void _setRefVisible (bool visible);
 
     bool _setImageData (const MemoryBlock& file);
-    void _setRefOpacity (float opacity);
     void _setDrawGrid (bool draw);
+    void _setImageOpacity (float opacity);
     void _setImageScale (float scale);
     void _setImageRotation (float rot);
     void _setImageXoffset (float off);
@@ -141,7 +146,11 @@ public:
 
     void _setFrames (const ReferenceCountedArray<Frame> frames);
     void _setFrameIndex (uint16 index);
-
+    void _deleteFrame (uint16 index);
+    void _insertFrame (uint16 index, Frame::Ptr frame);
+    void _newFrame();
+    void _dupFrame();
+    
     void _setIldaShowBlanked (bool show);
     void _setIldaDrawLines (bool draw);
     void _setIldaSelection (const SparseSet<uint16>& selection);
