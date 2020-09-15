@@ -109,7 +109,7 @@ void FrameList::resized()
     dupButton->setBounds (84, 8, 32, 32);
     upButton->setBounds (120, 8, 32, 32);
     downButton->setBounds (156, 8, 32, 32);
-    frameList->setBounds (10, 48, 180, getHeight()-40);
+    frameList->setBounds (10, 48, 180, getHeight()-58);
 }
 
 //==============================================================================

@@ -24,7 +24,7 @@ class CBSelector : public Component,
                    public Button::Listener
 {
 public:
-    CBSelector (ChangeListener* listener)
+    CBSelector (ChangeListener* listener, Colour color)
     {
         colorSelector.reset ( new ColourSelector (ColourSelector::showColourAtTop
                                                    | ColourSelector::editableColour
@@ -32,7 +32,7 @@ public:
                                                   | ColourSelector::showColourspace));
         addAndMakeVisible (colorSelector.get());
         colorSelector->setName ("background");
-        colorSelector->setCurrentColour (findColour (TextButton::buttonColourId));
+        colorSelector->setCurrentColour (color);
         colorSelector->addChangeListener (listener);
         colorSelector->setColour (ColourSelector::backgroundColourId, Colours::transparentBlack);
         colorSelector->addComponentListener (dynamic_cast<ComponentListener*>(listener));
@@ -138,7 +138,7 @@ public:
     
     void clicked() override
     {
-        auto* colourSelector = new CBSelector (this);
+        auto* colourSelector = new CBSelector (this, findColour (TextButton::buttonColourId));
         CallOutBox::launchAsynchronously (colourSelector, getScreenBounds(), nullptr);
     }
 
