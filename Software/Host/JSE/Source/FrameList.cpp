@@ -26,18 +26,64 @@ FrameList::FrameList (FrameEditor* frame)
     frameEditor = frame;
     frameEditor->addActionListener (this);
     
+    addButton.reset (new TextButton ("addButton"));
+    addAndMakeVisible (addButton.get());
+    addButton->setButtonText ("+");
+    addButton->setTooltip ("Add a new frame");
+    addButton->addListener (this);
+
+    delButton.reset (new TextButton ("delButton"));
+    addAndMakeVisible (delButton.get());
+    delButton->setButtonText ("-");
+    delButton->setTooltip ("Delete the current frame");
+    delButton->addListener (this);
+    
+    dupIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
+                                             BinaryData::duplicatewhite_pngSize);
+    
+    dupButton.reset (new DrawableButton ("dupButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (dupButton.get());
+    dupButton->setImages (dupIcon.get());
+    dupButton->setEdgeIndent (0);
+    dupButton->setTooltip ("Duplicate the current frame");
+    dupButton->addListener (this);
+    
+    upIcon = Drawable::createFromImageData (BinaryData::upwhite_png,
+                                            BinaryData::upwhite_pngSize);
+    
+    upButton.reset (new DrawableButton ("upButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (upButton.get());
+    upButton->setImages (upIcon.get());
+    upButton->setTooltip ("Move the current frame up");
+    upButton->addListener (this);
+
+    downIcon = Drawable::createFromImageData (BinaryData::downwhite_png,
+                                              BinaryData::downwhite_pngSize);
+
+    downButton.reset (new DrawableButton ("downButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (downButton.get());
+    downButton->setImages (downIcon.get());
+    downButton->setTooltip ("Move the current frame down");
+    downButton->addListener (this);
+    
     frameList.reset (new ListBox ("frameList", this));
     addAndMakeVisible (frameList.get());
     frameList->setRowHeight (150);
     frameList->setColour (ListBox::backgroundColourId, getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
 //    frameList->setMultipleSelectionEnabled (true);
-
-    frameList->selectRow (frameEditor->getFrameIndex());
+    refresh();
 }
 
 FrameList::~FrameList()
 {
+    frameList = nullptr;
+    dupButton = nullptr;
+    dupIcon = nullptr;
+    downButton = nullptr;
+    downIcon = nullptr;
+    upButton = nullptr;
+    upIcon = nullptr;
 }
 
 void FrameList::paint (juce::Graphics& g)
@@ -58,7 +104,12 @@ void FrameList::paint (juce::Graphics& g)
 
 void FrameList::resized()
 {
-    frameList->setBounds (10, 30, 180, getHeight()-40);
+    addButton->setBounds (12, 8, 32, 32);
+    delButton->setBounds (48, 8, 32, 32);
+    dupButton->setBounds (84, 8, 32, 32);
+    upButton->setBounds (120, 8, 32, 32);
+    downButton->setBounds (156, 8, 32, 32);
+    frameList->setBounds (10, 48, 180, getHeight()-40);
 }
 
 //==============================================================================
@@ -102,13 +153,54 @@ void FrameList::selectedRowsChanged (int lastRowSelected)
 }
 
 //==============================================================================
+void FrameList::buttonClicked (juce::Button* buttonThatWasClicked)
+{
+    if (buttonThatWasClicked == addButton.get())
+        frameEditor->newFrame();
+    else if (buttonThatWasClicked == delButton.get())
+        frameEditor->deleteFrame();
+    else if (buttonThatWasClicked == dupButton.get())
+        frameEditor->dupFrame();
+    else if (buttonThatWasClicked == upButton.get())
+        frameEditor->moveFrameUp();
+    else if (buttonThatWasClicked == downButton.get())
+        frameEditor->moveFrameDown();
+}
+
+//==============================================================================
 void FrameList::actionListenerCallback (const String& message)
 {
     if (message == EditorActions::framesChanged)
     {
         frameList->updateContent();
         frameList->repaint();
+        refresh();
     }
     if (message == EditorActions::frameIndexChanged)
-        frameList->selectRow (frameEditor->getFrameIndex());
+        refresh();
+}
+
+//==============================================================================
+void FrameList::refresh()
+{
+    if (frameEditor->getFrameCount() > 1)
+    {
+        delButton->setEnabled (true);
+        upButton->setEnabled (true);
+        downButton->setEnabled (true);
+    }
+    else
+    {
+        delButton->setEnabled (false);
+        upButton->setEnabled (false);
+        downButton->setEnabled (false);
+    }
+    
+    if (!frameEditor->getFrameIndex())
+        upButton->setEnabled (false);
+    
+    if (frameEditor->getFrameIndex() >= frameEditor->getFrameCount() - 1)
+        downButton->setEnabled (false);
+    
+    frameList->selectRow (frameEditor->getFrameIndex());
 }

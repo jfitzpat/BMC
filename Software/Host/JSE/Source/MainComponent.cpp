@@ -164,6 +164,9 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::newFrame);
         menu.addCommandItem (&commandManager, CommandIDs::duplicateFrame);
         menu.addCommandItem (&commandManager, CommandIDs::deleteFrame);
+        menu.addSeparator();
+        menu.addCommandItem (&commandManager, CommandIDs::moveFrameUp);
+        menu.addCommandItem (&commandManager, CommandIDs::moveFrameDown);
     }
     else if (menuIndex == 2)
     {
@@ -255,6 +258,8 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::editClearSelection,
                                 CommandIDs::deleteFrame,
                                 CommandIDs::newFrame,
+                                CommandIDs::moveFrameUp,
+                                CommandIDs::moveFrameDown,
                                 CommandIDs::duplicateFrame,
                                 CommandIDs::helpWebSite,
                                 CommandIDs::appAbout,
@@ -331,6 +336,14 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::duplicateFrame:
             result.setInfo ("Duplicate Frame", "Duplicate selected frame", "Menu", 0);
             break;
+        case CommandIDs::moveFrameDown:
+            result.setInfo ("Move Frame Down", "Move the current frame down", "Menu", 0);
+            result.setActive (frameEditor->getFrameIndex() < (frameEditor->getFrameCount() - 1));
+            break;
+        case CommandIDs::moveFrameUp:
+            result.setInfo ("Move Frame Up", "Move the current frame up", "Menu", 0);
+            result.setActive (frameEditor->getFrameIndex());
+            break;
 
         case CommandIDs::editSelectAll:
             result.setInfo ("Select All", "Select entire layer", "Menu", 0);
@@ -372,7 +385,7 @@ bool MainComponent::perform (const InvocationInfo& info)
             frameEditor->clearSelection();
             break;
         case CommandIDs::deleteFrame:
-            frameEditor->deleteFrame (frameEditor->getFrameIndex());
+            frameEditor->deleteFrame();
             break;
         case CommandIDs::newFrame:
             frameEditor->newFrame();
@@ -380,7 +393,13 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::duplicateFrame:
             frameEditor->dupFrame();
             break;
-
+        case CommandIDs::moveFrameUp:
+            frameEditor->moveFrameUp();
+            break;
+        case CommandIDs::moveFrameDown:
+            frameEditor->moveFrameDown();
+            break;
+            
         case CommandIDs::fileOpen:
             frameEditor->loadFile();
             if (frameEditor->getLoadedFile().getFileName().length())

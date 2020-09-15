@@ -29,7 +29,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     
     layerVisible.reset (new juce::ToggleButton ("layerVisible"));
     addAndMakeVisible (layerVisible.get());
-    layerVisible->setTooltip ("Make this layer visible or invisible.");
+    layerVisible->setTooltip ("Make this layer visible or invisible");
     layerVisible->setButtonText ("Visible");
     layerVisible->addListener (this);
 
@@ -41,7 +41,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
 
     showBlanking.reset (new juce::ToggleButton ("showBlanking"));
     addAndMakeVisible (showBlanking.get());
-    showBlanking->setTooltip ("Show blanked (invisible) coordinates.");
+    showBlanking->setTooltip ("Show blanked (invisible) coordinates");
     showBlanking->setButtonText ("Show Blanked Points");
     showBlanking->addListener (this);
 
@@ -70,19 +70,19 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     currentSelection->setCaretVisible (true);
     currentSelection->setPopupMenuEnabled (true);
     currentSelection->setColour (TextEditor::textColourId, Colours::white);
-    currentSelection->setTooltip ("Selected point(s).");
+    currentSelection->setTooltip ("Selected point(s)");
     currentSelection->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789 -:,;"), true);
     currentSelection->addListener (this);
 
     decSelection.reset (new juce::TextButton ("decSelection"));
     addAndMakeVisible (decSelection.get());
-    decSelection->setTooltip ("Shift the selection down.");
+    decSelection->setTooltip ("Shift the selection down");
     decSelection->setButtonText ("-");
     decSelection->addListener (this);
 
     incSelection.reset (new juce::TextButton ("incSelection"));
     addAndMakeVisible (incSelection.get());
-    incSelection->setTooltip ("Shift the selection up.");
+    incSelection->setTooltip ("Shift the selection up");
     incSelection->setButtonText ("+");
     incSelection->addListener (this);
 
@@ -143,7 +143,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionX->setCaretVisible (true);
     selectionX->setPopupMenuEnabled (true);
     selectionX->setColour (TextEditor::textColourId, Colours::white);
-    selectionX->setTooltip ("X coordinate of selected point(s).");
+    selectionX->setTooltip ("X coordinate of selected point(s)");
     selectionX->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     selectionX->addListener (this);
 
@@ -156,7 +156,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionY->setCaretVisible (true);
     selectionY->setPopupMenuEnabled (true);
     selectionY->setColour (TextEditor::textColourId, Colours::white);
-    selectionY->setTooltip ("Y coordinate of selected point(s).");
+    selectionY->setTooltip ("Y coordinate of selected point(s)");
     selectionY->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     selectionY->addListener (this);
 
@@ -169,7 +169,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionZ->setCaretVisible (true);
     selectionZ->setPopupMenuEnabled (true);
     selectionZ->setColour (TextEditor::textColourId, Colours::white);
-    selectionZ->setTooltip ("Z coordinate of selected point(s).");
+    selectionZ->setTooltip ("Z coordinate of selected point(s)");
     selectionZ->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     selectionZ->addListener (this);
 
@@ -182,7 +182,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionR->setCaretVisible (true);
     selectionR->setPopupMenuEnabled (true);
     selectionR->setColour (TextEditor::textColourId, Colours::white);
-    selectionR->setTooltip ("Red level of selected point(s).");
+    selectionR->setTooltip ("Red level of selected point(s)");
     selectionR->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
     selectionR->addListener (this);
 
@@ -195,7 +195,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionG->setCaretVisible (true);
     selectionG->setPopupMenuEnabled (true);
     selectionG->setColour (TextEditor::textColourId, Colours::white);
-    selectionG->setTooltip ("Green level of selected point(s).");
+    selectionG->setTooltip ("Green level of selected point(s)");
     selectionG->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
     selectionG->addListener (this);
 
@@ -208,13 +208,13 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionB->setCaretVisible (true);
     selectionB->setPopupMenuEnabled (true);
     selectionB->setColour (TextEditor::textColourId, Colours::white);
-    selectionB->setTooltip ("Blue level of selected point(s).");
+    selectionB->setTooltip ("Blue level of selected point(s)");
     selectionB->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
     selectionB->addListener (this);
     
     colorButton.reset (new ColourButton ());
     addAndMakeVisible (colorButton.get());
-    colorButton->setTooltip ("Select color for selected point(s).");
+    colorButton->setTooltip ("Select color for selected point(s)");
     colorButton->addChangeListener (this);
 
     refresh();

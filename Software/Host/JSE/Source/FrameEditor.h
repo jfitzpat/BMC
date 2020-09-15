@@ -115,9 +115,11 @@ public:
     void setIldaDrawLines (bool show);
 
     void setFrameIndex (uint16 index);
-    void deleteFrame (uint16 index);
+    void deleteFrame ();
     void newFrame();
     void dupFrame();
+    void moveFrameUp();
+    void moveFrameDown();
     
     void setIldaSelection (const SparseSet<uint16>& selection);
 
@@ -150,6 +152,7 @@ public:
     void _insertFrame (uint16 index, Frame::Ptr frame);
     void _newFrame();
     void _dupFrame();
+    void _swapFrames (uint16 index1, uint16 index2);
     
     void _setIldaShowBlanked (bool show);
     void _setIldaDrawLines (bool draw);

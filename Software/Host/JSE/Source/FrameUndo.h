@@ -501,6 +501,32 @@ class UndoableDupFrame : public UndoableAction
         FrameEditor* frameEditor;
 };
 
+class UndoableSwapFrames : public UndoableAction
+{
+    public:
+        UndoableSwapFrames (FrameEditor* editor, uint16 _index1, uint16 _index2)
+        : index1 (_index1), index2 (_index2), frameEditor (editor)  {;}
+        
+        bool perform() override
+        {
+            frameEditor->incDirtyCounter();
+            frameEditor->_swapFrames(index1, index2);
+            return true;
+        }
+        
+        bool undo() override
+        {
+            frameEditor->_swapFrames(index1, index2);
+            frameEditor->decDirtyCounter();
+            return true;
+        }
+        
+    private:
+        uint16 index1;
+        uint16 index2;
+        FrameEditor* frameEditor;
+};
+
 class UndoableSetIldaSelection : public UndoableAction
 {
 public:

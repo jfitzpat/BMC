@@ -27,6 +27,7 @@
 */
 class FrameList  : public Component,
                    public ListBoxModel,
+                   public Button::Listener,
                    public ActionListener
 {
 public:
@@ -48,10 +49,24 @@ public:
     void selectedRowsChanged (int lastRowSelected) override;
 
     //==============================================================================
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+
+    //==============================================================================
     void actionListenerCallback (const String& message) override;
 
 private:
+    void refresh();
+    
     FrameEditor* frameEditor;
+    
+    std::unique_ptr<TextButton> addButton;
+    std::unique_ptr<TextButton> delButton;
+    std::unique_ptr<Drawable> dupIcon;
+    std::unique_ptr<DrawableButton> dupButton;
+    std::unique_ptr<Drawable> upIcon;
+    std::unique_ptr<DrawableButton> upButton;
+    std::unique_ptr<Drawable> downIcon;
+    std::unique_ptr<DrawableButton> downButton;
     std::unique_ptr<ListBox> frameList;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameList)

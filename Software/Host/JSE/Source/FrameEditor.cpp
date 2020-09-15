@@ -501,8 +501,10 @@ void FrameEditor::setFrameIndex (uint16 index)
     }
 }
 
-void FrameEditor::deleteFrame (uint16 index)
+void FrameEditor::deleteFrame ()
 {
+    uint16 index = getFrameIndex();
+    
     if ((Frames.size() > 1) && (index < Frames.size()))
     {
         beginNewTransaction ("Delete Frame");
@@ -521,10 +523,41 @@ void FrameEditor::newFrame()
 
 void FrameEditor::dupFrame()
 {
+    // Update the thumbnail before duplicating
+    currentFrame->buildThumbNail();
+
     beginNewTransaction ("Duplicate Frame");
     uint16 sel = getFrameIndex() + 1;
     perform (new UndoableDupFrame (this));
     perform (new UndoableSetFrameIndex (this, sel));
+}
+
+void FrameEditor::moveFrameUp()
+{
+    if (getFrameIndex())
+    {
+        // Update the thumb just in case there are edits
+        currentFrame->buildThumbNail();
+        
+        beginNewTransaction ("Move Frame Up");
+        uint16 sel = getFrameIndex();
+        perform (new UndoableSwapFrames (this, sel, sel - 1));
+        perform (new UndoableSetFrameIndex (this, sel - 1));
+    }
+}
+
+void FrameEditor::moveFrameDown()
+{
+    if (getFrameIndex() < (Frames.size() - 1))
+    {
+        // Update the thumb just in case there are edits
+        currentFrame->buildThumbNail();
+
+        beginNewTransaction ("Move Frame Down");
+        uint16 sel = getFrameIndex();
+        perform (new UndoableSwapFrames (this, sel, sel + 1));
+        perform (new UndoableSetFrameIndex (this, sel + 1));
+    }
 }
 
 void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
@@ -840,6 +873,19 @@ void FrameEditor::_dupFrame()
     Frame::Ptr newFrame = new Frame (*oldFrame.get());
     Frames.insert (getFrameIndex() + 1, newFrame);
     sendActionMessage (EditorActions::framesChanged);
+}
+
+void FrameEditor::_swapFrames (uint16 index1, uint16 index2)
+{
+    if (index1 < Frames.size() && index2 < Frames.size())
+    {
+        Frames.swap (index1, index2);
+        
+        // We could be whacking out the current index pointer
+        // So reset active data just in case
+        currentFrame = Frames[getFrameIndex()];
+        sendActionMessage (EditorActions::framesChanged);
+    }
 }
 
 void FrameEditor::_setIldaShowBlanked (bool show)

@@ -54,6 +54,8 @@ public:
         deleteFrame,
         newFrame,
         duplicateFrame,
+        moveFrameUp,
+        moveFrameDown,
         helpWebSite,
         appAbout,
         appPreferences,

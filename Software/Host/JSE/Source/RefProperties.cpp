@@ -29,31 +29,31 @@ RefProperties::RefProperties (FrameEditor* editor)
 
     layerVisible.reset (new juce::ToggleButton ("layerVisible"));
     addAndMakeVisible (layerVisible.get());
-    layerVisible->setTooltip ("Make this layer visible or invisible.");
+    layerVisible->setTooltip ("Make this layer visible or invisible");
     layerVisible->setButtonText ("Visible");
     layerVisible->addListener (this);
 
     drawGrid.reset (new juce::ToggleButton ("drawGrid"));
     addAndMakeVisible (drawGrid.get());
-    drawGrid->setTooltip ("Make the grid visible or invisible.");
+    drawGrid->setTooltip ("Make the grid visible or invisible");
     drawGrid->setButtonText ("Grid");
     drawGrid->addListener (this);
 
     selectImageButton.reset (new juce::TextButton ("selectImageButton"));
     addAndMakeVisible (selectImageButton.get());
-    selectImageButton->setTooltip ("Select the background image file to display.");
+    selectImageButton->setTooltip ("Select the background image file to display");
     selectImageButton->setButtonText ("Select Image");
     selectImageButton->addListener (this);
 
     clearImageButton.reset (new juce::TextButton ("clearImageButton"));
     addAndMakeVisible (clearImageButton.get());
-    clearImageButton->setTooltip ("Clear the background image.");
+    clearImageButton->setTooltip ("Clear the background image");
     clearImageButton->setButtonText ("Clear");
     clearImageButton->addListener (this);
 
     backgroundAlpha.reset (new juce::Slider ("backgroundAlpha"));
     addAndMakeVisible (backgroundAlpha.get());
-    backgroundAlpha->setTooltip (TRANS("Adjust the opacity of the background image."));
+    backgroundAlpha->setTooltip (TRANS("Adjust the opacity of the background image"));
     backgroundAlpha->setRange (0, 100, 1);
     backgroundAlpha->setSliderStyle (juce::Slider::LinearHorizontal);
     backgroundAlpha->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 90, 20);
@@ -63,7 +63,7 @@ RefProperties::RefProperties (FrameEditor* editor)
 
     backgroundScale.reset (new juce::Slider ("backgroundScale"));
     addAndMakeVisible (backgroundScale.get());
-    backgroundScale->setTooltip (TRANS("Adjust the size of the background image."));
+    backgroundScale->setTooltip (TRANS("Adjust the size of the background image"));
     backgroundScale->setRange (1, 200, 1);
     backgroundScale->setSliderStyle (juce::Slider::LinearHorizontal);
     backgroundScale->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 90, 20);
@@ -73,7 +73,7 @@ RefProperties::RefProperties (FrameEditor* editor)
 
     backgroundRotation.reset (new juce::Slider ("backgroundRotation"));
     addAndMakeVisible (backgroundRotation.get());
-    backgroundRotation->setTooltip (TRANS("Rotate the background image."));
+    backgroundRotation->setTooltip (TRANS("Rotate the background image"));
     backgroundRotation->setRange (0, 359, 1);
     backgroundRotation->setSliderStyle (juce::Slider::LinearHorizontal);
     backgroundRotation->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 110, 20);
@@ -83,7 +83,7 @@ RefProperties::RefProperties (FrameEditor* editor)
 
     backgroundXoffset.reset (new juce::Slider ("backgroundXoffset"));
     addAndMakeVisible (backgroundXoffset.get());
-    backgroundXoffset->setTooltip (TRANS("Shift the background image left/right."));
+    backgroundXoffset->setTooltip (TRANS("Shift the background image left/right"));
     backgroundXoffset->setRange (-100, 100, 1);
     backgroundXoffset->setSliderStyle (juce::Slider::LinearHorizontal);
     backgroundXoffset->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 110, 20);
@@ -93,7 +93,7 @@ RefProperties::RefProperties (FrameEditor* editor)
 
     backgroundYoffset.reset (new juce::Slider ("backgroundYoffset"));
     addAndMakeVisible (backgroundYoffset.get());
-    backgroundYoffset->setTooltip (TRANS("Shift the background image up/down."));
+    backgroundYoffset->setTooltip (TRANS("Shift the background image up/down"));
     backgroundYoffset->setRange (-100, 100, 1);
     backgroundYoffset->setSliderStyle (juce::Slider::LinearHorizontal);
     backgroundYoffset->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 110, 20);
