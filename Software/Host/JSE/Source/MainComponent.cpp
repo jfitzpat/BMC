@@ -105,7 +105,6 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    Logger::outputDebugString("w: " + String(getWidth()) + " h: " + String(getHeight()));
     toolBar->setBounds (0, 0, 200, 97);
     frameList->setBounds (0, 97, 200, getHeight() - 97);
     laserControls->setBounds (getWidth() - 200, 0, 200, 97);
@@ -297,6 +296,9 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
         case CommandIDs::appExit:
             result.setInfo("Exit", "Exit the application", "Menu", 0);
+            #if JUCE_WINDOWS
+                result.addDefaultKeypress(KeyPress::F4Key, ModifierKeys::altModifier);
+            #endif
             break;
         case CommandIDs::editUndo:
             result.addDefaultKeypress('z', ModifierKeys::commandModifier);

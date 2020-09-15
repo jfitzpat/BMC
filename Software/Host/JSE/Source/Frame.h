@@ -55,6 +55,8 @@ public:
     uint16 getPointCount() { return (uint16)framePoints.size(); }
     
     bool getPoint (uint16 index, XYPoint& point);
+    XYPoint getPoint (uint16 index) { return framePoints[index]; }
+    
     void addPoint (XYPoint& point);
     void replacePoint (uint16 index, const XYPoint& newPoint);
     

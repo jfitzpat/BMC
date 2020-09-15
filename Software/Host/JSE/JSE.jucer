@@ -10,6 +10,8 @@
         <FILE id="OVPQcf" name="down-white.png" compile="0" resource="1" file="Graphics/down-white.png"/>
         <FILE id="NfqRkZ" name="duplicate-white.png" compile="0" resource="1"
               file="Graphics/duplicate-white.png"/>
+        <FILE id="BvljVN" name="jse.png" compile="0" resource="0" file="Graphics/jse.png"/>
+        <FILE id="VuLuq9" name="jse2.png" compile="0" resource="0" file="Graphics/jse2.png"/>
         <FILE id="RczVdz" name="up-white.png" compile="0" resource="1" file="Graphics/up-white.png"/>
       </GROUP>
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">
@@ -72,7 +74,7 @@
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
-    <VS2019 targetFolder="Builds/VisualStudio2019">
+    <VS2019 targetFolder="Builds/VisualStudio2019" bigIcon="VuLuq9">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="JSE"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="JSE"/>
@@ -86,7 +88,7 @@
         <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2019>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="Builds/MacOSX" bigIcon="VuLuq9">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="JSE"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="JSE"/>

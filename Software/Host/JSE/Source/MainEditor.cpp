@@ -124,16 +124,66 @@ MainEditor::WorkingArea::WorkingArea (FrameEditor* frame)
 {
     frameEditor = frame;
     frameEditor->addActionListener (this);
+    
+    drawMark = false;
 }
 
 MainEditor::WorkingArea::~WorkingArea()
 {
 }
 
-void MainEditor::WorkingArea::mouseDown(const MouseEvent& event)
+void MainEditor::WorkingArea::mouseDown (const MouseEvent& event)
 {
-    Logger::outputDebugString ("Mouse: " + String(event.getMouseDownX() - 32768) +
-                               ", " + String(32768 - event.getMouseDownY()));
+}
+
+void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
+{
+}
+
+void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
+{
+    if (frameEditor->getActiveLayer() != FrameEditor::ilda)
+        return;
+    
+    int x = event.x - 32768;
+    int y = 32767 - event.y;
+    
+    Rectangle<int16> r(x - (int16)(5 * activeInvScale), y - (int16)(5 * activeInvScale), (int16)(10 * activeInvScale), (int16)(10 * activeInvScale));
+    
+    uint16 n;
+    for (n = 0; n < frameEditor->getPointCount(); ++n)
+    {
+        Frame::XYPoint point;
+        frameEditor->getPoint (n, point);
+        if (r.contains (point.x.w, point.y.w))
+        {
+            markIndex = n;
+
+            if (drawMark == true)
+                repaint (lastMarkRect);
+            drawMark = true;
+
+            lastMarkRect = Rectangle<int>(event.x - (int)(15 * activeInvScale),
+                                          event.y - (int)(15 * activeInvScale),
+                                          (int)(30 * activeInvScale),
+                                          (int)(30 * activeInvScale));
+            repaint (lastMarkRect);
+            break;
+        }
+    }
+    
+    if (n == frameEditor->getPointCount())
+    {
+        if (drawMark == true)
+        {
+            drawMark = false;
+            repaint (lastMarkRect);
+        }
+    }
+}
+
+void MainEditor::WorkingArea::mouseDrag (const MouseEvent& event)
+{
 }
 
 void MainEditor::WorkingArea::paint (juce::Graphics& g)
@@ -195,7 +245,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                     {
                         g.setColour (Colours::darkgrey);
                         g.drawEllipse((float)(point.x.w + (32768 - halfDotSize)),
-                                   (float)((32768 - halfDotSize) - point.y.w), dotSize, dotSize, activeInvScale);
+                                   (float)((32767 - halfDotSize) - point.y.w), dotSize, dotSize, activeInvScale);
                     }
 
                     // Mark selected even if ShowBlanked is off, since can be edited
@@ -204,7 +254,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                     {
                         g.setColour (Colours::lightblue);
                         g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
-                                   (float)((32768 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
+                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
                     }
                 }
                 else
@@ -217,7 +267,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                     {
                         g.setColour (Colours::whitesmoke);
                         g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
-                                   (float)((32768 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
+                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
                     }
                 }
                 
@@ -240,9 +290,9 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                             {
                                 g.setColour (Colours::darkgrey);
                                 g.drawLine ((float)(point.x.w + 32768),
-                                            (float)(32768 - point.y.w),
+                                            (float)(32767 - point.y.w),
                                             (float)(nextPoint.x.w + 32768),
-                                            (float)(32768 - nextPoint.y.w),
+                                            (float)(32767 - nextPoint.y.w),
                                             activeInvScale);
                             }
                         }
@@ -250,12 +300,21 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                         {
                             g.setColour (Colour (point.red, point.green, point.blue));
                             g.drawLine ((float)(point.x.w + 32768),
-                                        (float)(32768 - point.y.w),
+                                        (float)(32767 - point.y.w),
                                         (float)(nextPoint.x.w + 32768),
-                                        (float)(32768 - nextPoint.y.w),
+                                        (float)(32767 - nextPoint.y.w),
                                         halfDotSize);
                         }
                     }
+                }
+            }
+            if (frameEditor->getActiveLayer() == FrameEditor::ilda && drawMark)
+            {
+                if (n == markIndex)
+                {
+                    g.setColour (Colours::white);
+                    g.drawEllipse((float)(point.x.w + (32768 - selectSize)),
+                               (float)((32767 - selectSize) - point.y.w), 2 * selectSize, 2 * selectSize, 2 * activeInvScale);
                 }
             }
         }
