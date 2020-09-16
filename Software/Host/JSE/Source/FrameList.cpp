@@ -98,8 +98,7 @@ void FrameList::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
     g.setColour (juce::Colours::grey);
-    
-    g.drawRect (getLocalBounds().removeFromRight(1), 1);
+    g.drawRect (getLocalBounds().removeFromLeft(1), 1);
 }
 
 void FrameList::resized()

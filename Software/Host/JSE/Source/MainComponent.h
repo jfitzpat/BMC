@@ -21,7 +21,6 @@
 
 #include <JuceHeader.h>
 #include "FrameEditor.h"
-#include "EditToolBar.h"
 #include "LaserControls.h"
 #include "EditProperties.h"
 #include "FrameList.h"
@@ -97,7 +96,6 @@ private:
     std::unique_ptr<RecentlyOpenedFilesList> recentFileList;
     
     std::unique_ptr<FrameEditor> frameEditor;
-    std::unique_ptr<EditToolBar> toolBar;
     std::unique_ptr<LaserControls> laserControls;
     std::unique_ptr<EditProperties> editProperties;
     std::unique_ptr<MainEditor>mainEditor;

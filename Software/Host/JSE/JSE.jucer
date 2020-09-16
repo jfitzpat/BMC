@@ -10,7 +10,6 @@
         <FILE id="OVPQcf" name="down-white.png" compile="0" resource="1" file="Graphics/down-white.png"/>
         <FILE id="NfqRkZ" name="duplicate-white.png" compile="0" resource="1"
               file="Graphics/duplicate-white.png"/>
-        <FILE id="BvljVN" name="jse.png" compile="0" resource="0" file="Graphics/jse.png"/>
         <FILE id="VuLuq9" name="jse2.png" compile="0" resource="0" file="Graphics/jse2.png"/>
         <FILE id="RczVdz" name="up-white.png" compile="0" resource="1" file="Graphics/up-white.png"/>
       </GROUP>
@@ -50,8 +49,6 @@
               file="Source/EditProperties.cpp"/>
         <FILE id="g32aaP" name="EditProperties.h" compile="0" resource="0"
               file="Source/EditProperties.h"/>
-        <FILE id="qppk3R" name="EditToolBar.cpp" compile="1" resource="0" file="Source/EditToolBar.cpp"/>
-        <FILE id="kq54fx" name="EditToolBar.h" compile="0" resource="0" file="Source/EditToolBar.h"/>
         <FILE id="UCK1AL" name="Frame.cpp" compile="1" resource="0" file="Source/Frame.cpp"/>
         <FILE id="XTnGAe" name="Frame.h" compile="0" resource="0" file="Source/Frame.h"/>
         <FILE id="o7xuOw" name="FrameEditor.cpp" compile="1" resource="0" file="Source/FrameEditor.cpp"/>

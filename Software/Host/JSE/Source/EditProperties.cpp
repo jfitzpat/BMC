@@ -58,12 +58,12 @@ void EditProperties::paint (juce::Graphics& g)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     
     g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds().removeFromLeft(1), 1);
+    g.drawRect (getLocalBounds().removeFromRight(1), 1);
 }
 
 void EditProperties::resized()
 {
-    layerTabs->setBounds (1, 0, getWidth()-1, getHeight());
+    layerTabs->setBounds (0, 2, getWidth()-1, getHeight()-2);
 }
 
 void EditProperties::actionListenerCallback (const String& message)

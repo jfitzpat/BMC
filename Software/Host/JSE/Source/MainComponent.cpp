@@ -47,8 +47,6 @@ MainComponent::MainComponent()
     frameEditor->addActionListener (this);
     
     // GUI components
-    toolBar.reset (new EditToolBar (frameEditor.get()));
-    addAndMakeVisible (toolBar.get());
     laserControls.reset (new LaserControls (frameEditor.get()));
     addAndMakeVisible (laserControls.get());
     editProperties.reset (new EditProperties (frameEditor.get()));
@@ -89,7 +87,6 @@ MainComponent::~MainComponent()
     propertiesFile = nullptr;
     
     frameList = nullptr;
-    toolBar = nullptr;
     laserControls = nullptr;
     editProperties = nullptr;
     mainEditor = nullptr;
@@ -105,10 +102,10 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    toolBar->setBounds (0, 0, 200, 97);
-    frameList->setBounds (0, 97, 200, getHeight() - 97);
-    laserControls->setBounds (getWidth() - 200, 0, 200, 97);
-    editProperties->setBounds (getWidth() - 200, 97, 200, getHeight() - 97);
+    laserControls->setBounds (getWidth() - 200, 0, 200, 64);
+    frameList->setBounds (getWidth() - 200, 64, 200, getHeight() - 64);
+
+    editProperties->setBounds (0, 0, 200, getHeight());
     mainEditor->setBounds (200, 0, getWidth() - 400, getHeight());
 }
 
