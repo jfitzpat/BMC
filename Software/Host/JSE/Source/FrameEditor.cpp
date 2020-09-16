@@ -31,6 +31,7 @@ FrameEditor::FrameEditor()
     : dirtyCounter (0),
       scanRate (30000),
       activeLayer (sketch),
+      activeIldaTool (selectTool),
       sketchVisible (true),
       ildaVisible (true),
       ildaShowBlanked (true),
@@ -182,6 +183,16 @@ void FrameEditor::setActiveLayer (Layer layer)
         perform(new UndoableSetLayer (this, layer));
     }
 }
+
+void FrameEditor::setActiveIldaTool (IldaTool tool)
+{
+    if (activeIldaTool != tool)
+    {
+        beginNewTransaction ("Tool Change");
+        perform (new UndoableSetIldaTool (this, tool));
+    }
+}
+
 void FrameEditor::setSketchVisible (bool visible)
 {
     if (visible != sketchVisible)
@@ -718,7 +729,16 @@ void FrameEditor::_setActiveLayer (Layer layer)
     if (layer != activeLayer)
     {
         activeLayer = layer;
-        sendActionMessage(EditorActions::layerChanged);
+        sendActionMessage (EditorActions::layerChanged);
+    }
+}
+
+void FrameEditor::_setActiveIldaTool (IldaTool tool)
+{
+    if (activeIldaTool != tool)
+    {
+        activeIldaTool = tool;
+        sendActionMessage (EditorActions::ildaToolChanged);
     }
 }
 

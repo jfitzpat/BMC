@@ -57,6 +57,7 @@ public:
 private:
     void updatePointDisplay();
     void updateSelection();
+    void updateTools();
     void adjustSelection (int offset);
     
     void refresh();
@@ -67,6 +68,10 @@ private:
     std::unique_ptr<ToggleButton> showBlanking;
     std::unique_ptr<ToggleButton> drawLines;
     std::unique_ptr<Label> pointLabel;
+    std::unique_ptr<Drawable> selectIcon;
+    std::unique_ptr<DrawableButton> selectToolButton;
+    std::unique_ptr <Drawable> pointIcon;
+    std::unique_ptr<DrawableButton> pointToolButton;
     std::unique_ptr<Label> selectionLabel;
     std::unique_ptr<TextEditor> currentSelection;
     std::unique_ptr<TextButton> decSelection;

@@ -53,6 +53,26 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     pointLabel->setColour (Label::textColourId, juce::Colours::white);
     pointLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
 
+    selectIcon = Drawable::createFromImageData (BinaryData::pointinghand_png,
+                                                BinaryData::pointinghand_pngSize);
+    
+    selectToolButton.reset (new DrawableButton ("selToolButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (selectToolButton.get());
+    selectToolButton->setImages (selectIcon.get());
+    selectToolButton->setEdgeIndent (0);
+    selectToolButton->setTooltip ("Point Selection tool");
+    selectToolButton->addListener (this);
+
+    pointIcon = Drawable::createFromImageData (BinaryData::croshair_png,
+                                               BinaryData::croshair_pngSize);
+    
+    pointToolButton.reset (new DrawableButton ("pointToolButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (pointToolButton.get());
+    pointToolButton->setImages (pointIcon.get());
+    pointToolButton->setEdgeIndent (0);
+    pointToolButton->setTooltip ("Point Insertion tool");
+    pointToolButton->addListener (this);
+
     selectionLabel.reset (new Label ("selectionLabel", "Selected"));
     addAndMakeVisible (selectionLabel.get());
     selectionLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
@@ -226,6 +246,10 @@ IldaProperties::~IldaProperties()
     drawLines = nullptr;
     showBlanking = nullptr;
     pointLabel = nullptr;
+    selectToolButton = nullptr;
+    selectIcon = nullptr;
+    pointToolButton = nullptr;
+    pointIcon = nullptr;
     selectionLabel = nullptr;
     incSelection = nullptr;
     decSelection = nullptr;
@@ -256,48 +280,46 @@ void IldaProperties::resized()
     drawLines->setBounds (16, 48, getWidth() - 32, 24);
     showBlanking->setBounds (16, 80, getWidth() - 32, 24);
     pointLabel->setBounds (16, 112, getWidth() - 32, 24);
-    selectionLabel->setBounds (16, 144, getWidth() - 32, 12);
-    currentSelection->setBounds (16, 160, getWidth() - 32, 24);
-    decSelection->setBounds (59, 188, 40, 20);
-    incSelection->setBounds (101, 188, 40, 20);
-    xLabel->setBounds(16, 216, 54, 12);
-    yLabel->setBounds(16 + 56, 216, 54, 12);
-    zLabel->setBounds(16 + 112, 216, 54, 12);
-    selectionX->setBounds (16, 232, 54, 24);
-    selectionY->setBounds (16 + 56, 232, 54, 24);
-    selectionZ->setBounds (16 + 112, 232, 54, 24);
-    rLabel->setBounds(16, 264, 54, 12);
-    gLabel->setBounds(16 + 56, 264, 54, 12);
-    bLabel->setBounds(16 + 112, 264, 54, 12);
-    selectionR->setBounds (16, 280, 54, 24);
-    selectionG->setBounds (16 + 56, 280, 54, 24);
-    selectionB->setBounds (16 + 112, 280, 54, 24);
-    colorButton->setBounds (79, 308, 40, 20);
+    
+    selectToolButton->setBounds (16, 144, 32, 32);
+    pointToolButton->setBounds (52, 144, 32, 32);
+    
+    selectionLabel->setBounds (16, 184, getWidth() - 32, 12);
+    currentSelection->setBounds (16, 200, getWidth() - 32, 24);
+    decSelection->setBounds (59, 228, 40, 20);
+    incSelection->setBounds (101, 228, 40, 20);
+    xLabel->setBounds(16, 256, 54, 12);
+    yLabel->setBounds(16 + 56, 256, 54, 12);
+    zLabel->setBounds(16 + 112, 256, 54, 12);
+    selectionX->setBounds (16, 272, 54, 24);
+    selectionY->setBounds (16 + 56, 272, 54, 24);
+    selectionZ->setBounds (16 + 112, 272, 54, 24);
+    rLabel->setBounds(16, 304, 54, 12);
+    gLabel->setBounds(16 + 56, 304, 54, 12);
+    bLabel->setBounds(16 + 112, 304, 54, 12);
+    selectionR->setBounds (16, 320, 54, 24);
+    selectionG->setBounds (16 + 56, 320, 54, 24);
+    selectionB->setBounds (16 + 112, 320, 54, 24);
+    colorButton->setBounds (79, 348, 40, 20);
 }
 
 //==============================================================================
 void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     if (buttonThatWasClicked == layerVisible.get())
-    {
         frameEditor->setIldaVisible (layerVisible->getToggleState());
-    }
     else if (buttonThatWasClicked == showBlanking.get())
-    {
         frameEditor->setIldaShowBlanked (showBlanking->getToggleState());
-    }
     else if (buttonThatWasClicked == drawLines.get())
-    {
         frameEditor->setIldaDrawLines (drawLines->getToggleState());
-    }
+    else if (buttonThatWasClicked == selectToolButton.get())
+        frameEditor->setActiveIldaTool (FrameEditor::selectTool);
+    else if (buttonThatWasClicked == pointToolButton.get())
+        frameEditor->setActiveIldaTool (FrameEditor::pointTool);
     else if (buttonThatWasClicked == decSelection.get())
-    {
         adjustSelection (-1);
-    }
     else if (buttonThatWasClicked == incSelection.get())
-    {
         adjustSelection (1);
-    }
 }
 
 //==============================================================================
@@ -316,6 +338,8 @@ void IldaProperties::actionListenerCallback (const String& message)
         updateSelection();
     else if (message == EditorActions::ildaPointsChanged)
         updateSelection();
+    else if (message == EditorActions::ildaToolChanged)
+        updateTools();
 }
 
 void IldaProperties::changeListenerCallback (ChangeBroadcaster* source)
@@ -581,6 +605,20 @@ void IldaProperties::updateSelection()
     }
 }
 
+void IldaProperties::updateTools()
+{
+    if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+    {
+        selectToolButton->setToggleState (true, dontSendNotification);
+        pointToolButton->setToggleState (false, dontSendNotification);
+    }
+    else
+    {
+        selectToolButton->setToggleState (false, dontSendNotification);
+        pointToolButton->setToggleState (true, dontSendNotification);
+    }
+}
+
 void IldaProperties::adjustSelection (int offset)
 {
     SparseSet<uint16> newSelection;
@@ -626,6 +664,7 @@ void IldaProperties::refresh()
     layerVisible->setToggleState (frameEditor->getIldaVisible(), dontSendNotification);
     showBlanking->setToggleState (frameEditor->getIldaShowBlanked(), dontSendNotification);
     drawLines->setToggleState (frameEditor->getIldaDrawLines(), dontSendNotification);
+    updateTools();
     updatePointDisplay();
     updateSelection();
 }

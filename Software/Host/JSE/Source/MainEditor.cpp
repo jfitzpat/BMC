@@ -125,7 +125,10 @@ MainEditor::WorkingArea::WorkingArea (FrameEditor* frame)
     frameEditor = frame;
     frameEditor->addActionListener (this);
     
+    updateCursor();
+    
     drawMark = false;
+    drawRect = false;
 }
 
 MainEditor::WorkingArea::~WorkingArea()
@@ -134,22 +137,96 @@ MainEditor::WorkingArea::~WorkingArea()
 
 void MainEditor::WorkingArea::mouseDown (const MouseEvent& event)
 {
+    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
+        frameEditor->getActiveIldaTool() != FrameEditor::selectTool)
+        return;
+    
+    // Has user highlighted a point?
+    if (drawMark)
+    {
+        SparseSet<uint16> selection;
+        
+        if (event.mods.isCommandDown() || event.mods.isAltDown())
+            selection = frameEditor->getIldaSelection();
+        
+        if (selection.contains (markIndex) || event.mods.isAltDown())
+            selection.removeRange (Range<uint16>(markIndex, markIndex + 1));
+        else
+            selection.addRange (Range<uint16>(markIndex, markIndex + 1));
+        
+        drawMark = false;
+        frameEditor->setIldaSelection (selection);
+    }
+    else
+        drawRect = true;
 }
 
 void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
 {
+    if (drawRect)
+    {
+        drawRect = false;
+        int expansion = (int)(activeInvScale * 3);
+        repaint (lastDrawRect.expanded (expansion, expansion));
+        
+        // Search for points to alter to/from selection
+        // First, rectangle to ILDA space
+        
+        int x = lastDrawRect.getX() - 32768;
+        int y = 32767 - (lastDrawRect.getY() + lastDrawRect.getHeight());
+
+        Rectangle<int16> r (x, y, (uint16)lastDrawRect.getWidth(), (uint16)lastDrawRect.getHeight());
+        
+        // Check if we should be using the existing selection
+        SparseSet<uint16> selection;
+        if (event.mods.isAltDown() || event.mods.isCommandDown())
+            selection = frameEditor->getIldaSelection();
+        
+        // Loop through all the points
+        for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
+        {
+            Frame::XYPoint point;
+            frameEditor->getPoint (n, point);
+            if (r.contains (point.x.w, point.y.w))
+            {
+                if (frameEditor->getIldaShowBlanked() ||
+                    (! (point.status & Frame::BlankedPoint)))
+                {
+                    if (event.mods.isAltDown())
+                        selection.removeRange (Range<uint16>(n, n + 1));
+                    else
+                        selection.addRange (Range<uint16>(n, n + 1));
+                }
+            }
+        }
+        
+        // Make the selection
+        frameEditor->setIldaSelection (selection);
+    }
 }
 
 void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
 {
-    if (frameEditor->getActiveLayer() != FrameEditor::ilda)
+    // If we aren't the ILDA / Select Tool case, clear and past marks
+    // and bail
+    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
+        frameEditor->getActiveIldaTool() != FrameEditor::selectTool)
+    {
+        if (drawMark)
+        {
+            drawMark = false;
+            repaint (lastMarkRect);
+        }
         return;
+    }
     
+    // Create a test rectangle in ILDA space with a 10 pixel margin
     int x = event.x - 32768;
     int y = 32767 - event.y;
     
     Rectangle<int16> r(x - (int16)(5 * activeInvScale), y - (int16)(5 * activeInvScale), (int16)(10 * activeInvScale), (int16)(10 * activeInvScale));
     
+    // Loop through the points and look for a match
     uint16 n;
     for (n = 0; n < frameEditor->getPointCount(); ++n)
     {
@@ -157,21 +234,27 @@ void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
         frameEditor->getPoint (n, point);
         if (r.contains (point.x.w, point.y.w))
         {
-            markIndex = n;
+            // Dont' match blanked points unless they are visible
+            if (frameEditor->getIldaShowBlanked() ||
+                (! (point.status & Frame::BlankedPoint)))
+            {
+                markIndex = n;
 
-            if (drawMark == true)
+                if (drawMark == true)
+                    repaint (lastMarkRect);
+                drawMark = true;
+
+                lastMarkRect = Rectangle<int>(event.x - (int)(15 * activeInvScale),
+                                              event.y - (int)(15 * activeInvScale),
+                                              (int)(30 * activeInvScale),
+                                              (int)(30 * activeInvScale));
                 repaint (lastMarkRect);
-            drawMark = true;
-
-            lastMarkRect = Rectangle<int>(event.x - (int)(15 * activeInvScale),
-                                          event.y - (int)(15 * activeInvScale),
-                                          (int)(30 * activeInvScale),
-                                          (int)(30 * activeInvScale));
-            repaint (lastMarkRect);
-            break;
+                break;
+            }
         }
     }
     
+    // No matches, clear any pending mark
     if (n == frameEditor->getPointCount())
     {
         if (drawMark == true)
@@ -184,6 +267,13 @@ void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
 
 void MainEditor::WorkingArea::mouseDrag (const MouseEvent& event)
 {
+    if (drawRect)
+    {
+        int expansion = (int)(activeInvScale * 3);
+        repaint (lastDrawRect.expanded (expansion, expansion));
+        lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
+        repaint (lastDrawRect.expanded (expansion, expansion));
+    }
 }
 
 void MainEditor::WorkingArea::paint (juce::Graphics& g)
@@ -308,6 +398,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                     }
                 }
             }
+            
             if (frameEditor->getActiveLayer() == FrameEditor::ilda && drawMark)
             {
                 if (n == markIndex)
@@ -318,11 +409,41 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                 }
             }
         }
+        
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda && drawRect)
+        {
+            g.setColour (Colours::grey);
+            g.drawRect (lastDrawRect, (int)activeInvScale >> 1);
+        }
+
     }
 }
 
 void MainEditor::WorkingArea::resized()
 {
+}
+
+void MainEditor::WorkingArea::updateCursor()
+{
+    if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+    {
+        switch (frameEditor->getActiveIldaTool())
+        {
+            case FrameEditor::selectTool:
+                setMouseCursor (MouseCursor (MouseCursor::PointingHandCursor));
+                break;
+                
+            case FrameEditor::pointTool:
+                setMouseCursor (MouseCursor (MouseCursor::CrosshairCursor));
+                break;
+
+            default:
+                setMouseCursor (MouseCursor (MouseCursor::NormalCursor));
+                break;
+        }
+    }
+    else
+        setMouseCursor (MouseCursor (MouseCursor::NormalCursor));
 }
 
 void MainEditor::WorkingArea::actionListenerCallback (const String& message)
@@ -348,9 +469,14 @@ void MainEditor::WorkingArea::actionListenerCallback (const String& message)
     else if (message == EditorActions::refDrawGridChanged)
         repaint();
     else if (message == EditorActions::layerChanged)
+    {
+        updateCursor();
         repaint();
+    }
     else if (message == EditorActions::ildaSelectionChanged)
         repaint();
     else if (message == EditorActions::ildaPointsChanged)
         repaint();
+    else if (message == EditorActions::ildaToolChanged)
+        updateCursor();
 }

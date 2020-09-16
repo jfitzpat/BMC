@@ -36,7 +36,11 @@ public:
         reference
     } Layer;
 
-
+    typedef enum {
+        selectTool,
+        pointTool
+    } IldaTool;
+    
     // Dirty/Clean mechanism
     uint32 getDirtyCounter() { return dirtyCounter; }
     void setDirtyCounter (uint32 count);
@@ -57,6 +61,8 @@ public:
     bool getIldaVisible() { return ildaVisible; }
     bool getRefVisible() { return refVisible; }
     
+    IldaTool getActiveIldaTool() { return activeIldaTool; }
+
     const MemoryBlock& getImageData() {return currentFrame->getImageData(); }
     
     const Image* getImage() { return currentFrame->getBackgroundImage(); }
@@ -95,6 +101,8 @@ public:
     void setIldaVisible (bool visible);
     void setRefVisible (bool visible);
     
+    void setActiveIldaTool (IldaTool tool);
+
     void selectImage();
     void clearImage();
     void setDrawGrid (bool draw);
@@ -138,6 +146,8 @@ public:
     void _setIldaVisible (bool visible);
     void _setRefVisible (bool visible);
 
+    void _setActiveIldaTool (IldaTool tool);
+
     bool _setImageData (const MemoryBlock& file);
     void _setDrawGrid (bool draw);
     void _setImageOpacity (float opacity);
@@ -166,6 +176,7 @@ private:
     uint32 dirtyCounter;
     uint32 scanRate;
     Layer activeLayer;
+    IldaTool activeIldaTool;
     bool sketchVisible;
     bool ildaVisible;
     bool ildaShowBlanked;
@@ -201,4 +212,5 @@ namespace EditorActions
     const String ildaDrawLinesChanged       ("DLC");
     const String ildaSelectionChanged       ("ISC");
     const String ildaPointsChanged          ("IPC");
+    const String ildaToolChanged            ("ITC");
 }

@@ -53,7 +53,7 @@ public:
         addAndMakeVisible (greenButton.get());
         greenButton->addListener (this);
         greenButton->setButtonText ("");
-        greenButton->setColour (TextButton::buttonColourId, Colours::green);
+        greenButton->setColour (TextButton::buttonColourId, Colour(0, 255, 0));
 
         blueButton.reset (new juce::TextButton ("blue"));
         addAndMakeVisible (blueButton.get());
@@ -138,8 +138,8 @@ public:
     
     void clicked() override
     {
-        auto* colourSelector = new CBSelector (this, findColour (TextButton::buttonColourId));
-        CallOutBox::launchAsynchronously (colourSelector, getScreenBounds(), nullptr);
+        auto colourSelector = std::make_unique<CBSelector>(this, findColour (TextButton::buttonColourId));
+        CallOutBox::launchAsynchronously (std::move(colourSelector), getScreenBounds(), nullptr);
     }
 
     void componentBeingDeleted (Component&) override { sendChangeMessage(); }

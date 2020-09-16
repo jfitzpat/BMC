@@ -7,10 +7,13 @@
   <MAINGROUP id="dkE1Q5" name="JSE">
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{419AAC25-6FF2-599E-C3D9-334E04C580EF}" name="Binary Resources">
+        <FILE id="Ji38Wl" name="croshair.png" compile="0" resource="1" file="Graphics/croshair.png"/>
         <FILE id="OVPQcf" name="down-white.png" compile="0" resource="1" file="Graphics/down-white.png"/>
         <FILE id="NfqRkZ" name="duplicate-white.png" compile="0" resource="1"
               file="Graphics/duplicate-white.png"/>
         <FILE id="VuLuq9" name="jse2.png" compile="0" resource="0" file="Graphics/jse2.png"/>
+        <FILE id="MatEZ4" name="pointinghand.png" compile="0" resource="1"
+              file="Graphics/pointinghand.png"/>
         <FILE id="RczVdz" name="up-white.png" compile="0" resource="1" file="Graphics/up-white.png"/>
       </GROUP>
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">

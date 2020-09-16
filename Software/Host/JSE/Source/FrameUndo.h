@@ -47,6 +47,31 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableSetIldaTool : public UndoableAction
+{
+public:
+    UndoableSetIldaTool (FrameEditor* editor, FrameEditor::IldaTool tool)
+    : newTool(tool), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldTool = frameEditor->getActiveIldaTool();
+        frameEditor->_setActiveIldaTool (newTool);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setActiveIldaTool (oldTool);
+        return true;
+    }
+    
+private:
+    FrameEditor::IldaTool oldTool;
+    FrameEditor::IldaTool newTool;
+    FrameEditor* frameEditor;
+};
+
 class UndoableSetSketchVisibility : public UndoableAction
 {
 public:

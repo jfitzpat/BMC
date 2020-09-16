@@ -64,6 +64,9 @@ public:
         float getActiveInvScale() { return activeInvScale; }
         void setActiveInvScale (float scale) { activeInvScale = scale; }
 
+        //==============================================================================
+        void updateCursor();
+        
     private:
         FrameEditor* frameEditor;
         float activeScale;
@@ -72,7 +75,8 @@ public:
         bool drawMark;
         uint16 markIndex;
         Rectangle<int> lastMarkRect;
-
+        bool drawRect;
+        Rectangle<int> lastDrawRect;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WorkingArea)
     };
 
