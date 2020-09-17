@@ -91,9 +91,8 @@ void MainEditor::paint (juce::Graphics& g)
 
 void MainEditor::resized()
 {
-    // Reset zoom
-    zoomFactor = 1.0;
-    setTransform (AffineTransform());
+    // Manage zoom clippoing
+    keepOnscreen (getX(), getY());
     
     // Figure out our working area
     auto w = getWidth();
@@ -123,6 +122,30 @@ void MainEditor::actionListenerCallback (const String& /*message*/)
     
 }
 
+void MainEditor::keepOnscreen (int x, int y)
+{
+    int tx = 200;
+    int ty = 0;
+    int bx = getParentWidth() - 200;
+    int by = getParentHeight();
+    
+    getTransform().inverted().transformPoints(tx, ty, bx, by);
+    
+    if (x > tx)
+        x = tx;
+
+    if ((x + getWidth()) < bx)
+        x += (bx - (x + getWidth()));
+    
+    if (y > ty)
+        y = ty;
+    
+    if ((y + getHeight()) < by)
+        y += (by - (y + getHeight()));
+    
+    setTopLeftPosition (x, y);
+}
+
 void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetails& wheel)
 {
     if (event.mods.isCtrlDown())
@@ -144,35 +167,35 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
             setTransform (AffineTransform());
         else
             setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)event.x, (float)event.y));
-        
-        Logger::outputDebugString ("Zoom Factor: " + String (zoomFactor, 2));
+
+        keepOnscreen (getX(), getY());
         repaint();
     }
-    else if (event.mods.isShiftDown())
+    else if (wheel.deltaX != 0)
     {
         auto bounds = getBounds();
         int x = bounds.getX();
         if (wheel.deltaX < 0)
-            x -= 10;
+            x -= wheel.isInertial ? 1 : 10;
         else
-            x += 10;
-        setTopLeftPosition (x, bounds.getY());
-        Logger::outputDebugString ("X: " + String (x));
+            x += wheel.isInertial ? 1 : 10;
+        
+        keepOnscreen (x, bounds.getY());
         repaint();
     }
-    else
+    
+    else if (wheel.deltaY != 0)
     {
         auto bounds = getBounds();
         int y = bounds.getY();
         if (wheel.deltaY< 0)
-            y -= 10;
+            y -= wheel.isInertial ? 1 : 10;
         else
-            y += 10;
-        setTopLeftPosition (bounds.getX(), y);
-        Logger::outputDebugString ("Y: " + String (y));
+            y += wheel.isInertial ? 1 : 10;
+        
+        keepOnscreen (bounds.getX(), y);
         repaint();
     }
-
 }
 
 //==============================================================================

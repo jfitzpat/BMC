@@ -83,11 +83,12 @@ public:
     };
 
 private:
+    void keepOnscreen (int x, int y);
+    
     float zoomFactor;
     FrameEditor* frameEditor;
     std::unique_ptr<WorkingArea> workingArea;
     
     Rectangle<int> activeArea;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainEditor)
 };
