@@ -137,6 +137,62 @@ void FrameEditor::fileIldaExport()
 }
 
 //==============================================================================
+const Point<int16> FrameEditor::getCenterOfIldaSelection()
+{
+    // Don't bother if there is no selection visible
+    if (ildaSelection.isEmpty() || activeLayer != ilda)
+        return Point<int16> (0, 0);
+    
+    bool first = true;
+    int16 minx, maxx, miny, maxy;
+    minx = maxx = miny = maxy = 0;  // For Visual Studio warning
+    
+    for (auto n = 0; n < ildaSelection.getNumRanges(); ++n)
+    {
+        Range<uint16> r = ildaSelection.getRange (n);
+        for (auto i=0; i < r.getLength(); ++i)
+        {
+            Frame::XYPoint point;
+            currentFrame->getPoint (r.getStart() + i, point);
+            
+            if (first)
+            {
+                minx = maxx = point.x.w;
+                miny = maxy = point.y.w;
+                first = false;
+            }
+            else
+            {
+                if (point.x.w < minx)
+                    minx = point.x.w;
+                else if (point.x.w > maxx)
+                    maxx = point.x.w;
+                
+                if (point.y.w < miny)
+                    miny = point.y.w;
+                else if (point.y.w > maxy)
+                    maxy = point.y.w;
+            }
+        }
+    }
+    
+    return Point<int16> ((minx + maxx) / 2, (miny + maxy) / 2);
+}
+
+const Point<int> FrameEditor::getComponentCenterOfIldaSelection()
+{
+    Point<int16> c = getCenterOfIldaSelection();
+    return Point<int> ((int)c.getX() + 32768, 32767 - (int)c.getY());
+}
+
+void FrameEditor::getComponentCenterOfIldaSelection (int&x, int&y)
+{
+    Point<int16> c = getCenterOfIldaSelection();
+    
+    x = (int)c.getX() + 32768;
+    y = 32767 - (int)c.getY();
+}
+
 void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
 {
     points.clear();

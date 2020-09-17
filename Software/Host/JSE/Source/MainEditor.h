@@ -35,11 +35,17 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    //==============================================================================
     void mouseWheelMove (const MouseEvent&, const MouseWheelDetails&) override;
+    void mouseMagnify (const MouseEvent&, float) override;
 
     //==============================================================================
     void actionListenerCallback (const String& message) override;
 
+    //==============================================================================
+    void setZoom (float zoom);
+    float getZoom () { return zoomFactor; }
+    
     //==============================================================================
     class WorkingArea : public Component,
                         public ActionListener
@@ -84,6 +90,7 @@ public:
 
 private:
     void keepOnscreen (int x, int y);
+    void translateWorkingToMain (int& x, int& y);
     
     float zoomFactor;
     FrameEditor* frameEditor;

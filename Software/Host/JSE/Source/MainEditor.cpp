@@ -122,6 +122,13 @@ void MainEditor::actionListenerCallback (const String& /*message*/)
     
 }
 
+void MainEditor::translateWorkingToMain (int& x, int& y)
+{
+    workingArea->getTransform().transformPoint (x, y);
+    x += getX() + activeArea.getX();
+    y += getY() + activeArea.getY();
+}
+
 void MainEditor::keepOnscreen (int x, int y)
 {
     int tx = 200;
@@ -146,6 +153,55 @@ void MainEditor::keepOnscreen (int x, int y)
     setTopLeftPosition (x, y);
 }
 
+void MainEditor::setZoom (float zoom)
+{
+    if (zoom < 1.0) zoom = 1.0;
+    if (zoom > 16.0) zoom = 16.0;
+    
+    zoomFactor = zoom;
+    
+    int x;
+    int y;
+    frameEditor->getComponentCenterOfIldaSelection (x, y);
+    translateWorkingToMain (x, y);
+    
+    if (zoomFactor == 1.0)
+        setTransform (AffineTransform());
+    else
+        setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)x, (float)y));
+        
+    keepOnscreen (getX(), getY());
+}
+
+void MainEditor::mouseMagnify (const MouseEvent& event, float scale)
+{
+    if (scale > 1.0)
+    {
+        zoomFactor += 0.05;
+        if (zoomFactor > 16.0)
+            zoomFactor = 16.0;
+    }
+    else
+    {
+        zoomFactor -= 0.05;
+        if (zoomFactor < 1.0)
+            zoomFactor = 1.0;
+    }
+
+    int x;
+    int y;
+    frameEditor->getComponentCenterOfIldaSelection (x, y);
+    translateWorkingToMain (x, y);
+
+    if (zoomFactor == 1.0)
+        setTransform (AffineTransform());
+    else
+        setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)x, (float)y));
+
+    keepOnscreen (getX(), getY());
+    repaint();
+}
+
 void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetails& wheel)
 {
     if (event.mods.isCtrlDown())
@@ -153,8 +209,8 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
         if (wheel.deltaY > 0)
         {
             zoomFactor += 0.05;
-            if (zoomFactor > 10.0)
-                zoomFactor = 10.0;
+            if (zoomFactor > 16.0)
+                zoomFactor = 16.0;
         }
         else
         {
@@ -162,11 +218,16 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
             if (zoomFactor < 1.0)
                 zoomFactor = 1.0;
         }
-        
+
+        int x;
+        int y;
+        frameEditor->getComponentCenterOfIldaSelection (x, y);
+        translateWorkingToMain (x, y);
+
         if (zoomFactor == 1.0)
             setTransform (AffineTransform());
         else
-            setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)event.x, (float)event.y));
+            setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)x, (float)y));
 
         keepOnscreen (getX(), getY());
         repaint();

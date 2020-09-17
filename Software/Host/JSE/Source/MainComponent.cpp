@@ -112,7 +112,7 @@ void MainComponent::resized()
 //==============================================================================
 StringArray MainComponent::getMenuBarNames()
 {
-    return { "File", "Edit", "Help" };
+    return { "File", "Edit", "View", "Help" };
 }
 
 PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuName*/)
@@ -165,6 +165,12 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::moveFrameDown);
     }
     else if (menuIndex == 2)
+    {
+        menu.addCommandItem (&commandManager, CommandIDs::zoomAll);
+        menu.addCommandItem (&commandManager, CommandIDs::zoomIn);
+        menu.addCommandItem (&commandManager, CommandIDs::zoomOut);
+    }
+    else if (menuIndex == 3)
     {
         menu.addCommandItem (&commandManager, CommandIDs::helpWebSite);
         #if JUCE_WINDOWS
@@ -260,7 +266,10 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::helpWebSite,
                                 CommandIDs::appAbout,
                                 CommandIDs::appPreferences,
-                                CommandIDs::clearRecentFiles };
+                                CommandIDs::clearRecentFiles,
+                                CommandIDs::zoomAll,
+                                CommandIDs::zoomOut,
+                                CommandIDs::zoomIn };
     
     c.addArray (commands);
 }
@@ -344,6 +353,19 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setActive (frameEditor->getFrameIndex());
             break;
 
+        case CommandIDs::zoomAll:
+            result.setInfo ("Fit All", "Fit entire edit field onscreen", "Menu", 0);
+            result.addDefaultKeypress('0', ModifierKeys::commandModifier);
+            break;
+        case CommandIDs::zoomIn:
+            result.setInfo ("Zoom In", "Zoom in on the selection", "Menu", 0);
+            result.addDefaultKeypress('+', ModifierKeys::commandModifier);
+            break;
+        case CommandIDs::zoomOut:
+            result.setInfo ("Zoom Out", "Zoom out on the selection", "Menu", 0);
+            result.addDefaultKeypress('-', ModifierKeys::commandModifier);
+            break;
+
         case CommandIDs::editSelectAll:
             result.setInfo ("Select All", "Select entire layer", "Menu", 0);
             result.addDefaultKeypress('a', ModifierKeys::commandModifier);
@@ -398,6 +420,40 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::moveFrameDown:
             frameEditor->moveFrameDown();
             break;
+            
+        case CommandIDs::zoomAll:
+            mainEditor->setZoom (1.0);
+            break;
+            
+        case CommandIDs::zoomIn:
+            {
+                float f;
+                f = mainEditor->getZoom();
+                if (f < 16.0f)
+                {
+                    f = round (f) * 2.0f;
+                    if (f > 16.0f)
+                        f = 16.0f;
+                    
+                    mainEditor->setZoom (f);
+                }
+            }
+            break;
+        case CommandIDs::zoomOut:
+            {
+                float f;
+                f = mainEditor->getZoom();
+                if (f > 1.0f)
+                {
+                    f = round (f) / 2.0f;
+                    if (f < 1.0f)
+                        f = 1.0f;
+                    
+                    mainEditor->setZoom (f);
+                }
+            }
+            break;
+
             
         case CommandIDs::fileOpen:
             frameEditor->loadFile();

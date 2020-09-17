@@ -58,7 +58,10 @@ public:
         helpWebSite,
         appAbout,
         appPreferences,
-        clearRecentFiles
+        clearRecentFiles,
+        zoomAll,
+        zoomIn,
+        zoomOut
     };
 
     //==============================================================================

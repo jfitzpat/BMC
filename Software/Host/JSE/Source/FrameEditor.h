@@ -88,6 +88,9 @@ public:
     bool getIldaShowBlanked() { return ildaShowBlanked; }
     bool getIldaDrawLines() { return ildaDrawLines; }
     const SparseSet<uint16>& getIldaSelection() { return ildaSelection; }
+    const Point<int16> getCenterOfIldaSelection();
+    const Point<int> getComponentCenterOfIldaSelection();
+    void getComponentCenterOfIldaSelection (int&x, int&y);
     
     void getIldaSelectedPoints (Array<Frame::XYPoint>& points);
     void getIldaPoints (const SparseSet<uint16>& selection, Array<Frame::XYPoint>& points);
