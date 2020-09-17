@@ -26,8 +26,8 @@ const float CenterPitch = 10.0;
 
 //==============================================================================
 MainEditor::MainEditor (FrameEditor* frame)
+    : zoomFactor (1.0), frameEditor (frame)
 {
-    frameEditor = frame;
     frameEditor->addActionListener (this);
     
     workingArea.reset (new WorkingArea(frame));
@@ -91,6 +91,10 @@ void MainEditor::paint (juce::Graphics& g)
 
 void MainEditor::resized()
 {
+    // Reset zoom
+    zoomFactor = 1.0;
+    setTransform (AffineTransform());
+    
     // Figure out our working area
     auto w = getWidth();
     auto h = getHeight();
@@ -117,6 +121,58 @@ void MainEditor::resized()
 void MainEditor::actionListenerCallback (const String& /*message*/)
 {
     
+}
+
+void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetails& wheel)
+{
+    if (event.mods.isCtrlDown())
+    {
+        if (wheel.deltaY > 0)
+        {
+            zoomFactor += 0.05;
+            if (zoomFactor > 10.0)
+                zoomFactor = 10.0;
+        }
+        else
+        {
+            zoomFactor -= 0.05;
+            if (zoomFactor < 1.0)
+                zoomFactor = 1.0;
+        }
+        
+        if (zoomFactor == 1.0)
+            setTransform (AffineTransform());
+        else
+            setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)event.x, (float)event.y));
+        
+        Logger::outputDebugString ("Zoom Factor: " + String (zoomFactor, 2));
+        repaint();
+    }
+    else if (event.mods.isShiftDown())
+    {
+        auto bounds = getBounds();
+        int x = bounds.getX();
+        if (wheel.deltaX < 0)
+            x -= 10;
+        else
+            x += 10;
+        setTopLeftPosition (x, bounds.getY());
+        Logger::outputDebugString ("X: " + String (x));
+        repaint();
+    }
+    else
+    {
+        auto bounds = getBounds();
+        int y = bounds.getY();
+        if (wheel.deltaY< 0)
+            y -= 10;
+        else
+            y += 10;
+        setTopLeftPosition (bounds.getX(), y);
+        Logger::outputDebugString ("Y: " + String (y));
+        repaint();
+    }
+
 }
 
 //==============================================================================

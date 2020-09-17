@@ -47,12 +47,12 @@ MainComponent::MainComponent()
     frameEditor->addActionListener (this);
     
     // GUI components
+    mainEditor.reset (new MainEditor (frameEditor.get()));
+    addAndMakeVisible (mainEditor.get());
     laserControls.reset (new LaserControls (frameEditor.get()));
     addAndMakeVisible (laserControls.get());
     editProperties.reset (new EditProperties (frameEditor.get()));
     addAndMakeVisible (editProperties.get());
-    mainEditor.reset (new MainEditor (frameEditor.get()));
-    addAndMakeVisible (mainEditor.get());
     frameList.reset (new FrameList (frameEditor.get()));
     addAndMakeVisible (frameList.get());
     

@@ -35,6 +35,8 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    void mouseWheelMove (const MouseEvent&, const MouseWheelDetails&) override;
+
     //==============================================================================
     void actionListenerCallback (const String& message) override;
 
@@ -81,6 +83,7 @@ public:
     };
 
 private:
+    float zoomFactor;
     FrameEditor* frameEditor;
     std::unique_ptr<WorkingArea> workingArea;
     
