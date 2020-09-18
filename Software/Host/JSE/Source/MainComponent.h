@@ -61,7 +61,11 @@ public:
         clearRecentFiles,
         zoomAll,
         zoomIn,
-        zoomOut
+        zoomOut,
+        panLeft,
+        panRight,
+        panUp,
+        panDown
     };
 
     //==============================================================================

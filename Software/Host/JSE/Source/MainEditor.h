@@ -46,6 +46,11 @@ public:
     void setZoom (float zoom);
     float getZoom () { return frameEditor->getZoomFactor(); }
     
+    void panLeft();
+    void panRight();
+    void panUp();
+    void panDown();
+    
     //==============================================================================
     class WorkingArea : public Component,
                         public ActionListener
@@ -73,12 +78,14 @@ public:
         void setActiveInvScale (float scale) { activeInvScale = scale; }
 
         //==============================================================================
+        Point<int> getLastMouseMove() { return lastMouseMove; }        
         void updateCursor();
         
     private:
         FrameEditor* frameEditor;
         float activeScale;
         float activeInvScale;
+        Point<int> lastMouseMove;
         
         bool drawMark;
         uint16 markIndex;
@@ -91,6 +98,7 @@ public:
 private:
     void keepOnscreen (int x, int y);
     void translateWorkingToMain (int& x, int& y);
+    void findZoomPoint (const MouseEvent& event, int& x, int& y);
     
     FrameEditor* frameEditor;
     std::unique_ptr<WorkingArea> workingArea;

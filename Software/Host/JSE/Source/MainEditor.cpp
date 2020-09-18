@@ -160,6 +160,7 @@ void MainEditor::setZoom (float zoom)
     
     int x;
     int y;
+
     frameEditor->getComponentCenterOfIldaSelection (x, y);
     translateWorkingToMain (x, y);
     
@@ -172,10 +173,33 @@ void MainEditor::setZoom (float zoom)
 }
 
 #ifdef JUCE_WINDOWS
-#define ZOOM_STEP (0.2f)
+#define ZOOM_STEP (0.4f)
 #else
-#define ZOOM_STEP (0.1f)
+#define ZOOM_STEP (0.2f)
 #endif
+
+void MainEditor::findZoomPoint (const MouseEvent& event, int& x, int& y)
+{
+    if (! frameEditor->getIldaSelection().isEmpty())
+    {
+        frameEditor->getComponentCenterOfIldaSelection (x, y);
+        translateWorkingToMain (x, y);
+    }
+    else
+    {
+        x = event.getEventRelativeTo (workingArea.get()).x;
+        y = event.getEventRelativeTo (workingArea.get()).y;
+        Logger::outputDebugString (String(x) + ", " + String(y));
+        if (workingArea->getBounds().contains(x, y))
+            translateWorkingToMain (x, y);
+        else
+        {
+            Logger::outputDebugString ("default");
+            x = getBounds().getCentreX();
+            y = getBounds().getCentreY();
+        }
+    }
+}
 
 void MainEditor::mouseMagnify (const MouseEvent& event, float scale)
 {
@@ -198,8 +222,7 @@ void MainEditor::mouseMagnify (const MouseEvent& event, float scale)
     
     int x;
     int y;
-    frameEditor->getComponentCenterOfIldaSelection (x, y);
-    translateWorkingToMain (x, y);
+    findZoomPoint (event, x, y);
 
     if (zoomFactor == 1.0)
         setTransform (AffineTransform());
@@ -207,7 +230,6 @@ void MainEditor::mouseMagnify (const MouseEvent& event, float scale)
         setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)x, (float)y));
 
     keepOnscreen (getX(), getY());
-    repaint();
 }
 
 void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetails& wheel)
@@ -233,22 +255,27 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
         
         int x;
         int y;
-        frameEditor->getComponentCenterOfIldaSelection (x, y);
-        translateWorkingToMain (x, y);
-
+        findZoomPoint (event, x, y);
+        
         if (zoomFactor == 1.0)
             setTransform (AffineTransform());
         else
             setTransform (AffineTransform::scale (zoomFactor, zoomFactor, (float)x, (float)y));
 
         keepOnscreen (getX(), getY());
-        repaint();
     }
-#if JUCE_MAC
+    else if (wheel.deltaY != 0 && event.mods.isShiftDown())
+    {
+        auto bounds = getBounds();
+        int x = bounds.getX();
+        if (wheel.deltaY< 0)
+            x -= wheel.isInertial ? 1 : 10;
+        else
+            x += wheel.isInertial ? 1 : 10;
+        
+        keepOnscreen (x, bounds.getY());
+    }
     else if (wheel.deltaY != 0)
-#else
-    else if (wheel.deltaY != 0 && (!event.mods.isShiftDown()))
-#endif
     {
         auto bounds = getBounds();
         int y = bounds.getY();
@@ -258,9 +285,7 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
             y += wheel.isInertial ? 1 : 10;
         
         keepOnscreen (bounds.getX(), y);
-        repaint();
     }
-#if JUCE_MAC
     else if (wheel.deltaX != 0)
     {
         auto bounds = getBounds();
@@ -269,20 +294,39 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
             x -= wheel.isInertial ? 1 : 10;
         else
             x += wheel.isInertial ? 1 : 10;
-#else
-    else if (wheel.deltaY != 0 && (event.mods.isShiftDown()))
-    {
-        auto bounds = getBounds();
-        int x = bounds.getX();
-        if (wheel.deltaY < 0)
-            x -= wheel.isInertial ? 1 : 10;
-        else
-            x += wheel.isInertial ? 1 : 10;
-#endif
+
         keepOnscreen (x, bounds.getY());
-        repaint();
     }
 }
+
+void MainEditor::panLeft()
+{
+    int x = getX();
+    x -= 10;
+    keepOnscreen (x, getY());
+}
+
+void MainEditor::panRight()
+{
+    int x = getX();
+    x += 10;
+    keepOnscreen (x, getY());
+}
+
+void MainEditor::panUp()
+{
+    int y = getY();
+    y -= 10;
+    keepOnscreen (getX(), y);
+}
+
+void MainEditor::panDown()
+{
+    int y = getY();
+    y += 10;
+    keepOnscreen (getX(), y);
+}
+
 
 //==============================================================================
 MainEditor::WorkingArea::WorkingArea (FrameEditor* frame)
@@ -378,6 +422,9 @@ void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
 
 void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
 {
+    // Save the position for modifier keys
+    lastMouseMove = Point<int>(event.x, event.y);
+    
     // If we aren't the ILDA / Select Tool case, clear and past marks
     // and bail
     if (frameEditor->getActiveLayer() != FrameEditor::ilda ||

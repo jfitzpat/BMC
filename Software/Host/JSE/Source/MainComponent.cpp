@@ -269,7 +269,11 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::clearRecentFiles,
                                 CommandIDs::zoomAll,
                                 CommandIDs::zoomOut,
-                                CommandIDs::zoomIn };
+                                CommandIDs::zoomIn,
+                                CommandIDs::panLeft,
+                                CommandIDs::panRight,
+                                CommandIDs::panUp,
+                                CommandIDs::panDown };
     
     c.addArray (commands);
 }
@@ -368,7 +372,22 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress('-', ModifierKeys::commandModifier);
             result.setActive (mainEditor->getZoom() != MIN_ZOOM);
             break;
-
+        case CommandIDs::panUp:
+            result.setInfo ("Pan Up", "Pan the edit view up", "ShortCut", 0);
+            result.addDefaultKeypress (KeyPress::upKey, ModifierKeys::commandModifier);
+            break;
+        case CommandIDs::panDown:
+            result.setInfo ("Pan Down", "Pan the edit view down", "ShortCut", 0);
+            result.addDefaultKeypress (KeyPress::downKey, ModifierKeys::commandModifier);
+            break;
+        case CommandIDs::panLeft:
+            result.setInfo ("Pan Left", "Pan the edit view left", "ShortCut", 0);
+            result.addDefaultKeypress (KeyPress::leftKey, ModifierKeys::commandModifier);
+            break;
+        case CommandIDs::panRight:
+            result.setInfo ("Pan Right", "Pan the edit view right", "ShortCut", 0);
+            result.addDefaultKeypress (KeyPress::rightKey, ModifierKeys::commandModifier);
+            break;
         case CommandIDs::editSelectAll:
             result.setInfo ("Select All", "Select entire layer", "Menu", 0);
             result.addDefaultKeypress('a', ModifierKeys::commandModifier);
@@ -456,8 +475,19 @@ bool MainComponent::perform (const InvocationInfo& info)
                 }
             }
             break;
+        case CommandIDs::panUp:
+            mainEditor->panUp();
+            break;
+        case CommandIDs::panDown:
+            mainEditor->panDown();
+            break;
+        case CommandIDs::panLeft:
+            mainEditor->panLeft();
+            break;
+        case CommandIDs::panRight:
+            mainEditor->panRight();
+            break;
 
-            
         case CommandIDs::fileOpen:
             frameEditor->loadFile();
             if (frameEditor->getLoadedFile().getFileName().length())
