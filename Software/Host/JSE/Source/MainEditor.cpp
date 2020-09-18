@@ -173,17 +173,23 @@ void MainEditor::setZoom (float zoom)
     keepOnscreen (getX(), getY());
 }
 
+#ifdef JUCE_WINDOWS
+#define ZOOM_STEP (0.2f)
+#else
+#define ZOOM_STEP (0.1f)
+#endif
+
 void MainEditor::mouseMagnify (const MouseEvent& event, float scale)
 {
     if (scale > 1.0)
     {
-        zoomFactor += 0.05;
+        zoomFactor += ZOOM_STEP;
         if (zoomFactor > 16.0)
             zoomFactor = 16.0;
     }
     else
     {
-        zoomFactor -= 0.05;
+        zoomFactor -= ZOOM_STEP;
         if (zoomFactor < 1.0)
             zoomFactor = 1.0;
     }
@@ -208,13 +214,13 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
     {
         if (wheel.deltaY > 0)
         {
-            zoomFactor += 0.05;
+            zoomFactor += ZOOM_STEP;
             if (zoomFactor > 16.0)
                 zoomFactor = 16.0;
         }
         else
         {
-            zoomFactor -= 0.05;
+            zoomFactor -= ZOOM_STEP;
             if (zoomFactor < 1.0)
                 zoomFactor = 1.0;
         }
@@ -232,20 +238,11 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
         keepOnscreen (getX(), getY());
         repaint();
     }
-    else if (wheel.deltaX != 0)
-    {
-        auto bounds = getBounds();
-        int x = bounds.getX();
-        if (wheel.deltaX < 0)
-            x -= wheel.isInertial ? 1 : 10;
-        else
-            x += wheel.isInertial ? 1 : 10;
-        
-        keepOnscreen (x, bounds.getY());
-        repaint();
-    }
-    
+#if JUCE_MAC
     else if (wheel.deltaY != 0)
+#else
+    else if (wheel.deltaY != 0 && (!event.mods.isShiftDown()))
+#endif
     {
         auto bounds = getBounds();
         int y = bounds.getY();
@@ -255,6 +252,28 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
             y += wheel.isInertial ? 1 : 10;
         
         keepOnscreen (bounds.getX(), y);
+        repaint();
+    }
+#if JUCE_MAC
+    else if (wheel.deltaX != 0)
+    {
+        auto bounds = getBounds();
+        int x = bounds.getX();
+        if (wheel.deltaX < 0)
+            x -= wheel.isInertial ? 1 : 10;
+        else
+            x += wheel.isInertial ? 1 : 10;
+#else
+    else if (wheel.deltaY != 0 && (event.mods.isShiftDown()))
+    {
+        auto bounds = getBounds();
+        int x = bounds.getX();
+        if (wheel.deltaY < 0)
+            x -= wheel.isInertial ? 1 : 10;
+        else
+            x += wheel.isInertial ? 1 : 10;
+#endif
+        keepOnscreen (x, bounds.getY());
         repaint();
     }
 }

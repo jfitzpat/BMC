@@ -23,11 +23,40 @@
 #include "RefProperties.h"
 #include "EditProperties.h"
 
+#include "MainComponent.h"  // So we can find the ApplicationCommandTarget
+
 //==============================================================================
 EditProperties::EditProperties (FrameEditor* frame)
 {
     frameEditor = frame;
     frameEditor->addActionListener (this);
+    
+    zoomInIcon = Drawable::createFromImageData(BinaryData::zoomin_png, BinaryData::zoomin_pngSize);
+
+    zoomInButton.reset (new DrawableButton ("zoomInButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (zoomInButton.get());
+    zoomInButton->setImages (zoomInIcon.get());
+    zoomInButton->setEdgeIndent (0);
+    zoomInButton->setTooltip ("Zoom In");
+    zoomInButton->addListener (this);
+
+    zoomOutIcon = Drawable::createFromImageData(BinaryData::zoomout_png, BinaryData::zoomout_pngSize);
+
+    zoomOutButton.reset (new DrawableButton ("zoomOutButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (zoomOutButton.get());
+    zoomOutButton->setImages (zoomOutIcon.get());
+    zoomOutButton->setEdgeIndent (0);
+    zoomOutButton->setTooltip ("Zoom Out");
+    zoomOutButton->addListener (this);
+
+    showAllIcon = Drawable::createFromImageData(BinaryData::showall_png, BinaryData::showall_pngSize);
+
+    showAllButton.reset (new DrawableButton ("showAllButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (showAllButton.get());
+    showAllButton->setImages (showAllIcon.get());
+    showAllButton->setEdgeIndent (0);
+    showAllButton->setTooltip ("Fit All");
+    showAllButton->addListener (this);
     
     layerTabs.reset (new PropTabbedComponent (frame));
     layerTabs->setOutline (0);
@@ -50,6 +79,13 @@ EditProperties::EditProperties (FrameEditor* frame)
 
 EditProperties::~EditProperties()
 {
+    showAllButton = nullptr;
+    showAllIcon = nullptr;
+    zoomInButton = nullptr;
+    zoomInIcon = nullptr;
+    zoomOutButton = nullptr;
+    zoomOutIcon = nullptr;
+    layerTabs = nullptr;
 }
 
 void EditProperties::paint (juce::Graphics& g)
@@ -63,7 +99,10 @@ void EditProperties::paint (juce::Graphics& g)
 
 void EditProperties::resized()
 {
-    layerTabs->setBounds (0, 2, getWidth()-1, getHeight()-2);
+    zoomInButton->setBounds (getWidth() - 116, 8, 32, 32);
+    zoomOutButton->setBounds (getWidth() - 80, 8, 32, 32);
+    showAllButton->setBounds (getWidth() - 44, 8, 32, 32);
+    layerTabs->setBounds (0, 48, getWidth()-1, getHeight()-48);
 }
 
 void EditProperties::actionListenerCallback (const String& message)
@@ -73,4 +112,34 @@ void EditProperties::actionListenerCallback (const String& message)
         if (frameEditor->getActiveLayer() != layerTabs->getCurrentTabIndex())
             layerTabs->setCurrentTabIndex (frameEditor->getActiveLayer());
     }
+}
+
+//==============================================================================
+void EditProperties::buttonClicked (juce::Button* buttonThatWasClicked)
+{
+    if (buttonThatWasClicked == showAllButton.get())
+    {
+        MainComponent* main;
+        
+        main = dynamic_cast<MainComponent*> (getParentComponent());
+        if (main != nullptr)
+            main->commandManager.invokeDirectly (MainComponent::CommandIDs::zoomAll, true);
+    }
+    else if (buttonThatWasClicked == zoomInButton.get())
+    {
+        MainComponent* main;
+        
+        main = dynamic_cast<MainComponent*> (getParentComponent());
+        if (main != nullptr)
+            main->commandManager.invokeDirectly (MainComponent::CommandIDs::zoomIn, true);
+    }
+    else if (buttonThatWasClicked == zoomOutButton.get())
+    {
+        MainComponent* main;
+        
+        main = dynamic_cast<MainComponent*> (getParentComponent());
+        if (main != nullptr)
+            main->commandManager.invokeDirectly (MainComponent::CommandIDs::zoomOut, true);
+    }
+
 }

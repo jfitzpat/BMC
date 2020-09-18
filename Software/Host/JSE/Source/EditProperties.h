@@ -45,6 +45,7 @@ private:
 
 //==============================================================================
 class EditProperties  : public Component,
+                        public Button::Listener,
                         public ActionListener
 {
 public:
@@ -56,10 +57,21 @@ public:
     void resized() override;
 
     //==============================================================================
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+
+    //==============================================================================
     void actionListenerCallback (const String& message) override;
 
 private:
     FrameEditor* frameEditor;
+    
+    std::unique_ptr<Drawable> showAllIcon;
+    std::unique_ptr<DrawableButton> showAllButton;
+    std::unique_ptr<Drawable> zoomInIcon;
+    std::unique_ptr<DrawableButton> zoomInButton;
+    std::unique_ptr<Drawable> zoomOutIcon;
+    std::unique_ptr<DrawableButton> zoomOutButton;
+    
     std::unique_ptr<PropTabbedComponent> layerTabs;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EditProperties)

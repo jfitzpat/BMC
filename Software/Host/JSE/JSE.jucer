@@ -14,7 +14,10 @@
         <FILE id="VuLuq9" name="jse2.png" compile="0" resource="0" file="Graphics/jse2.png"/>
         <FILE id="MatEZ4" name="pointinghand.png" compile="0" resource="1"
               file="Graphics/pointinghand.png"/>
+        <FILE id="RpuDEN" name="showall.png" compile="0" resource="1" file="Graphics/showall.png"/>
         <FILE id="RczVdz" name="up-white.png" compile="0" resource="1" file="Graphics/up-white.png"/>
+        <FILE id="vAcbvi" name="zoomin.png" compile="0" resource="1" file="Graphics/zoomin.png"/>
+        <FILE id="pW91jU" name="zoomout.png" compile="0" resource="1" file="Graphics/zoomout.png"/>
       </GROUP>
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">
         <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
