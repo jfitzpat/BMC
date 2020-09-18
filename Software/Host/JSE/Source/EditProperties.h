@@ -63,6 +63,8 @@ public:
     void actionListenerCallback (const String& message) override;
 
 private:
+    void updateZoomButtons();
+    
     FrameEditor* frameEditor;
     
     std::unique_ptr<Drawable> showAllIcon;

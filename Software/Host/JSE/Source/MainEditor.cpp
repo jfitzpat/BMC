@@ -26,7 +26,7 @@ const float CenterPitch = 10.0;
 
 //==============================================================================
 MainEditor::MainEditor (FrameEditor* frame)
-    : zoomFactor (1.0), frameEditor (frame)
+    : frameEditor (frame)
 {
     frameEditor->addActionListener (this);
     
@@ -155,10 +155,8 @@ void MainEditor::keepOnscreen (int x, int y)
 
 void MainEditor::setZoom (float zoom)
 {
-    if (zoom < 1.0) zoom = 1.0;
-    if (zoom > 16.0) zoom = 16.0;
-    
-    zoomFactor = zoom;
+    frameEditor->_setZoomFactor (zoom);
+    float zoomFactor = frameEditor->getZoomFactor();
     
     int x;
     int y;
@@ -181,19 +179,23 @@ void MainEditor::setZoom (float zoom)
 
 void MainEditor::mouseMagnify (const MouseEvent& event, float scale)
 {
+    float zoomFactor = frameEditor->getZoomFactor();
+    
     if (scale > 1.0)
     {
         zoomFactor += ZOOM_STEP;
-        if (zoomFactor > 16.0)
-            zoomFactor = 16.0;
+        if (zoomFactor > MAX_ZOOM)
+            zoomFactor = MAX_ZOOM;
     }
     else
     {
         zoomFactor -= ZOOM_STEP;
-        if (zoomFactor < 1.0)
-            zoomFactor = 1.0;
+        if (zoomFactor < MIN_ZOOM)
+            zoomFactor = MIN_ZOOM;
     }
 
+    frameEditor->_setZoomFactor (zoomFactor);
+    
     int x;
     int y;
     frameEditor->getComponentCenterOfIldaSelection (x, y);
@@ -212,19 +214,23 @@ void MainEditor::mouseWheelMove (const MouseEvent& event, const MouseWheelDetail
 {
     if (event.mods.isCtrlDown())
     {
+        float zoomFactor = frameEditor->getZoomFactor();
+        
         if (wheel.deltaY > 0)
         {
             zoomFactor += ZOOM_STEP;
-            if (zoomFactor > 16.0)
-                zoomFactor = 16.0;
+            if (zoomFactor > MAX_ZOOM)
+                zoomFactor = MAX_ZOOM;
         }
         else
         {
             zoomFactor -= ZOOM_STEP;
-            if (zoomFactor < 1.0)
-                zoomFactor = 1.0;
+            if (zoomFactor < MIN_ZOOM)
+                zoomFactor = MIN_ZOOM;
         }
 
+        frameEditor->_setZoomFactor (zoomFactor);
+        
         int x;
         int y;
         frameEditor->getComponentCenterOfIldaSelection (x, y);
@@ -379,11 +385,11 @@ void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
         return;
     }
     
-    // Create a test rectangle in ILDA space with a 10 pixel margin
+    // Create a test rectangle in ILDA space with a 6 pixel margin
     int x = event.x - 32768;
     int y = 32767 - event.y;
     
-    Rectangle<int16> r(x - (int16)(5 * activeInvScale), y - (int16)(5 * activeInvScale), (int16)(10 * activeInvScale), (int16)(10 * activeInvScale));
+    Rectangle<int16> r(x - (int16)(3 * activeInvScale), y - (int16)(3 * activeInvScale), (int16)(6 * activeInvScale), (int16)(6 * activeInvScale));
     
     // Loop through the points and look for a match
     uint16 n;
@@ -487,39 +493,6 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
             
             if (frameEditor->getPoint (n, point))
             {
-                // Draw the dots
-                if (point.status & Frame::BlankedPoint)
-                {
-                    if (frameEditor->getIldaShowBlanked())
-                    {
-                        g.setColour (Colours::darkgrey);
-                        g.drawEllipse((float)(point.x.w + (32768 - halfDotSize)),
-                                   (float)((32767 - halfDotSize) - point.y.w), dotSize, dotSize, activeInvScale);
-                    }
-
-                    // Mark selected even if ShowBlanked is off, since can be edited
-                    if (frameEditor->getIldaSelection().contains (n) &&
-                        frameEditor->getActiveLayer() == FrameEditor::ilda)
-                    {
-                        g.setColour (Colours::lightblue);
-                        g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
-                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
-                    }
-                }
-                else
-                {
-                    g.setColour (Colour (point.red, point.green, point.blue));
-                    g.fillEllipse(point.x.w + (32768 - halfDotSize), (32768 - halfDotSize) - point.y.w, dotSize, dotSize);
-                    
-                    if (frameEditor->getIldaSelection().contains (n) &&
-                        frameEditor->getActiveLayer() == FrameEditor::ilda)
-                    {
-                        g.setColour (Colours::whitesmoke);
-                        g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
-                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
-                    }
-                }
-                
                 // Draw lines
                 if (frameEditor->getIldaDrawLines())
                 {
@@ -554,6 +527,39 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                                         (float)(32767 - nextPoint.y.w),
                                         halfDotSize);
                         }
+                    }
+                }
+
+                // Draw the dots
+                if (point.status & Frame::BlankedPoint)
+                {
+                    if (frameEditor->getIldaShowBlanked())
+                    {
+                        g.setColour (Colours::darkgrey);
+                        g.drawEllipse((float)(point.x.w + (32768 - halfDotSize)),
+                                   (float)((32767 - halfDotSize) - point.y.w), dotSize, dotSize, activeInvScale);
+                    }
+
+                    // Mark selected even if ShowBlanked is off, since can be edited
+                    if (frameEditor->getIldaSelection().contains (n) &&
+                        frameEditor->getActiveLayer() == FrameEditor::ilda)
+                    {
+                        g.setColour (Colours::lightblue);
+                        g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
+                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
+                    }
+                }
+                else
+                {
+                    g.setColour (Colour (point.red, point.green, point.blue));
+                    g.fillEllipse(point.x.w + (32768 - halfDotSize), (32768 - halfDotSize) - point.y.w, dotSize, dotSize);
+                    
+                    if (frameEditor->getIldaSelection().contains (n) &&
+                        frameEditor->getActiveLayer() == FrameEditor::ilda)
+                    {
+                        g.setColour (Colours::whitesmoke);
+                        g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
+                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
                     }
                 }
             }

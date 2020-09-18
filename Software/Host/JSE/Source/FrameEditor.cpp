@@ -30,6 +30,7 @@
 FrameEditor::FrameEditor()
     : dirtyCounter (0),
       scanRate (30000),
+      zoomFactor (1.0),
       activeLayer (sketch),
       activeIldaTool (selectTool),
       sketchVisible (true),
@@ -786,6 +787,18 @@ void FrameEditor::_setActiveLayer (Layer layer)
     {
         activeLayer = layer;
         sendActionMessage (EditorActions::layerChanged);
+    }
+}
+
+void FrameEditor::_setZoomFactor (float zoom)
+{
+    zoom = jmin (zoom, MAX_ZOOM);
+    zoom = jmax (zoom, MIN_ZOOM);
+    
+    if (zoom != zoomFactor)
+    {
+        zoomFactor = zoom;
+        sendActionMessage (EditorActions::zoomFactorChanged);
     }
 }
 

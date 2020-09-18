@@ -22,6 +22,9 @@
 #include <JuceHeader.h>
 #include "Frame.h"
 
+#define MIN_ZOOM (1.0f)
+#define MAX_ZOOM (16.0f)
+
 //==============================================================================
 class FrameEditor  : public ActionBroadcaster,
                      public UndoManager
@@ -56,6 +59,7 @@ public:
     uint32 getScanRate() { return scanRate; }
     const File& getLoadedFile() { return loadedFile; }
     
+    float getZoomFactor() { return zoomFactor; }
     Layer getActiveLayer() { return activeLayer; }
     bool getSketchVisible() { return sketchVisible; }
     bool getIldaVisible() { return ildaVisible; }
@@ -144,6 +148,7 @@ public:
     
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }
+    void _setZoomFactor (float zoom);
     void _setActiveLayer (Layer layer);
     void _setSketchVisible (bool visible);
     void _setIldaVisible (bool visible);
@@ -178,6 +183,7 @@ private:
     File loadedFile;
     uint32 dirtyCounter;
     uint32 scanRate;
+    float zoomFactor;
     Layer activeLayer;
     IldaTool activeIldaTool;
     bool sketchVisible;
@@ -202,6 +208,7 @@ namespace EditorActions
 {
     const String dirtyStatusChanged         ("DSC");
     const String layerChanged               ("LC");
+    const String zoomFactorChanged          ("ZFC");
     const String sketchVisibilityChanged    ("SVC");
     const String ildaVisibilityChanged      ("IVC");
     const String refVisibilityChanged       ("RVC");

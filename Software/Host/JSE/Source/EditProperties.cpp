@@ -75,6 +75,7 @@ EditProperties::EditProperties (FrameEditor* frame)
                       new RefProperties (frame), true);
     
     frameEditor->setActiveLayer (FrameEditor::sketch);
+    updateZoomButtons();
 }
 
 EditProperties::~EditProperties()
@@ -105,6 +106,30 @@ void EditProperties::resized()
     layerTabs->setBounds (0, 48, getWidth()-1, getHeight()-48);
 }
 
+void EditProperties::updateZoomButtons()
+{
+    float zoom = frameEditor->getZoomFactor();
+    if (zoom == MIN_ZOOM)
+    {
+        showAllButton->setEnabled (false);
+        zoomOutButton->setEnabled (false);
+        zoomInButton->setEnabled (true);
+    }
+    else if (zoom == MAX_ZOOM)
+    {
+        showAllButton->setEnabled (true);
+        zoomOutButton->setEnabled (true);
+        zoomInButton->setEnabled (false);
+    }
+    else
+    {
+        showAllButton->setEnabled (true);
+        zoomOutButton->setEnabled (true);
+        zoomInButton->setEnabled (true);
+    }
+
+}
+
 void EditProperties::actionListenerCallback (const String& message)
 {
     if (message == EditorActions::layerChanged)
@@ -112,6 +137,8 @@ void EditProperties::actionListenerCallback (const String& message)
         if (frameEditor->getActiveLayer() != layerTabs->getCurrentTabIndex())
             layerTabs->setCurrentTabIndex (frameEditor->getActiveLayer());
     }
+    else if (message == EditorActions::zoomFactorChanged)
+        updateZoomButtons();
 }
 
 //==============================================================================

@@ -356,14 +356,17 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::zoomAll:
             result.setInfo ("Fit All", "Fit entire edit field onscreen", "Menu", 0);
             result.addDefaultKeypress('0', ModifierKeys::commandModifier);
+            result.setActive (mainEditor->getZoom() != MIN_ZOOM);
             break;
         case CommandIDs::zoomIn:
             result.setInfo ("Zoom In", "Zoom in on the selection", "Menu", 0);
             result.addDefaultKeypress('+', ModifierKeys::commandModifier);
+            result.setActive (mainEditor->getZoom() != MAX_ZOOM);
             break;
         case CommandIDs::zoomOut:
             result.setInfo ("Zoom Out", "Zoom out on the selection", "Menu", 0);
             result.addDefaultKeypress('-', ModifierKeys::commandModifier);
+            result.setActive (mainEditor->getZoom() != MIN_ZOOM);
             break;
 
         case CommandIDs::editSelectAll:
@@ -429,11 +432,11 @@ bool MainComponent::perform (const InvocationInfo& info)
             {
                 float f;
                 f = mainEditor->getZoom();
-                if (f < 16.0f)
+                if (f < MAX_ZOOM)
                 {
                     f = round (f) * 2.0f;
-                    if (f > 16.0f)
-                        f = 16.0f;
+                    if (f > MAX_ZOOM)
+                        f = MAX_ZOOM;
                     
                     mainEditor->setZoom (f);
                 }
@@ -443,11 +446,11 @@ bool MainComponent::perform (const InvocationInfo& info)
             {
                 float f;
                 f = mainEditor->getZoom();
-                if (f > 1.0f)
+                if (f > MIN_ZOOM)
                 {
                     f = round (f) / 2.0f;
-                    if (f < 1.0f)
-                        f = 1.0f;
+                    if (f < MIN_ZOOM)
+                        f = MIN_ZOOM;
                     
                     mainEditor->setZoom (f);
                 }

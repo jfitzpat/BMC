@@ -44,7 +44,7 @@ public:
 
     //==============================================================================
     void setZoom (float zoom);
-    float getZoom () { return zoomFactor; }
+    float getZoom () { return frameEditor->getZoomFactor(); }
     
     //==============================================================================
     class WorkingArea : public Component,
@@ -92,7 +92,6 @@ private:
     void keepOnscreen (int x, int y);
     void translateWorkingToMain (int& x, int& y);
     
-    float zoomFactor;
     FrameEditor* frameEditor;
     std::unique_ptr<WorkingArea> workingArea;
     
