@@ -203,7 +203,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionR->setPopupMenuEnabled (true);
     selectionR->setColour (TextEditor::textColourId, Colours::white);
     selectionR->setTooltip ("Red level of selected point(s)");
-    selectionR->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
+    selectionR->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789ABCDEFabcdef*"), true);
     selectionR->addListener (this);
 
     selectionG.reset (new TextEditor ("selectionG"));
@@ -216,7 +216,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionG->setPopupMenuEnabled (true);
     selectionG->setColour (TextEditor::textColourId, Colours::white);
     selectionG->setTooltip ("Green level of selected point(s)");
-    selectionG->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
+    selectionG->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789ABCDEFabcdef*"), true);
     selectionG->addListener (this);
 
     selectionB.reset (new TextEditor ("selectionB"));
@@ -229,7 +229,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectionB->setPopupMenuEnabled (true);
     selectionB->setColour (TextEditor::textColourId, Colours::white);
     selectionB->setTooltip ("Blue level of selected point(s)");
-    selectionB->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789*"), true);
+    selectionB->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789ABCDEFabcdef*"), true);
     selectionB->addListener (this);
     
     colorButton.reset (new ColourButton ());
@@ -430,21 +430,21 @@ void IldaProperties::textEditorReturnKeyPressed (TextEditor& editor)
     else if (&editor == selectionR.get())
     {
         if (! selectionR->getText().containsChar ('*'))
-            frameEditor->setIldaSelectedR ((uint8) selectionR->getText().getIntValue());
+            frameEditor->setIldaSelectedR ((uint8) selectionR->getText().getHexValue32());
 
         layerVisible->grabKeyboardFocus();
     }
     else if (&editor == selectionG.get())
     {
         if (! selectionG->getText().containsChar ('*'))
-            frameEditor->setIldaSelectedG ((uint8) selectionG->getText().getIntValue());
+            frameEditor->setIldaSelectedG ((uint8) selectionG->getText().getHexValue32());
 
         layerVisible->grabKeyboardFocus();
     }
     else if (&editor == selectionB.get())
     {
         if (! selectionB->getText().containsChar ('*'))
-            frameEditor->setIldaSelectedB ((uint8) selectionB->getText().getIntValue());
+            frameEditor->setIldaSelectedB ((uint8) selectionB->getText().getHexValue32());
 
         layerVisible->grabKeyboardFocus();
     }
@@ -590,9 +590,9 @@ void IldaProperties::updateSelection()
             selectionX->setText ( mx ? "*" : String (lastPoint.x.w));
             selectionY->setText ( my ? "*" : String (lastPoint.y.w));
             selectionZ->setText ( mz ? "*" : String (lastPoint.z.w));
-            selectionR->setText ( mr ? "*" : String (lastPoint.red));
-            selectionG->setText ( mg ? "*" : String (lastPoint.green));
-            selectionB->setText ( mb ? "*" : String (lastPoint.blue));
+            selectionR->setText ( mr ? "*" : String::toHexString (lastPoint.red).toUpperCase());
+            selectionG->setText ( mg ? "*" : String::toHexString (lastPoint.green).toUpperCase());
+            selectionB->setText ( mb ? "*" : String::toHexString (lastPoint.blue).toUpperCase());
             
             colorButton->setEnabled (true);
             if (mr || mg || mb)

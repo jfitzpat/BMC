@@ -323,7 +323,10 @@ void MainEditor::WorkingArea::mouseDown (const MouseEvent& event)
         frameEditor->setIldaSelection (selection);
     }
     else
+    {
         drawRect = true;
+        lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
+    }
 }
 
 void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
@@ -367,6 +370,9 @@ void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
         
         // Make the selection
         frameEditor->setIldaSelection (selection);
+        
+        // Discard the rect
+        lastDrawRect = Rectangle<int>();
     }
 }
 

@@ -9,28 +9,28 @@
 namespace BinaryData
 {
     extern const char*   croshair_png;
-    const int            croshair_pngSize = 2039;
+    const int            croshair_pngSize = 2173;
 
     extern const char*   downwhite_png;
-    const int            downwhite_pngSize = 2686;
+    const int            downwhite_pngSize = 2538;
 
     extern const char*   duplicatewhite_png;
-    const int            duplicatewhite_pngSize = 2303;
+    const int            duplicatewhite_pngSize = 2727;
 
     extern const char*   pointinghand_png;
-    const int            pointinghand_pngSize = 6792;
+    const int            pointinghand_pngSize = 2438;
 
     extern const char*   showall_png;
-    const int            showall_pngSize = 4549;
+    const int            showall_pngSize = 2762;
 
     extern const char*   upwhite_png;
-    const int            upwhite_pngSize = 2654;
+    const int            upwhite_pngSize = 2501;
 
     extern const char*   zoomin_png;
-    const int            zoomin_pngSize = 6248;
+    const int            zoomin_pngSize = 3369;
 
     extern const char*   zoomout_png;
-    const int            zoomout_pngSize = 6294;
+    const int            zoomout_pngSize = 3300;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
     const int namedResourceListSize = 8;
