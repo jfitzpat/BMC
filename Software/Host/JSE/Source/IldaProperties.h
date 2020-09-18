@@ -64,6 +64,7 @@ private:
 
     FrameEditor* frameEditor;
     Colour selectionColour;
+
     std::unique_ptr<ToggleButton> layerVisible;
     std::unique_ptr<ToggleButton> showBlanking;
     std::unique_ptr<ToggleButton> drawLines;
@@ -72,6 +73,7 @@ private:
     std::unique_ptr<DrawableButton> selectToolButton;
     std::unique_ptr <Drawable> pointIcon;
     std::unique_ptr<DrawableButton> pointToolButton;
+    std::unique_ptr<ColourButton> pointToolColorButton;
     std::unique_ptr<Label> selectionLabel;
     std::unique_ptr<TextEditor> currentSelection;
     std::unique_ptr<TextButton> decSelection;

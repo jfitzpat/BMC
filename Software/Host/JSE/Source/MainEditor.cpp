@@ -344,12 +344,8 @@ MainEditor::WorkingArea::~WorkingArea()
 {
 }
 
-void MainEditor::WorkingArea::mouseDown (const MouseEvent& event)
+void MainEditor::WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
 {
-    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
-        frameEditor->getActiveIldaTool() != FrameEditor::selectTool)
-        return;
-    
     // Has user highlighted a point?
     if (drawMark)
     {
@@ -371,6 +367,20 @@ void MainEditor::WorkingArea::mouseDown (const MouseEvent& event)
         drawRect = true;
         lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
     }
+}
+
+void MainEditor::WorkingArea::mouseDown (const MouseEvent& event)
+{
+    // Left mouse only for now
+    if (! event.mods.isLeftButtonDown())
+        return;
+    
+    // Only dealing with ILDA layer
+    if (frameEditor->getActiveLayer() != FrameEditor::ilda)
+        return;
+    
+    if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+        mouseDownIldaSelect (event);
 }
 
 void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
@@ -420,24 +430,8 @@ void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
     }
 }
 
-void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
+void MainEditor::WorkingArea::mouseMoveIldaSelect (const MouseEvent& event)
 {
-    // Save the position for modifier keys
-    lastMouseMove = Point<int>(event.x, event.y);
-    
-    // If we aren't the ILDA / Select Tool case, clear and past marks
-    // and bail
-    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
-        frameEditor->getActiveIldaTool() != FrameEditor::selectTool)
-    {
-        if (drawMark)
-        {
-            drawMark = false;
-            repaint (lastMarkRect);
-        }
-        return;
-    }
-    
     // Create a test rectangle in ILDA space with a 6 pixel margin
     int x = event.x - 32768;
     int y = 32767 - event.y;
@@ -481,6 +475,24 @@ void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
             repaint (lastMarkRect);
         }
     }
+}
+
+void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
+{
+    // If we aren't the ILDA layer case, clear all hover marks
+    // and bail
+    if (frameEditor->getActiveLayer() != FrameEditor::ilda)
+    {
+        if (drawMark)
+        {
+            drawMark = false;
+            repaint (lastMarkRect);
+        }
+        return;
+    }
+    
+    if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+        mouseMoveIldaSelect (event);
 }
 
 void MainEditor::WorkingArea::mouseDrag (const MouseEvent& event)

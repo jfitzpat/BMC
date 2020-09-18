@@ -33,6 +33,7 @@ FrameEditor::FrameEditor()
       zoomFactor (1.0),
       activeLayer (sketch),
       activeIldaTool (selectTool),
+      pointToolColor (Colours::red),
       sketchVisible (true),
       ildaVisible (true),
       ildaShowBlanked (true),
@@ -247,6 +248,15 @@ void FrameEditor::setActiveIldaTool (IldaTool tool)
     {
         beginNewTransaction ("Tool Change");
         perform (new UndoableSetIldaTool (this, tool));
+    }
+}
+
+void FrameEditor::setPointToolColor (const Colour& color)
+{
+    if (pointToolColor != color)
+    {
+        beginNewTransaction ("Point Tool Color");
+        perform (new UndoableSetPointToolColor (this, color));
     }
 }
 
@@ -808,6 +818,15 @@ void FrameEditor::_setActiveIldaTool (IldaTool tool)
     {
         activeIldaTool = tool;
         sendActionMessage (EditorActions::ildaToolChanged);
+    }
+}
+
+void FrameEditor::_setPointToolColor (const Colour& color)
+{
+    if (color != pointToolColor)
+    {
+        pointToolColor = color;
+        sendActionMessage (EditorActions::ildaPointToolColorChanged);
     }
 }
 

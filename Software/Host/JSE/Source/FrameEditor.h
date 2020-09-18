@@ -66,7 +66,8 @@ public:
     bool getRefVisible() { return refVisible; }
     
     IldaTool getActiveIldaTool() { return activeIldaTool; }
-
+    Colour getPointToolColor() { return pointToolColor; }
+    
     const MemoryBlock& getImageData() {return currentFrame->getImageData(); }
     
     const Image* getImage() { return currentFrame->getBackgroundImage(); }
@@ -109,6 +110,7 @@ public:
     void setRefVisible (bool visible);
     
     void setActiveIldaTool (IldaTool tool);
+    void setPointToolColor (const Colour& color);
 
     void selectImage();
     void clearImage();
@@ -155,6 +157,7 @@ public:
     void _setRefVisible (bool visible);
 
     void _setActiveIldaTool (IldaTool tool);
+    void _setPointToolColor (const Colour& color);
 
     bool _setImageData (const MemoryBlock& file);
     void _setDrawGrid (bool draw);
@@ -186,6 +189,7 @@ private:
     float zoomFactor;
     Layer activeLayer;
     IldaTool activeIldaTool;
+    Colour pointToolColor;
     bool sketchVisible;
     bool ildaVisible;
     bool ildaShowBlanked;
@@ -223,4 +227,5 @@ namespace EditorActions
     const String ildaSelectionChanged       ("ISC");
     const String ildaPointsChanged          ("IPC");
     const String ildaToolChanged            ("ITC");
+    const String ildaPointToolColorChanged  ("PTC");
 }

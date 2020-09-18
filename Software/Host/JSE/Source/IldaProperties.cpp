@@ -73,6 +73,12 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     pointToolButton->setTooltip ("Point Insertion tool");
     pointToolButton->addListener (this);
 
+    pointToolColorButton.reset (new ColourButton ());
+    addAndMakeVisible (pointToolColorButton.get());
+    pointToolColorButton->setTooltip ("Select color for point tool");
+    pointToolColorButton->addChangeListener (this);
+    pointToolColorButton->setColour (TextButton::buttonColourId, frameEditor->getPointToolColor());
+
     selectionLabel.reset (new Label ("selectionLabel", "Selected"));
     addAndMakeVisible (selectionLabel.get());
     selectionLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
@@ -249,6 +255,7 @@ IldaProperties::~IldaProperties()
     selectToolButton = nullptr;
     selectIcon = nullptr;
     pointToolButton = nullptr;
+    pointToolColorButton = nullptr;
     pointIcon = nullptr;
     selectionLabel = nullptr;
     incSelection = nullptr;
@@ -283,7 +290,7 @@ void IldaProperties::resized()
     
     selectToolButton->setBounds (16, 144, 32, 32);
     pointToolButton->setBounds (52, 144, 32, 32);
-    
+    pointToolColorButton->setBounds (88, 150, 20, 20);
     selectionLabel->setBounds (16, 184, getWidth() - 32, 12);
     currentSelection->setBounds (16, 200, getWidth() - 32, 24);
     decSelection->setBounds (59, 228, 40, 20);
@@ -300,7 +307,7 @@ void IldaProperties::resized()
     selectionR->setBounds (16, 320, 54, 24);
     selectionG->setBounds (16 + 56, 320, 54, 24);
     selectionB->setBounds (16 + 112, 320, 54, 24);
-    colorButton->setBounds (79, 348, 40, 20);
+    colorButton->setBounds (89, 348, 20, 20);
 }
 
 //==============================================================================
@@ -340,6 +347,8 @@ void IldaProperties::actionListenerCallback (const String& message)
         updateSelection();
     else if (message == EditorActions::ildaToolChanged)
         updateTools();
+    else if (message == EditorActions::ildaPointToolColorChanged)
+        updateTools();
 }
 
 void IldaProperties::changeListenerCallback (ChangeBroadcaster* source)
@@ -349,6 +358,11 @@ void IldaProperties::changeListenerCallback (ChangeBroadcaster* source)
         Colour c = colorButton->findColour (TextButton::buttonColourId);
         if (c != selectionColour)
             frameEditor->setIldaSelectedRGB (c);
+    }
+    else if (source == pointToolColorButton.get())
+    {
+        Colour c = pointToolColorButton->findColour (TextButton::buttonColourId);
+        frameEditor->setPointToolColor (c);
     }
 }
 
@@ -617,6 +631,8 @@ void IldaProperties::updateTools()
         selectToolButton->setToggleState (false, dontSendNotification);
         pointToolButton->setToggleState (true, dontSendNotification);
     }
+
+    pointToolColorButton->setColour (TextButton::buttonColourId, frameEditor->getPointToolColor());
 }
 
 void IldaProperties::adjustSelection (int offset)

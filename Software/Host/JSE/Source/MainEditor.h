@@ -78,14 +78,15 @@ public:
         void setActiveInvScale (float scale) { activeInvScale = scale; }
 
         //==============================================================================
-        Point<int> getLastMouseMove() { return lastMouseMove; }        
         void updateCursor();
         
     private:
+        void mouseDownIldaSelect (const MouseEvent& event);
+        void mouseMoveIldaSelect (const MouseEvent& event);
+
         FrameEditor* frameEditor;
         float activeScale;
         float activeInvScale;
-        Point<int> lastMouseMove;
         
         bool drawMark;
         uint16 markIndex;

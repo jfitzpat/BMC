@@ -51,7 +51,7 @@ class UndoableSetIldaTool : public UndoableAction
 {
 public:
     UndoableSetIldaTool (FrameEditor* editor, FrameEditor::IldaTool tool)
-    : newTool(tool), frameEditor (editor) {;}
+    : newTool (tool), frameEditor (editor) {;}
     
     bool perform() override
     {
@@ -69,6 +69,31 @@ public:
 private:
     FrameEditor::IldaTool oldTool;
     FrameEditor::IldaTool newTool;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetPointToolColor : public UndoableAction
+{
+public:
+    UndoableSetPointToolColor (FrameEditor* editor, const Colour& color)
+    : newColor (color), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldColor = frameEditor->getPointToolColor();
+        frameEditor->_setPointToolColor (newColor);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setPointToolColor (oldColor);
+        return true;
+    }
+    
+private:
+    Colour oldColor;
+    Colour newColor;
     FrameEditor* frameEditor;
 };
 
