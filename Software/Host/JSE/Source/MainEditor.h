@@ -81,8 +81,11 @@ public:
         void updateCursor();
         
     private:
+        void killMarkers();
         void mouseDownIldaSelect (const MouseEvent& event);
+        void mouseDownIldaPoint (const MouseEvent& event);
         void mouseMoveIldaSelect (const MouseEvent& event);
+        void mouseMoveIldaPoint (const MouseEvent& event);
 
         FrameEditor* frameEditor;
         float activeScale;
@@ -91,8 +94,16 @@ public:
         bool drawMark;
         uint16 markIndex;
         Rectangle<int> lastMarkRect;
+        
         bool drawRect;
         Rectangle<int> lastDrawRect;
+        
+        bool drawDot;
+        Point<int> dotAt;
+        int dotFrom;
+        int dotTo;
+        Rectangle<int> lastDotRect;
+        
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WorkingArea)
     };
 

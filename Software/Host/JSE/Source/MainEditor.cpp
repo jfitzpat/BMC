@@ -338,10 +338,39 @@ MainEditor::WorkingArea::WorkingArea (FrameEditor* frame)
     
     drawMark = false;
     drawRect = false;
+    drawDot = false;
 }
 
 MainEditor::WorkingArea::~WorkingArea()
 {
+}
+
+void MainEditor::WorkingArea::killMarkers()
+{
+    if (drawMark)
+    {
+        drawMark = false;
+        repaint (lastMarkRect);
+    }
+    
+    if (drawDot)
+    {
+        drawDot = false;
+        repaint (lastDotRect);
+    }
+}
+
+void MainEditor::WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
+{
+    if (drawMark)
+    {
+        SparseSet<uint16> selection;
+        
+        selection.addRange (Range<uint16>(markIndex, markIndex + 1));
+        
+        drawMark = false;
+        frameEditor->setIldaSelection (selection);
+    }
 }
 
 void MainEditor::WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
@@ -381,6 +410,8 @@ void MainEditor::WorkingArea::mouseDown (const MouseEvent& event)
     
     if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
         mouseDownIldaSelect (event);
+    else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+        mouseDownIldaPoint (event);
 }
 
 void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
@@ -428,6 +459,50 @@ void MainEditor::WorkingArea::mouseUp (const MouseEvent& event)
         // Discard the rect
         lastDrawRect = Rectangle<int>();
     }
+}
+
+void MainEditor::WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
+{
+    int x = event.x;
+    int y = event.y;
+    
+    if (!frameEditor->getPointCount())
+    {
+        dotAt = Point<int> (x, y);
+        dotFrom = -1;
+        dotTo = -1;
+        
+        if (drawDot == true)
+            repaint (lastDotRect);
+        drawDot = true;
+        
+        lastDotRect = Rectangle<int>(x - (int)(15 * activeInvScale),
+                                     y - (int)(15 * activeInvScale),
+                                     (int)(30 * activeInvScale),
+                                     (int)(30 * activeInvScale));
+        repaint (lastDotRect);
+    }
+    else if (! frameEditor->getIldaSelection().isEmpty())
+    {
+        dotAt = Point<int> (x, y);
+
+        SparseSet<uint16> selection = frameEditor->getIldaSelection();
+        Range<uint16> r = selection.getRange (selection.getNumRanges() - 1);
+        dotFrom = r.getEnd() - 1;
+        dotTo = dotFrom + 1;
+        if (dotTo >= frameEditor->getPointCount())
+            dotTo = 0;
+
+        if (drawDot == true)
+            repaint (lastDotRect);
+        drawDot = true;
+        
+        // !!!!
+        lastDotRect = getBounds();
+        repaint (lastDotRect);
+    }
+    else
+        mouseMoveIldaSelect (event);
 }
 
 void MainEditor::WorkingArea::mouseMoveIldaSelect (const MouseEvent& event)
@@ -483,16 +558,14 @@ void MainEditor::WorkingArea::mouseMove (const MouseEvent& event)
     // and bail
     if (frameEditor->getActiveLayer() != FrameEditor::ilda)
     {
-        if (drawMark)
-        {
-            drawMark = false;
-            repaint (lastMarkRect);
-        }
+        killMarkers();
         return;
     }
     
     if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
         mouseMoveIldaSelect (event);
+    else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+        mouseMoveIldaPoint (event);
 }
 
 void MainEditor::WorkingArea::mouseDrag (const MouseEvent& event)
@@ -569,7 +642,7 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
                     else
                         b = frameEditor->getPoint (0, nextPoint);
 
-                    if (b)
+                    if (b && ((n != dotFrom) || (! drawDot)))
                     {
                         if (point.status & Frame::BlankedPoint)
                         {
@@ -646,6 +719,77 @@ void MainEditor::WorkingArea::paint (juce::Graphics& g)
             g.drawRect (lastDrawRect, (int)activeInvScale >> 1);
         }
 
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda && drawDot)
+        {
+            Colour c = frameEditor->getPointToolColor();
+
+            // draw lines
+            if (dotFrom != -1)
+            {
+                Frame::XYPoint point;
+                frameEditor->getPoint (dotFrom, point);
+                
+                if (point.status & Frame::BlankedPoint)
+                {
+                    g.setColour (Colours::darkgrey);
+                    g.drawLine ((float)(point.x.w + 32768),
+                                (float)(32767 - point.y.w),
+                                (float)dotAt.getX(),
+                                (float)dotAt.getY(),
+                                activeInvScale);
+                }
+                else
+                {
+                    g.setColour (Colour (point.red, point.green, point.blue));
+                    g.drawLine ((float)(point.x.w + 32768),
+                                (float)(32767 - point.y.w),
+                                (float)dotAt.getX(),
+                                (float)dotAt.getY(),
+                                activeInvScale);
+                }
+            }
+
+            if (dotTo != -1)
+            {
+                Frame::XYPoint point;
+                frameEditor->getPoint (dotTo, point);
+                
+                if (c == Colours::black)
+                {
+                    g.setColour (Colours::darkgrey);
+                    g.drawLine ((float)dotAt.getX(),
+                                (float)dotAt.getY(),
+                                (float)(point.x.w + 32768),
+                                (float)(32767 - point.y.w),
+                                activeInvScale);
+                }
+                else
+                {
+                    g.setColour (c);
+                    g.drawLine ((float)dotAt.getX(),
+                                (float)dotAt.getY(),
+                                (float)(point.x.w + 32768),
+                                (float)(32767 - point.y.w),
+                                activeInvScale);
+                }
+            }
+
+            // Draw Dot
+            if (c == Colours::black)
+            {
+                g.setColour (Colours::darkgrey);
+                g.drawEllipse((float)dotAt.getX() - halfSelectSize,
+                              (float)dotAt.getY() - halfSelectSize,
+                              selectSize, selectSize, 2 * activeInvScale);
+            }
+            else
+            {
+                g.setColour (frameEditor->getPointToolColor());
+                g.fillEllipse((float)dotAt.getX() - halfSelectSize,
+                              (float)dotAt.getY() - halfSelectSize,
+                              selectSize, selectSize);
+            }
+        }
     }
 }
 
@@ -700,13 +844,22 @@ void MainEditor::WorkingArea::actionListenerCallback (const String& message)
         repaint();
     else if (message == EditorActions::layerChanged)
     {
+        killMarkers();
         updateCursor();
         repaint();
     }
     else if (message == EditorActions::ildaSelectionChanged)
+    {
+        killMarkers();
         repaint();
+    }
     else if (message == EditorActions::ildaPointsChanged)
         repaint();
     else if (message == EditorActions::ildaToolChanged)
+    {
+        killMarkers();
         updateCursor();
+    }
+    else if (message == EditorActions::framesChanged)
+        killMarkers();
 }
