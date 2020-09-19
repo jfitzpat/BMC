@@ -273,7 +273,8 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::panLeft,
                                 CommandIDs::panRight,
                                 CommandIDs::panUp,
-                                CommandIDs::panDown };
+                                CommandIDs::panDown,
+                                CommandIDs::cancelRequest };
     
     c.addArray (commands);
 }
@@ -405,7 +406,10 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::appPreferences:
             result.setInfo ("Preferences...", "Set app preferences", "Menu", 0);
             break;
-
+        case CommandIDs::cancelRequest:
+            result.setInfo ("Cancel", "Cancel current operation", "ShortCut", 0);
+            result.addDefaultKeypress (KeyPress::escapeKey, 0);
+            break;
         default:
             break;
     }
@@ -552,6 +556,9 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::appExit:
             juce::JUCEApplication::getInstance()->systemRequestedQuit();
             break;
+        
+        case CommandIDs::cancelRequest:
+            frameEditor->cancelRequest();
     }
     return true;
 }

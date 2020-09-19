@@ -445,6 +445,32 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableInsertPoint : public UndoableAction
+{
+public:
+    UndoableInsertPoint (FrameEditor* editor, uint16 index, const Frame::XYPoint& point)
+    : pointIndex (index), newPoint (point), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        frameEditor->_insertPoint (pointIndex, newPoint);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_deletePoint (pointIndex);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    uint16 pointIndex;
+    Frame::XYPoint newPoint;
+    FrameEditor* frameEditor;
+};
+
 class UndoableSetFrameIndex : public UndoableAction
 {
 public:

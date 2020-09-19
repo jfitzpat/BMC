@@ -55,6 +55,9 @@ public:
     void fileSaveAs();
     void fileIldaExport();
     
+    // Tool helpers
+    void cancelRequest();
+    
     // Polling
     uint32 getScanRate() { return scanRate; }
     const File& getLoadedFile() { return loadedFile; }
@@ -148,6 +151,8 @@ public:
     void setIldaSelectedB (uint8 newR);
     void setIldaSelectedRGB (const Colour newColor);
     
+    void insertPoint (const Frame::XYPoint& point);
+    
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }
     void _setZoomFactor (float zoom);
@@ -159,6 +164,9 @@ public:
     void _setActiveIldaTool (IldaTool tool);
     void _setPointToolColor (const Colour& color);
 
+    void _insertPoint (uint16 index, const Frame::XYPoint& point);
+    void _deletePoint (uint16 index);
+    
     bool _setImageData (const MemoryBlock& file);
     void _setDrawGrid (bool draw);
     void _setImageOpacity (float opacity);
@@ -228,4 +236,5 @@ namespace EditorActions
     const String ildaPointsChanged          ("IPC");
     const String ildaToolChanged            ("ITC");
     const String ildaPointToolColorChanged  ("PTC");
+    const String cancelRequest              ("CR");
 }

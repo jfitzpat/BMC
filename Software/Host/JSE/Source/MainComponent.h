@@ -65,7 +65,8 @@ public:
         panLeft,
         panRight,
         panUp,
-        panDown
+        panDown,
+        cancelRequest
     };
 
     //==============================================================================

@@ -138,6 +138,11 @@ void FrameEditor::fileIldaExport()
     }
 }
 
+void FrameEditor::cancelRequest()
+{
+    sendActionMessage (EditorActions::cancelRequest);
+}
+
 //==============================================================================
 const Point<int16> FrameEditor::getCenterOfIldaSelection()
 {
@@ -638,6 +643,27 @@ void FrameEditor::moveFrameDown()
     }
 }
 
+void FrameEditor::insertPoint (const Frame::XYPoint& point)
+{
+    uint16 index;
+    
+    if (! getPointCount())
+        index = 0;
+    else if (ildaSelection.isEmpty())
+        return;
+    else
+    {
+        Range<uint16> r = ildaSelection.getRange (ildaSelection.getNumRanges() - 1);
+        index = r.getEnd();
+    }
+    
+    beginNewTransaction ("Insert Point");
+    perform (new UndoableInsertPoint (this, index, point));
+    SparseSet<uint16> selection;
+    selection.addRange (Range<uint16> (index, index+1));
+    perform (new UndoableSetIldaSelection (this, selection));
+}
+
 void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
 {
     if (selection.getTotalRange().getEnd() > getPointCount())
@@ -1052,5 +1078,23 @@ void FrameEditor::_setIldaPoints (const SparseSet<uint16>& selection,
     }
     
     sendActionMessage (EditorActions::ildaPointsChanged);
+}
+
+void FrameEditor::_insertPoint (uint16 index, const Frame::XYPoint& point)
+{
+    if (index <= currentFrame->getPointCount())
+    {
+        currentFrame->insertPoint (index, point);
+        sendActionMessage (EditorActions::ildaPointsChanged);
+    }
+}
+
+void FrameEditor::_deletePoint (uint16 index)
+{
+    if (index < currentFrame->getPointCount())
+    {
+        currentFrame->removePoint (index);
+        sendActionMessage (EditorActions::ildaPointsChanged);
+    }
 }
 

@@ -57,6 +57,7 @@ public:
 private:
     void updatePointDisplay();
     void updateSelection();
+    void disableSelectionTools();
     void updateTools();
     void adjustSelection (int offset);
     

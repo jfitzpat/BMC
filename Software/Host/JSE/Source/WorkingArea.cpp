@@ -63,6 +63,24 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
         drawMark = false;
         frameEditor->setIldaSelection (selection);
     }
+    else if (drawDot)
+    {
+        Frame::XYPoint point;
+        zerostruct (point);
+        
+        point.x.w = (int16)(dotAt.getX() - 32768);
+        point.y.w = (int16)(32767 - dotAt.getY());
+        Colour c = frameEditor->getPointToolColor();
+        point.red = c.getRed();
+        point.green = c.getGreen();
+        point.blue = c.getBlue();
+        
+        if (c == Colours::black)
+            point.status = Frame::BlankedPoint;
+        
+        drawDot = false;
+        frameEditor->insertPoint (point);
+    }
 }
 
 void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
@@ -189,8 +207,22 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
             repaint (lastDotRect);
         drawDot = true;
         
-        // !!!!
-        lastDotRect = getBounds();
+        // Figure out the rectangle that encompasses all points
+        // and repaint it
+        Path p;
+        Frame::XYPoint point;
+        frameEditor->getPoint (dotFrom, point);
+        p.startNewSubPath ((float)point.x.w + 32768.0f,
+                           32767.0f - (float)point.y.w );
+        p.lineTo (dotAt.getX(), dotAt.getY());
+        frameEditor->getPoint (dotTo, point);
+        p.lineTo ((float)point.x.w + 32768.0f,
+                  32767.0f - (float)point.y.w);
+        
+        Rectangle<float> rect = p.getBounds();
+        rect = rect.expanded (30 * activeInvScale, 30 * activeInvScale);
+        lastDotRect = Rectangle<int> ((int)rect.getX(), (int)rect.getY(),
+                                      (int)rect.getWidth(), (int)rect.getHeight());
         repaint (lastDotRect);
     }
     else

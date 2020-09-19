@@ -344,11 +344,19 @@ void IldaProperties::actionListenerCallback (const String& message)
     else if (message == EditorActions::ildaSelectionChanged)
         updateSelection();
     else if (message == EditorActions::ildaPointsChanged)
+    {
+        updatePointDisplay();
         updateSelection();
+    }
     else if (message == EditorActions::ildaToolChanged)
         updateTools();
     else if (message == EditorActions::ildaPointToolColorChanged)
         updateTools();
+    else if (message == EditorActions::cancelRequest)
+    {
+        if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+            frameEditor->setIldaSelection (SparseSet<uint16>());
+    }
 }
 
 void IldaProperties::changeListenerCallback (ChangeBroadcaster* source)
@@ -498,26 +506,33 @@ void IldaProperties::updatePointDisplay()
     }
 }
 
+void IldaProperties::disableSelectionTools()
+{
+    currentSelection->setText (String());
+    decSelection->setEnabled (false);
+    incSelection->setEnabled (false);
+    xLabel->setColour (Label::textColourId, juce::Colours::grey);
+    yLabel->setColour (Label::textColourId, juce::Colours::grey);
+    zLabel->setColour (Label::textColourId, juce::Colours::grey);
+    rLabel->setColour (Label::textColourId, juce::Colours::grey);
+    gLabel->setColour (Label::textColourId, juce::Colours::grey);
+    bLabel->setColour (Label::textColourId, juce::Colours::grey);
+    selectionX->setText (String()); selectionY->setText (String());
+    selectionZ->setText (String()); selectionR->setText (String());
+    selectionG->setText (String()); selectionB->setText (String());
+    selectionX->setEnabled (false); selectionY->setEnabled (false);
+    selectionZ->setEnabled (false); selectionR->setEnabled (false);
+    selectionG->setEnabled (false); selectionB->setEnabled (false);
+    colorButton->setEnabled (false);
+    colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
+}
+
 void IldaProperties::updateSelection()
 {
     if (! frameEditor->getPointCount())
     {
         selectionLabel->setColour (Label::textColourId, juce::Colours::grey);
-        currentSelection->setText (String());
-        currentSelection->setEnabled (false);
-        decSelection->setEnabled (false);
-        incSelection->setEnabled (false);
-        xLabel->setColour (Label::textColourId, juce::Colours::grey);
-        yLabel->setColour (Label::textColourId, juce::Colours::grey);
-        zLabel->setColour (Label::textColourId, juce::Colours::grey);
-        rLabel->setColour (Label::textColourId, juce::Colours::grey);
-        gLabel->setColour (Label::textColourId, juce::Colours::grey);
-        bLabel->setColour (Label::textColourId, juce::Colours::grey);
-        selectionX->setEnabled (false); selectionY->setEnabled (false);
-        selectionZ->setEnabled (false); selectionR->setEnabled (false);
-        selectionG->setEnabled (false); selectionB->setEnabled (false);
-        colorButton->setEnabled (false);
-        colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
+        disableSelectionTools();
     }
     else
     {
@@ -525,26 +540,7 @@ void IldaProperties::updateSelection()
         selectionLabel->setColour (Label::textColourId, juce::Colours::white);
         auto s = frameEditor->getIldaSelection();
         if (s.isEmpty())
-        {
-            currentSelection->setText (String());
-            decSelection->setEnabled (false);
-            incSelection->setEnabled (false);
-            xLabel->setColour (Label::textColourId, juce::Colours::grey);
-            yLabel->setColour (Label::textColourId, juce::Colours::grey);
-            zLabel->setColour (Label::textColourId, juce::Colours::grey);
-            rLabel->setColour (Label::textColourId, juce::Colours::grey);
-            gLabel->setColour (Label::textColourId, juce::Colours::grey);
-            bLabel->setColour (Label::textColourId, juce::Colours::grey);
-            selectionX->setText (String()); selectionY->setText (String());
-            selectionZ->setText (String()); selectionR->setText (String());
-            selectionG->setText (String()); selectionB->setText (String());
-            selectionX->setEnabled (false); selectionY->setEnabled (false);
-            selectionZ->setEnabled (false); selectionR->setEnabled (false);
-            selectionG->setEnabled (false); selectionB->setEnabled (false);
-            colorButton->setEnabled (false);
-            colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
-
-        }
+            disableSelectionTools();
         else
         {
             String sString;
