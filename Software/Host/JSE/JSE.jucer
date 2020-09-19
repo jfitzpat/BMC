@@ -68,6 +68,8 @@
         <FILE id="rtHiO9" name="LaserControls.h" compile="0" resource="0" file="Source/LaserControls.h"/>
         <FILE id="Ib9G68" name="MainEditor.cpp" compile="1" resource="0" file="Source/MainEditor.cpp"/>
         <FILE id="OPZfYb" name="MainEditor.h" compile="0" resource="0" file="Source/MainEditor.h"/>
+        <FILE id="VlejnN" name="WorkingArea.cpp" compile="1" resource="0" file="Source/WorkingArea.cpp"/>
+        <FILE id="T09JBP" name="WorkingArea.h" compile="0" resource="0" file="Source/WorkingArea.h"/>
       </GROUP>
       <FILE id="DQsHcS" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="kkKZtM" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>

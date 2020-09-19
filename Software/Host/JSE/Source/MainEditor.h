@@ -21,6 +21,7 @@
 
 #include <JuceHeader.h>
 #include "FrameEditor.h"
+#include "WorkingArea.h"
 
 
 //==============================================================================
@@ -51,62 +52,6 @@ public:
     void panUp();
     void panDown();
     
-    //==============================================================================
-    class WorkingArea : public Component,
-                        public ActionListener
-    {
-    public:
-        WorkingArea (FrameEditor* frame);
-        ~WorkingArea() override;
-
-        //==============================================================================
-        void mouseDown (const MouseEvent& event) override;
-        void mouseUp (const MouseEvent& event) override;
-        void mouseDrag (const MouseEvent& event) override;
-        void mouseMove (const MouseEvent& event) override;
-        
-        void paint (juce::Graphics&) override;
-        void resized() override;
-
-        //==============================================================================
-        void actionListenerCallback (const String& message) override;
-
-        //==============================================================================
-        float getActiveScale() { return activeScale; }
-        void setActiveScale (float scale) { activeScale = scale; }
-        float getActiveInvScale() { return activeInvScale; }
-        void setActiveInvScale (float scale) { activeInvScale = scale; }
-
-        //==============================================================================
-        void updateCursor();
-        
-    private:
-        void killMarkers();
-        void mouseDownIldaSelect (const MouseEvent& event);
-        void mouseDownIldaPoint (const MouseEvent& event);
-        void mouseMoveIldaSelect (const MouseEvent& event);
-        void mouseMoveIldaPoint (const MouseEvent& event);
-
-        FrameEditor* frameEditor;
-        float activeScale;
-        float activeInvScale;
-        
-        bool drawMark;
-        uint16 markIndex;
-        Rectangle<int> lastMarkRect;
-        
-        bool drawRect;
-        Rectangle<int> lastDrawRect;
-        
-        bool drawDot;
-        Point<int> dotAt;
-        int dotFrom;
-        int dotTo;
-        Rectangle<int> lastDotRect;
-        
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WorkingArea)
-    };
-
 private:
     void keepOnscreen (int x, int y);
     void translateWorkingToMain (int& x, int& y);
