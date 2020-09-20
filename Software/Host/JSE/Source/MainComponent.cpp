@@ -156,6 +156,7 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::editSelectAll);
         menu.addCommandItem (&commandManager, CommandIDs::editClearSelection);
+        menu.addCommandItem (&commandManager, CommandIDs::deleteSelection);
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::newFrame);
         menu.addCommandItem (&commandManager, CommandIDs::duplicateFrame);
@@ -274,6 +275,7 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::panRight,
                                 CommandIDs::panUp,
                                 CommandIDs::panDown,
+                                CommandIDs::deleteSelection,
                                 CommandIDs::cancelRequest,
                                 CommandIDs::deleteRequest };
     
@@ -412,10 +414,16 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress (KeyPress::escapeKey, 0);
             break;
         case CommandIDs::deleteRequest:
-            result.setInfo ("Delete", "Delete the current Selection", "ShortCut", 0);
+            result.setInfo ("Delete", "Delete", "ShortCut", 0);
             result.addDefaultKeypress (KeyPress::deleteKey, 0);
             result.addDefaultKeypress (KeyPress::backspaceKey, 0);
             break;
+        case CommandIDs::deleteSelection:
+            result.setInfo ("Delete Selection", "Delete the current selection", "Menu", 0);
+            result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
+            result.setActive (frameEditor->hasSelection());
+            break;
+            
         default:
             break;
     }
@@ -567,6 +575,7 @@ bool MainComponent::perform (const InvocationInfo& info)
             frameEditor->cancelRequest();
             break;
             
+        case CommandIDs::deleteSelection:
         case CommandIDs::deleteRequest:
             frameEditor->deleteRequest();
             break;

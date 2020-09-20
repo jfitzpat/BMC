@@ -148,6 +148,14 @@ void FrameEditor::deleteRequest()
     sendActionMessage (EditorActions::deleteRequest);
 }
 
+bool FrameEditor::hasSelection()
+{
+    if (activeLayer == ilda && (! ildaSelection.isEmpty()))
+        return true;
+        
+    return false;
+}
+
 //==============================================================================
 const Point<int16> FrameEditor::getCenterOfIldaSelection()
 {

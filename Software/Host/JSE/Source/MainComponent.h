@@ -66,6 +66,7 @@ public:
         panRight,
         panUp,
         panDown,
+        deleteSelection,
         cancelRequest,
         deleteRequest,
         upRequest,

@@ -52,11 +52,10 @@ void WorkingArea::killMarkers()
     }
 }
 
-void WorkingArea::insertAnchor (uint16 index)
+void WorkingArea::insertAnchor (uint16 index, Colour c)
 {
     Frame::XYPoint point;
     frameEditor->getPoint (index, point);
-    Colour c = frameEditor->getPointToolColor();
     point.red = c.getRed();
     point.green = c.getGreen();
     point.blue = c.getBlue();
@@ -81,14 +80,10 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
 
         // Right click insert an anchor
         if (event.mods.isRightButtonDown())
-            insertAnchor (markIndex);
+            insertAnchor (markIndex, frameEditor->getPointToolColor());
     }
     else if (drawDot)
     {
-        // Right click insert an anchor
-        if (event.mods.isRightButtonDown())
-            insertAnchor (dotFrom);
-
         Frame::XYPoint point;
         zerostruct (point);
         
@@ -163,7 +158,7 @@ void WorkingArea::mouseUp (const MouseEvent& event)
         int x = lastDrawRect.getX() - 32768;
         int y = 32767 - (lastDrawRect.getY() + lastDrawRect.getHeight());
 
-        Rectangle<int16> r (x, y, (uint16)lastDrawRect.getWidth(), (uint16)lastDrawRect.getHeight());
+        Rectangle<int> r (x, y, lastDrawRect.getWidth(), lastDrawRect.getHeight());
         
         // Check if we should be using the existing selection
         SparseSet<uint16> selection;
@@ -219,6 +214,18 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
     }
     else if (! frameEditor->getIldaSelection().isEmpty())
     {
+        if (event.mods.isCtrlDown())
+        {
+            int nearest = findCloseMouseMatch (event);
+            if (nearest >= 0)
+            {
+                Frame::XYPoint point;
+                frameEditor->getPoint ((uint16)nearest, point);
+                x = point.x.w + 32768;
+                y = 32767 - point.y.w;
+            }
+        }
+
         dotAt = Point<int> (x, y);
 
         SparseSet<uint16> selection = frameEditor->getIldaSelection();
@@ -254,7 +261,7 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
         mouseMoveIldaSelect (event);
 }
 
-void WorkingArea::mouseMoveIldaSelect (const MouseEvent& event)
+int WorkingArea::findCloseMouseMatch (const MouseEvent& event)
 {
     // Create a test rectangle in ILDA space with a 6 pixel margin
     int x = event.x - 32768;
@@ -269,29 +276,33 @@ void WorkingArea::mouseMoveIldaSelect (const MouseEvent& event)
         Frame::XYPoint point;
         frameEditor->getPoint (n, point);
         if (r.contains (point.x.w, point.y.w))
-        {
-            // Dont' match blanked points unless they are visible
             if (frameEditor->getIldaShowBlanked() ||
                 (! (point.status & Frame::BlankedPoint)))
-            {
-                markIndex = n;
-
-                if (drawMark == true)
-                    repaint (lastMarkRect);
-                drawMark = true;
-
-                lastMarkRect = Rectangle<int>(event.x - (int)(15 * activeInvScale),
-                                              event.y - (int)(15 * activeInvScale),
-                                              (int)(30 * activeInvScale),
-                                              (int)(30 * activeInvScale));
-                repaint (lastMarkRect);
-                break;
-            }
-        }
+                return n;
     }
     
-    // No matches, clear any pending mark
-    if (n == frameEditor->getPointCount())
+    return -1;
+}
+
+void WorkingArea::mouseMoveIldaSelect (const MouseEvent& event)
+{
+    int n = findCloseMouseMatch (event);
+    
+    if (n >= 0)
+    {
+        markIndex = (uint16)n;
+
+        if (drawMark == true)
+            repaint (lastMarkRect);
+        drawMark = true;
+
+        lastMarkRect = Rectangle<int>(event.x - (int)(15 * activeInvScale),
+                                      event.y - (int)(15 * activeInvScale),
+                                      (int)(30 * activeInvScale),
+                                      (int)(30 * activeInvScale));
+        repaint (lastMarkRect);
+    }
+    else
     {
         if (drawMark == true)
         {

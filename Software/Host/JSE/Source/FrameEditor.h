@@ -58,6 +58,7 @@ public:
     // Tool helpers
     void cancelRequest();
     void deleteRequest();
+    bool hasSelection();
     
     // Polling
     uint32 getScanRate() { return scanRate; }
