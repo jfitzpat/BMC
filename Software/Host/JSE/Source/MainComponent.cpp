@@ -274,7 +274,8 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::panRight,
                                 CommandIDs::panUp,
                                 CommandIDs::panDown,
-                                CommandIDs::cancelRequest };
+                                CommandIDs::cancelRequest,
+                                CommandIDs::deleteRequest };
     
     c.addArray (commands);
 }
@@ -409,6 +410,11 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::cancelRequest:
             result.setInfo ("Cancel", "Cancel current operation", "ShortCut", 0);
             result.addDefaultKeypress (KeyPress::escapeKey, 0);
+            break;
+        case CommandIDs::deleteRequest:
+            result.setInfo ("Delete", "Delete the current Selection", "ShortCut", 0);
+            result.addDefaultKeypress (KeyPress::deleteKey, 0);
+            result.addDefaultKeypress (KeyPress::backspaceKey, 0);
             break;
         default:
             break;
@@ -559,6 +565,11 @@ bool MainComponent::perform (const InvocationInfo& info)
         
         case CommandIDs::cancelRequest:
             frameEditor->cancelRequest();
+            break;
+            
+        case CommandIDs::deleteRequest:
+            frameEditor->deleteRequest();
+            break;
     }
     return true;
 }

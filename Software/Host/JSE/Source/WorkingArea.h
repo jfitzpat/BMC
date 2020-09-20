@@ -56,6 +56,7 @@ public:
     
 private:
     void killMarkers();
+    void insertAnchor (uint16 index);
     void mouseDownIldaSelect (const MouseEvent& event);
     void mouseDownIldaPoint (const MouseEvent& event);
     void mouseMoveIldaSelect (const MouseEvent& event);

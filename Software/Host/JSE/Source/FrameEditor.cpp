@@ -143,6 +143,11 @@ void FrameEditor::cancelRequest()
     sendActionMessage (EditorActions::cancelRequest);
 }
 
+void FrameEditor::deleteRequest()
+{
+    sendActionMessage (EditorActions::deleteRequest);
+}
+
 //==============================================================================
 const Point<int16> FrameEditor::getCenterOfIldaSelection()
 {
@@ -662,6 +667,17 @@ void FrameEditor::insertPoint (const Frame::XYPoint& point)
     SparseSet<uint16> selection;
     selection.addRange (Range<uint16> (index, index+1));
     perform (new UndoableSetIldaSelection (this, selection));
+}
+
+void FrameEditor::deletePoints()
+{
+    if (ildaSelection.isEmpty())
+        return;
+    
+    beginNewTransaction ("Delete Point(s)");
+    SparseSet<uint16> selection = ildaSelection;
+    perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
+    perform (new UndoableDeletePoints (this, selection));
 }
 
 void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)

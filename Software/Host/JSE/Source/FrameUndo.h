@@ -471,6 +471,49 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableDeletePoints : public UndoableAction
+{
+    public:
+        UndoableDeletePoints (FrameEditor* editor,
+                              const SparseSet<uint16>& select)
+        : selection (select), frameEditor (editor) {;}
+        
+        bool perform() override
+        {
+            frameEditor->incDirtyCounter();
+            frameEditor->getIldaPoints (selection, oldPoints);
+            
+            // Loop backwards through selection to delete
+            for (auto n = selection.getNumRanges() - 1; n >= 0; --n)
+            {
+                Range<uint16> r = selection.getRange (n);
+                for (auto i = r.getEnd() - 1; i >= r.getStart(); --i)
+                    frameEditor->_deletePoint (i);
+            }
+            return true;
+        }
+        
+        bool undo() override
+        {
+            int pindex = 0;
+            
+            // Loop forwards to insert
+            for (auto n = 0; n < selection.getNumRanges(); ++n)
+            {
+                Range<uint16> r = selection.getRange (n);
+                for (auto i = r.getStart(); i < r.getEnd(); ++i)
+                    frameEditor->_insertPoint (i, oldPoints[pindex++]);
+            }
+            frameEditor->decDirtyCounter();
+            return true;
+        }
+        
+    private:
+        SparseSet<uint16> selection;
+        Array<Frame::XYPoint> oldPoints;
+        FrameEditor* frameEditor;
+};
+
 class UndoableSetFrameIndex : public UndoableAction
 {
 public:

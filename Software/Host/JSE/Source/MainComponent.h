@@ -66,7 +66,16 @@ public:
         panRight,
         panUp,
         panDown,
-        cancelRequest
+        cancelRequest,
+        deleteRequest,
+        upRequest,
+        downRequest,
+        leftRequest,
+        rightRequest,
+        smallUpRequest,
+        smallDownRequest,
+        smallRightRequest,
+        smallLeftRequest
     };
 
     //==============================================================================

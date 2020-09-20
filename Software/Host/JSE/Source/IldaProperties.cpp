@@ -357,6 +357,11 @@ void IldaProperties::actionListenerCallback (const String& message)
         if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
             frameEditor->setIldaSelection (SparseSet<uint16>());
     }
+    else if (message == EditorActions::deleteRequest)
+    {
+        if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+            frameEditor->deletePoints();
+    }
 }
 
 void IldaProperties::changeListenerCallback (ChangeBroadcaster* source)

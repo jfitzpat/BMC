@@ -57,6 +57,7 @@ public:
     
     // Tool helpers
     void cancelRequest();
+    void deleteRequest();
     
     // Polling
     uint32 getScanRate() { return scanRate; }
@@ -152,6 +153,7 @@ public:
     void setIldaSelectedRGB (const Colour newColor);
     
     void insertPoint (const Frame::XYPoint& point);
+    void deletePoints();
     
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }
@@ -237,4 +239,5 @@ namespace EditorActions
     const String ildaToolChanged            ("ITC");
     const String ildaPointToolColorChanged  ("PTC");
     const String cancelRequest              ("CR");
+    const String deleteRequest              ("DR");
 }

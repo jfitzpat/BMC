@@ -52,19 +52,43 @@ void WorkingArea::killMarkers()
     }
 }
 
+void WorkingArea::insertAnchor (uint16 index)
+{
+    Frame::XYPoint point;
+    frameEditor->getPoint (index, point);
+    Colour c = frameEditor->getPointToolColor();
+    point.red = c.getRed();
+    point.green = c.getGreen();
+    point.blue = c.getBlue();
+    
+    if (c == Colours::black)
+        point.status = Frame::BlankedPoint;
+    else
+        point.status = 0;
+    
+    frameEditor->insertPoint (point);
+}
+
 void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
 {
     if (drawMark)
     {
+        // Select the point in question
         SparseSet<uint16> selection;
-        
         selection.addRange (Range<uint16>(markIndex, markIndex + 1));
-        
         drawMark = false;
         frameEditor->setIldaSelection (selection);
+
+        // Right click insert an anchor
+        if (event.mods.isRightButtonDown())
+            insertAnchor (markIndex);
     }
     else if (drawDot)
     {
+        // Right click insert an anchor
+        if (event.mods.isRightButtonDown())
+            insertAnchor (dotFrom);
+
         Frame::XYPoint point;
         zerostruct (point);
         
@@ -85,6 +109,11 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
 
 void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
 {
+    // Left mouse only for now
+    if (! event.mods.isLeftButtonDown())
+        return;
+    
+
     // Has user highlighted a point?
     if (drawMark)
     {
@@ -110,10 +139,6 @@ void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
 
 void WorkingArea::mouseDown (const MouseEvent& event)
 {
-    // Left mouse only for now
-    if (! event.mods.isLeftButtonDown())
-        return;
-    
     // Only dealing with ILDA layer
     if (frameEditor->getActiveLayer() != FrameEditor::ilda)
         return;
@@ -586,4 +611,20 @@ void WorkingArea::actionListenerCallback (const String& message)
     }
     else if (message == EditorActions::framesChanged)
         killMarkers();
+    else if (message == EditorActions::deleteRequest)
+    {
+        if (drawDot)
+        {
+            uint16 i = dotFrom;
+            
+            if (i > 0)
+                i--;
+            
+            killMarkers();
+            frameEditor->deletePoints();
+            SparseSet<uint16> selection;
+            selection.addRange (Range<uint16> (i, i+1));
+            frameEditor->setIldaSelection (selection);
+        }
+    }
 }
