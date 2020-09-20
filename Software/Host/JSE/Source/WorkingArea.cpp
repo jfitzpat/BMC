@@ -214,6 +214,8 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
     }
     else if (! frameEditor->getIldaSelection().isEmpty())
     {
+        // Ctrl snaps to nearest point (if one)
+        // Shift forces to nearest 45 degree angle
         if (event.mods.isCtrlDown())
         {
             int nearest = findCloseMouseMatch (event);
@@ -224,6 +226,26 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
                 x = point.x.w + 32768;
                 y = 32767 - point.y.w;
             }
+        }
+        else if (event.mods.isShiftDown())
+        {
+            Frame::XYPoint point;
+            frameEditor->getPoint (dotFrom, point);
+            Point<int> p (point.x.w + 32768, 32767 - point.y.w);
+            float angle = p.getAngleToPoint (Point<int>(x, y));
+            Logger::outputDebugString ("Angle: " + String (angle));
+            
+            float absA = abs(angle);
+            
+            if ((absA >= 0.0f && absA < 0.3926991f) ||
+                (abs(angle) >= 2.7488936f && abs(angle) < 3.15f))
+                x = p.getX();   // Force vertical
+            else if (absA >= 0.3926991f && absA < 1.178097f)
+                y = p.y - p.getDistanceFrom (Point<int>(x, p.getY()));  // 45 up
+            else if (absA >= 1.178097f && absA < 1.9634954f )
+                y = p.getY();   // Force horizontal
+            else if (absA >= 1.9634954f && absA < 2.7488936f)
+                y = p.y + p.getDistanceFrom (Point<int>(x, p.getY()));  // 45 down
         }
 
         dotAt = Point<int> (x, y);
