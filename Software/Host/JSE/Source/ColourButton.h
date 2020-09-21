@@ -131,18 +131,26 @@ class ColourButton  : public TextButton,
 {
 public:
     ColourButton()
-        : TextButton ("")
+    : TextButton (""), lockout (false)
     {
         setColour (TextButton::buttonColourId, Colours::transparentBlack);
     }
     
     void clicked() override
     {
-        auto colourSelector = std::make_unique<CBSelector>(this, findColour (TextButton::buttonColourId));
-        CallOutBox::launchAsynchronously (std::move(colourSelector), getScreenBounds(), nullptr);
+        if (! lockout)
+        {
+            lockout = true;
+            auto colourSelector = std::make_unique<CBSelector>(this, findColour (TextButton::buttonColourId));
+            CallOutBox::launchAsynchronously (std::move(colourSelector), getScreenBounds(), nullptr);
+        }
     }
 
-    void componentBeingDeleted (Component&) override { sendChangeMessage(); }
+    void componentBeingDeleted (Component&) override
+    {
+        sendChangeMessage();
+        Timer::callAfterDelay (300, [this] { clearLockOut(); });
+    }
 
     void changeListenerCallback (ChangeBroadcaster* source) override
     {
@@ -152,4 +160,8 @@ public:
                 setColour (TextButton::buttonColourId, cs->getCurrentColour());
         }
     }
+
+    void clearLockOut() { lockout = false; }
+private:
+    bool lockout;
 };

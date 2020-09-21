@@ -87,8 +87,8 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
         Frame::XYPoint point;
         zerostruct (point);
         
-        point.x.w = (int16)(dotAt.getX() - 32768);
-        point.y.w = (int16)(32767 - dotAt.getY());
+        point.x.w = Frame::getIldaX(dotAt);
+        point.y.w = Frame::getIldaY(dotAt);
         Colour c = frameEditor->getPointToolColor();
         point.red = c.getRed();
         point.green = c.getGreen();
@@ -154,11 +154,7 @@ void WorkingArea::mouseUp (const MouseEvent& event)
         
         // Search for points to alter to/from selection
         // First, rectangle to ILDA space
-        
-        int x = lastDrawRect.getX() - 32768;
-        int y = 32767 - (lastDrawRect.getY() + lastDrawRect.getHeight());
-
-        Rectangle<int> r (x, y, lastDrawRect.getWidth(), lastDrawRect.getHeight());
+        Rectangle<int> r = Frame::getIldaRect (lastDrawRect);
         
         // Check if we should be using the existing selection
         SparseSet<uint16> selection;
@@ -223,17 +219,19 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
             {
                 Frame::XYPoint point;
                 frameEditor->getPoint ((uint16)nearest, point);
-                x = point.x.w + 32768;
-                y = 32767 - point.y.w;
+                x = Frame::getCompXInt (point);
+                y = Frame::getCompYInt (point);
             }
         }
         else if (event.mods.isShiftDown())
         {
+            // Since 45 dgrees is tan 1, could probably
+            // do this more efficiently with two distances and ratio
+            // but this is easy...
             Frame::XYPoint point;
             frameEditor->getPoint (dotFrom, point);
-            Point<int> p (point.x.w + 32768, 32767 - point.y.w);
+            Point<int> p = Frame::getCompPoint (point);
             float angle = p.getAngleToPoint (Point<int>(x, y));
-            Logger::outputDebugString ("Angle: " + String (angle));
             
             float absA = abs(angle);
             
@@ -266,12 +264,12 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
         Path p;
         Frame::XYPoint point;
         frameEditor->getPoint (dotFrom, point);
-        p.startNewSubPath ((float)point.x.w + 32768.0f,
-                           32767.0f - (float)point.y.w );
+        p.startNewSubPath (Frame::getCompX (point),
+                           Frame::getCompY (point) );
         p.lineTo (dotAt.getX(), dotAt.getY());
         frameEditor->getPoint (dotTo, point);
-        p.lineTo ((float)point.x.w + 32768.0f,
-                  32767.0f - (float)point.y.w);
+        p.lineTo (Frame::getCompX (point),
+                  Frame::getCompY (point));
         
         Rectangle<float> rect = p.getBounds();
         rect = rect.expanded (30 * activeInvScale, 30 * activeInvScale);
@@ -286,8 +284,8 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
 int WorkingArea::findCloseMouseMatch (const MouseEvent& event)
 {
     // Create a test rectangle in ILDA space with a 6 pixel margin
-    int x = event.x - 32768;
-    int y = 32767 - event.y;
+    int x = Frame::toIldaX (event.x);
+    int y = Frame::toIldaY (event.y);
     
     Rectangle<int16> r(x - (int16)(3 * activeInvScale), y - (int16)(3 * activeInvScale), (int16)(6 * activeInvScale), (int16)(6 * activeInvScale));
     
@@ -431,20 +429,20 @@ void WorkingArea::paint (juce::Graphics& g)
                             if (frameEditor->getIldaShowBlanked())
                             {
                                 g.setColour (Colours::darkgrey);
-                                g.drawLine ((float)(point.x.w + 32768),
-                                            (float)(32767 - point.y.w),
-                                            (float)(nextPoint.x.w + 32768),
-                                            (float)(32767 - nextPoint.y.w),
+                                g.drawLine (Frame::getCompX (point),
+                                            Frame::getCompY (point),
+                                            Frame::getCompX (nextPoint),
+                                            Frame::getCompY (nextPoint),
                                             activeInvScale);
                             }
                         }
                         else
                         {
                             g.setColour (Colour (point.red, point.green, point.blue));
-                            g.drawLine ((float)(point.x.w + 32768),
-                                        (float)(32767 - point.y.w),
-                                        (float)(nextPoint.x.w + 32768),
-                                        (float)(32767 - nextPoint.y.w),
+                            g.drawLine (Frame::getCompX (point),
+                                        Frame::getCompY (point),
+                                        Frame::getCompX (nextPoint),
+                                        Frame::getCompY (nextPoint),
                                         halfDotSize);
                         }
                     }
@@ -456,8 +454,9 @@ void WorkingArea::paint (juce::Graphics& g)
                     if (frameEditor->getIldaShowBlanked())
                     {
                         g.setColour (Colours::darkgrey);
-                        g.drawEllipse((float)(point.x.w + (32768 - halfDotSize)),
-                                   (float)((32767 - halfDotSize) - point.y.w), dotSize, dotSize, activeInvScale);
+                        g.drawEllipse(Frame::getCompX (point) - halfDotSize,
+                                      Frame::getCompY (point) - halfDotSize,
+                                      dotSize, dotSize, activeInvScale);
                     }
 
                     // Mark selected even if ShowBlanked is off, since can be edited
@@ -465,21 +464,25 @@ void WorkingArea::paint (juce::Graphics& g)
                         frameEditor->getActiveLayer() == FrameEditor::ilda)
                     {
                         g.setColour (Colours::lightblue);
-                        g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
-                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
+                        g.drawEllipse(Frame::getCompX (point) - halfSelectSize,
+                                      Frame::getCompY (point) - halfSelectSize,
+                                      selectSize, selectSize, activeInvScale);
                     }
                 }
                 else
                 {
                     g.setColour (Colour (point.red, point.green, point.blue));
-                    g.fillEllipse(point.x.w + (32768 - halfDotSize), (32768 - halfDotSize) - point.y.w, dotSize, dotSize);
+                    g.fillEllipse(Frame::getCompX (point) - halfDotSize,
+                                  Frame::getCompY (point) - halfDotSize,
+                                  dotSize, dotSize);
                     
                     if (frameEditor->getIldaSelection().contains (n) &&
                         frameEditor->getActiveLayer() == FrameEditor::ilda)
                     {
                         g.setColour (Colours::whitesmoke);
-                        g.drawEllipse((float)(point.x.w + (32768 - halfSelectSize)),
-                                   (float)((32767 - halfSelectSize) - point.y.w), selectSize, selectSize, activeInvScale);
+                        g.drawEllipse(Frame::getCompX (point) - halfSelectSize,
+                                      Frame::getCompY (point) - halfSelectSize,
+                                      selectSize, selectSize, activeInvScale);
                     }
                 }
             }
@@ -489,8 +492,9 @@ void WorkingArea::paint (juce::Graphics& g)
                 if (n == markIndex)
                 {
                     g.setColour (Colours::white);
-                    g.drawEllipse((float)(point.x.w + (32768 - selectSize)),
-                               (float)((32767 - selectSize) - point.y.w), 2 * selectSize, 2 * selectSize, 2 * activeInvScale);
+                    g.drawEllipse (Frame::getCompX (point) - selectSize,
+                                   Frame::getCompY (point) - selectSize,
+                                   2 * selectSize, 2 * selectSize, 2 * activeInvScale);
                 }
             }
         }
@@ -514,8 +518,8 @@ void WorkingArea::paint (juce::Graphics& g)
                 if (point.status & Frame::BlankedPoint)
                 {
                     g.setColour (Colours::darkgrey);
-                    g.drawLine ((float)(point.x.w + 32768),
-                                (float)(32767 - point.y.w),
+                    g.drawLine (Frame::getCompX (point),
+                                Frame::getCompY (point),
                                 (float)dotAt.getX(),
                                 (float)dotAt.getY(),
                                 activeInvScale);
@@ -523,8 +527,8 @@ void WorkingArea::paint (juce::Graphics& g)
                 else
                 {
                     g.setColour (Colour (point.red, point.green, point.blue));
-                    g.drawLine ((float)(point.x.w + 32768),
-                                (float)(32767 - point.y.w),
+                    g.drawLine (Frame::getCompX (point),
+                                Frame::getCompY (point),
                                 (float)dotAt.getX(),
                                 (float)dotAt.getY(),
                                 activeInvScale);
@@ -541,8 +545,8 @@ void WorkingArea::paint (juce::Graphics& g)
                     g.setColour (Colours::darkgrey);
                     g.drawLine ((float)dotAt.getX(),
                                 (float)dotAt.getY(),
-                                (float)(point.x.w + 32768),
-                                (float)(32767 - point.y.w),
+                                Frame::getCompX (point),
+                                Frame::getCompY (point),
                                 activeInvScale);
                 }
                 else
@@ -550,8 +554,8 @@ void WorkingArea::paint (juce::Graphics& g)
                     g.setColour (c);
                     g.drawLine ((float)dotAt.getX(),
                                 (float)dotAt.getY(),
-                                (float)(point.x.w + 32768),
-                                (float)(32767 - point.y.w),
+                                Frame::getCompX (point),
+                                Frame::getCompY (point),
                                 activeInvScale);
                 }
             }

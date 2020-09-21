@@ -157,6 +157,12 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::editSelectAll);
         menu.addCommandItem (&commandManager, CommandIDs::editClearSelection);
         menu.addCommandItem (&commandManager, CommandIDs::deleteSelection);
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda &&
+            frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+        {
+            menu.addSeparator();
+            menu.addCommandItem (&commandManager, CommandIDs::blankingToggleRequest);
+        }
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::newFrame);
         menu.addCommandItem (&commandManager, CommandIDs::duplicateFrame);
@@ -277,7 +283,8 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::panDown,
                                 CommandIDs::deleteSelection,
                                 CommandIDs::cancelRequest,
-                                CommandIDs::deleteRequest };
+                                CommandIDs::deleteRequest,
+                                CommandIDs::blankingToggleRequest };
     
     c.addArray (commands);
 }
@@ -422,6 +429,10 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Delete Selection", "Delete the current selection", "Menu", 0);
             result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
             result.setActive (frameEditor->hasSelection());
+            break;
+        case CommandIDs::blankingToggleRequest:
+            result.setInfo ("Toggle Blanking", "Toggle Blanking on/off", "Menu", 0);
+            result.addDefaultKeypress ('b', 0);
             break;
             
         default:
@@ -578,6 +589,10 @@ bool MainComponent::perform (const InvocationInfo& info)
         case CommandIDs::deleteSelection:
         case CommandIDs::deleteRequest:
             frameEditor->deleteRequest();
+            break;
+            
+        case CommandIDs::blankingToggleRequest:
+            frameEditor->toggleBlanking();
             break;
     }
     return true;

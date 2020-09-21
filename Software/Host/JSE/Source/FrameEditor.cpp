@@ -33,7 +33,8 @@ FrameEditor::FrameEditor()
       zoomFactor (1.0),
       activeLayer (sketch),
       activeIldaTool (selectTool),
-      pointToolColor (Colours::red),
+      pointToolColor (Colours::white),
+      lastVisiblePointToolColor (Colours::white),
       sketchVisible (true),
       ildaVisible (true),
       ildaShowBlanked (true),
@@ -156,6 +157,12 @@ bool FrameEditor::hasSelection()
     return false;
 }
 
+void FrameEditor::toggleBlanking()
+{
+    if ((activeLayer == ilda) && (activeIldaTool == pointTool))
+        togglePointToolBlank();
+}
+
 //==============================================================================
 const Point<int16> FrameEditor::getCenterOfIldaSelection()
 {
@@ -202,15 +209,15 @@ const Point<int16> FrameEditor::getCenterOfIldaSelection()
 const Point<int> FrameEditor::getComponentCenterOfIldaSelection()
 {
     Point<int16> c = getCenterOfIldaSelection();
-    return Point<int> ((int)c.getX() + 32768, 32767 - (int)c.getY());
+    return Point<int> (Frame::toCompX (c.getX()), Frame::toCompX (c.getY()));
 }
 
 void FrameEditor::getComponentCenterOfIldaSelection (int&x, int&y)
 {
     Point<int16> c = getCenterOfIldaSelection();
     
-    x = (int)c.getX() + 32768;
-    y = 32767 - (int)c.getY();
+    x = Frame::toCompX (c.getX());
+    y = Frame::toCompY (c.getY());
 }
 
 void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
@@ -276,6 +283,14 @@ void FrameEditor::setPointToolColor (const Colour& color)
         beginNewTransaction ("Point Tool Color");
         perform (new UndoableSetPointToolColor (this, color));
     }
+}
+
+void FrameEditor::togglePointToolBlank()
+{
+    if (pointToolColor == Colours::black)
+        setPointToolColor (lastVisiblePointToolColor);
+    else
+        setPointToolColor (Colours::black);
 }
 
 void FrameEditor::setSketchVisible (bool visible)
@@ -876,6 +891,8 @@ void FrameEditor::_setPointToolColor (const Colour& color)
     if (color != pointToolColor)
     {
         pointToolColor = color;
+        if (color != Colours::black)
+            lastVisiblePointToolColor = color;
         sendActionMessage (EditorActions::ildaPointToolColorChanged);
     }
 }

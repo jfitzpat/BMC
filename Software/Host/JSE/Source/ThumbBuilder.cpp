@@ -48,14 +48,14 @@ void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, flo
                     g.setColour (Colour (point.red, point.green, point.blue));
                     
                     // We put in the dots for beam images, etc.
-                    g.fillEllipse((point.x.w + 32768) * wScale,
-                                (32768 - point.y.w) * hScale,
-                                  lineSize / 2.0f, lineSize / 2.0f);
+                    g.fillEllipse (Frame::getCompX(point) * wScale,
+                                   Frame::getCompY(point) * hScale,
+                                   lineSize / 2.0f, lineSize / 2.0f);
 
-                    g.drawLine ((float)(point.x.w + 32768) * wScale,
-                                (float)(32768 - point.y.w) * hScale,
-                                (float)(nextPoint.x.w + 32768) * wScale,
-                                (float)(32768 - nextPoint.y.w) *hScale,
+                    g.drawLine (Frame::getCompX(point) * wScale,
+                                Frame::getCompY(point) * hScale,
+                                Frame::getCompX(nextPoint) * wScale,
+                                Frame::getCompY(nextPoint) * hScale,
                                 lineSize);
                 }
             }

@@ -59,6 +59,7 @@ public:
     void cancelRequest();
     void deleteRequest();
     bool hasSelection();
+    void toggleBlanking();
     
     // Polling
     uint32 getScanRate() { return scanRate; }
@@ -116,6 +117,7 @@ public:
     
     void setActiveIldaTool (IldaTool tool);
     void setPointToolColor (const Colour& color);
+    void togglePointToolBlank();
 
     void selectImage();
     void clearImage();
@@ -201,6 +203,7 @@ private:
     Layer activeLayer;
     IldaTool activeIldaTool;
     Colour pointToolColor;
+    Colour lastVisiblePointToolColor;
     bool sketchVisible;
     bool ildaVisible;
     bool ildaShowBlanked;

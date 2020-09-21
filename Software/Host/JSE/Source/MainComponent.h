@@ -76,7 +76,8 @@ public:
         smallUpRequest,
         smallDownRequest,
         smallRightRequest,
-        smallLeftRequest
+        smallLeftRequest,
+        blankingToggleRequest
     };
 
     //==============================================================================

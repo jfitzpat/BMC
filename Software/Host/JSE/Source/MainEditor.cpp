@@ -189,12 +189,10 @@ void MainEditor::findZoomPoint (const MouseEvent& event, int& x, int& y)
     {
         x = event.getEventRelativeTo (workingArea.get()).x;
         y = event.getEventRelativeTo (workingArea.get()).y;
-        Logger::outputDebugString (String(x) + ", " + String(y));
         if (workingArea->getBounds().contains(x, y))
             translateWorkingToMain (x, y);
         else
         {
-            Logger::outputDebugString ("default");
             x = getBounds().getCentreX();
             y = getBounds().getCentreY();
         }
