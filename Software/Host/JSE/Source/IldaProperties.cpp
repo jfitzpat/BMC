@@ -253,6 +253,16 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     trashButton->setTooltip ("Delete the selected point(s)");
     trashButton->addListener (this);
 
+    centerIcon = Drawable::createFromImageData (BinaryData::center_png,
+                                                BinaryData::center_pngSize);
+    
+    centerButton.reset (new DrawableButton ("centerButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerButton.get());
+    centerButton->setImages (centerIcon.get());
+    centerButton->setEdgeIndent (0);
+    centerButton->setTooltip ("Center the selected point(s)");
+    centerButton->addListener (this);
+
     refresh();
 }
 
@@ -285,6 +295,8 @@ IldaProperties::~IldaProperties()
     colorButton = nullptr;
     trashButton = nullptr;
     trashIcon = nullptr;
+    centerButton = nullptr;
+    centerIcon = nullptr;
 }
 
 //==============================================================================
@@ -321,6 +333,7 @@ void IldaProperties::resized()
     selectionB->setBounds (16 + 112, 320, 54, 24);
     colorButton->setBounds (89, 348, 20, 20);
     trashButton->setBounds (16, 372, 32, 32);
+    centerButton->setBounds (52, 372, 32, 32);
 }
 
 //==============================================================================
@@ -342,6 +355,8 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->adjustIldaSelection (1);
     else if (buttonThatWasClicked == trashButton.get())
         frameEditor->deletePoints();
+    else if (buttonThatWasClicked == centerButton.get())
+        frameEditor->centerIldaSelected();
 }
 
 //==============================================================================
@@ -592,6 +607,7 @@ void IldaProperties::disableSelectionTools()
     colorButton->setEnabled (false);
     colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
     trashButton->setEnabled (false);
+    centerButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -679,7 +695,8 @@ void IldaProperties::updateSelection()
             
             colorButton->setColour (TextButton::buttonColourId, selectionColour);
             
-            trashButton->setEnabled(true);
+            trashButton->setEnabled (true);
+            centerButton->setEnabled (true);
         }
     }
 }

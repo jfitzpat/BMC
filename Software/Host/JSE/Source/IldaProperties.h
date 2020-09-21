@@ -93,6 +93,8 @@ private:
     std::unique_ptr<ColourButton> colorButton;
     std::unique_ptr<Drawable> trashIcon;
     std::unique_ptr<DrawableButton> trashButton;
+    std::unique_ptr<Drawable> centerIcon;
+    std::unique_ptr<DrawableButton> centerButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

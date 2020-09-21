@@ -780,12 +780,12 @@ void FrameEditor::adjustIldaSelection (int offset)
 }
 
 
-void FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain)
+bool FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain)
 {
     Array<Frame::XYPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
-        return;
+        return false;
     
     bool clipped = false;
     
@@ -819,18 +819,61 @@ void FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool 
             clipped = true;
         }
         point.z.w = (int16)z;
-        
-//        points.getReference (n) = point;
     }
     
     if (constrain && clipped)
-        return;
+        return false;
 
     if (getCurrentTransactionName() == "Point Move")
         undoCurrentTransactionOnly();
 
     beginNewTransaction ("Point Move");
     perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+    return true;
+}
+
+bool FrameEditor::centerIldaSelected (bool constrain)
+{
+    Array<Frame::XYPoint> points;
+    getIldaSelectedPoints (points);
+    if (! points.size())
+        return false;
+    
+    Point<int16> p = getCenterOfIldaSelection();
+    int xOffset = 0 - (int)p.getX();
+    int yOffset = 0 - (int)p.getY();
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        int x = point.x.w;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+        
+        int y = point.y.w;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    beginNewTransaction ("Center Point(s)");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+    return true;
 }
 
 void FrameEditor::setIldaSelectedX (int16 newX)

@@ -193,9 +193,10 @@ public:
     void setIldaSelection (const SparseSet<uint16>& selection);
     void adjustIldaSelection (int offset);
 
-    void moveIldaSelected (int xOffset, int yOffset, bool constrain = true)
-        { moveIldaSelected (xOffset, yOffset, 0, constrain); }
-    void moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
+    bool moveIldaSelected (int xOffset, int yOffset, bool constrain = true)
+        { return moveIldaSelected (xOffset, yOffset, 0, constrain); }
+    bool moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
+    bool centerIldaSelected (bool constrain = true);
 
     void setIldaSelectedX (int16 newX);
     void setIldaSelectedY (int16 newY);
