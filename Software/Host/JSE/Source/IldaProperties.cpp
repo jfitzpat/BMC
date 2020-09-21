@@ -287,10 +287,9 @@ void IldaProperties::resized()
     drawLines->setBounds (16, 48, getWidth() - 32, 24);
     showBlanking->setBounds (16, 80, getWidth() - 32, 24);
     pointLabel->setBounds (16, 112, getWidth() - 32, 24);
-    
-    selectToolButton->setBounds (16, 144, 32, 32);
-    pointToolButton->setBounds (52, 144, 32, 32);
-    pointToolColorButton->setBounds (88, 150, 20, 20);
+    selectToolButton->setBounds (76 + 16, 144, 32, 32);
+    pointToolButton->setBounds (76 + 52, 144, 32, 32);
+    pointToolColorButton->setBounds (76 + 88, 150, 20, 20);
     selectionLabel->setBounds (16, 184, getWidth() - 32, 12);
     currentSelection->setBounds (16, 200, getWidth() - 32, 24);
     decSelection->setBounds (59, 228, 40, 20);
@@ -324,9 +323,9 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == pointToolButton.get())
         frameEditor->setActiveIldaTool (FrameEditor::pointTool);
     else if (buttonThatWasClicked == decSelection.get())
-        adjustSelection (-1);
+        frameEditor->adjustIldaSelection (-1);
     else if (buttonThatWasClicked == incSelection.get())
-        adjustSelection (1);
+        frameEditor->adjustIldaSelection (1);
 }
 
 //==============================================================================
@@ -354,13 +353,59 @@ void IldaProperties::actionListenerCallback (const String& message)
         updateTools();
     else if (message == EditorActions::cancelRequest)
     {
-        if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
-            frameEditor->setIldaSelection (SparseSet<uint16>());
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+        {
+            if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool ||
+                frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+                frameEditor->setIldaSelection (SparseSet<uint16>());
+        }
     }
     else if (message == EditorActions::deleteRequest)
     {
-        if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+        // Note, WorkingArea manages PointTool Response
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda &&
+            frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
             frameEditor->deletePoints();
+    }
+    else if (message == EditorActions::upRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (0, 256);
+    }
+    else if (message == EditorActions::downRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (0, -256);
+    }
+    else if (message == EditorActions::leftRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (-256, 0);
+    }
+    else if (message == EditorActions::rightRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (256, 0);
+    }
+    else if (message == EditorActions::smallUpRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (0, 16);
+    }
+    else if (message == EditorActions::smallDownRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (0, -16);
+    }
+    else if (message == EditorActions::smallLeftRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (-16, 0);
+    }
+    else if (message == EditorActions::smallRightRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+            frameEditor->moveIldaSelected (16, 0);
     }
 }
 
@@ -634,46 +679,6 @@ void IldaProperties::updateTools()
     }
 
     pointToolColorButton->setColour (TextButton::buttonColourId, frameEditor->getPointToolColor());
-}
-
-void IldaProperties::adjustSelection (int offset)
-{
-    SparseSet<uint16> newSelection;
-    int points = (int)frameEditor->getPointCount();
-    
-    if (offset == 0 || offset >= points)
-        return;
-
-    // Valid range
-    Range<int> valid (0, points);
-
-    for (auto n = 0; n < frameEditor->getIldaSelection().getNumRanges(); ++n)
-    {
-        Range<uint16> r = frameEditor->getIldaSelection().getRange (n);
-        Range<int> shifted ((int)r.getStart() + offset, (int)r.getEnd() + offset);
-        
-        // Add the valid part of the shifted range
-        Range<int> newRange = valid.getIntersectionWith (shifted);
-        newSelection.addRange (Range<uint16> ((uint16)newRange.getStart(),
-                                              (uint16)newRange.getEnd()));
-        
-        // Deal with any wrap off either end with an additional range
-        int extra = (int)r.getLength() - newRange.getLength();
-        if (extra)
-        {
-            int s, e;
-            
-            if (offset > 0)
-                s = shifted.getEnd() - extra - points;
-            else
-                s = shifted.getStart() + points;
-
-            e = s + extra;
-            newSelection.addRange (Range<uint16> ((uint16)s, (uint16)e));
-        }
-    }
-    
-    frameEditor->setIldaSelection (newSelection);
 }
 
 void IldaProperties::refresh()

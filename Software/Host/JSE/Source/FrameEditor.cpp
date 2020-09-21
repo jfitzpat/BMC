@@ -139,16 +139,6 @@ void FrameEditor::fileIldaExport()
     }
 }
 
-void FrameEditor::cancelRequest()
-{
-    sendActionMessage (EditorActions::cancelRequest);
-}
-
-void FrameEditor::deleteRequest()
-{
-    sendActionMessage (EditorActions::deleteRequest);
-}
-
 bool FrameEditor::hasSelection()
 {
     if (activeLayer == ilda && (! ildaSelection.isEmpty()))
@@ -157,10 +147,21 @@ bool FrameEditor::hasSelection()
     return false;
 }
 
+bool FrameEditor::hasMovableSelection()
+{
+    return hasSelection();
+}
+
 void FrameEditor::toggleBlanking()
 {
     if ((activeLayer == ilda) && (activeIldaTool == pointTool))
         togglePointToolBlank();
+}
+
+void FrameEditor::cycleColors()
+{
+    if ((activeLayer == ilda) && (activeIldaTool == pointTool))
+        cyclePointToolColors();
 }
 
 //==============================================================================
@@ -291,6 +292,26 @@ void FrameEditor::togglePointToolBlank()
         setPointToolColor (lastVisiblePointToolColor);
     else
         setPointToolColor (Colours::black);
+}
+
+void FrameEditor::cyclePointToolColors()
+{
+    if (pointToolColor == Colours::white)
+        setPointToolColor (Colours::red);
+    else if (pointToolColor == Colours::red)
+        setPointToolColor (Colour (0, 255, 0));
+    else if (pointToolColor == Colour (0, 255, 0))
+        setPointToolColor (Colours::blue);
+    else if (pointToolColor == Colours::blue)
+        setPointToolColor (Colours::yellow);
+    else if (pointToolColor == Colours::yellow)
+        setPointToolColor (Colours::cyan);
+    else if (pointToolColor == Colours::cyan)
+        setPointToolColor (Colours::magenta);
+    else if (pointToolColor == Colours::magenta)
+        setPointToolColor (Colours::black);
+    else
+        setPointToolColor (Colours::white);
 }
 
 void FrameEditor::setSketchVisible (bool visible)
@@ -715,12 +736,107 @@ void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
     }
 }
 
+void FrameEditor::adjustIldaSelection (int offset)
+{
+    if (activeLayer != ilda || ildaSelection.isEmpty())
+        return;
+    
+    SparseSet<uint16> newSelection;
+    int points = getPointCount();
+    
+    if (offset == 0 || offset >= points)
+        return;
+
+    // Valid range
+    Range<int> valid (0, points);
+
+    for (auto n = 0; n < getIldaSelection().getNumRanges(); ++n)
+    {
+        Range<uint16> r = getIldaSelection().getRange (n);
+        Range<int> shifted ((int)r.getStart() + offset, (int)r.getEnd() + offset);
+        
+        // Add the valid part of the shifted range
+        Range<int> newRange = valid.getIntersectionWith (shifted);
+        newSelection.addRange (Range<uint16> ((uint16)newRange.getStart(),
+                                              (uint16)newRange.getEnd()));
+        
+        // Deal with any wrap off either end with an additional range
+        int extra = (int)r.getLength() - newRange.getLength();
+        if (extra)
+        {
+            int s, e;
+            
+            if (offset > 0)
+                s = shifted.getEnd() - extra - points;
+            else
+                s = shifted.getStart() + points;
+
+            e = s + extra;
+            newSelection.addRange (Range<uint16> ((uint16)s, (uint16)e));
+        }
+    }
+    
+    setIldaSelection (newSelection);
+}
+
+
+void FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain)
+{
+    Array<Frame::XYPoint> points;
+    getIldaSelectedPoints (points);
+    if (! points.size())
+        return;
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        int x = point.x.w;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+        
+        int y = point.y.w;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+        
+        int z = point.z.w;
+        z += zOffset;
+        if (Frame::clipIlda (z))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.z.w = (int16)z;
+        
+//        points.getReference (n) = point;
+    }
+    
+    if (constrain && clipped)
+        return;
+
+    if (getCurrentTransactionName() == "Point Move")
+        undoCurrentTransactionOnly();
+
+    beginNewTransaction ("Point Move");
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
 void FrameEditor::setIldaSelectedX (int16 newX)
 {
     Array<Frame::XYPoint> points;
-    
     getIldaSelectedPoints (points);
-    
     if (! points.size())
         return;
     
@@ -734,9 +850,7 @@ void FrameEditor::setIldaSelectedX (int16 newX)
 void FrameEditor::setIldaSelectedY (int16 newY)
 {
     Array<Frame::XYPoint> points;
-    
     getIldaSelectedPoints (points);
-    
     if (! points.size())
         return;
     
@@ -750,9 +864,7 @@ void FrameEditor::setIldaSelectedY (int16 newY)
 void FrameEditor::setIldaSelectedZ (int16 newZ)
 {
     Array<Frame::XYPoint> points;
-    
     getIldaSelectedPoints (points);
-    
     if (! points.size())
         return;
     
@@ -766,9 +878,7 @@ void FrameEditor::setIldaSelectedZ (int16 newZ)
 void FrameEditor::setIldaSelectedR (uint8 newR)
 {
     Array<Frame::XYPoint> points;
-    
     getIldaSelectedPoints (points);
-    
     if (! points.size())
         return;
     
@@ -788,9 +898,7 @@ void FrameEditor::setIldaSelectedR (uint8 newR)
 void FrameEditor::setIldaSelectedG (uint8 newG)
 {
     Array<Frame::XYPoint> points;
-    
     getIldaSelectedPoints (points);
-    
     if (! points.size())
         return;
     
@@ -810,9 +918,7 @@ void FrameEditor::setIldaSelectedG (uint8 newG)
 void FrameEditor::setIldaSelectedB (uint8 newB)
 {
     Array<Frame::XYPoint> points;
-    
     getIldaSelectedPoints (points);
-    
     if (! points.size())
         return;
     
@@ -832,9 +938,7 @@ void FrameEditor::setIldaSelectedB (uint8 newB)
 void FrameEditor::setIldaSelectedRGB (const Colour newColor)
 {
     Array<Frame::XYPoint> points;
-    
     getIldaSelectedPoints (points);
-    
     if (! points.size())
         return;
     

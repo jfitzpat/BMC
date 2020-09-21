@@ -157,11 +157,16 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::editSelectAll);
         menu.addCommandItem (&commandManager, CommandIDs::editClearSelection);
         menu.addCommandItem (&commandManager, CommandIDs::deleteSelection);
-        if (frameEditor->getActiveLayer() == FrameEditor::ilda &&
-            frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            menu.addSeparator();
-            menu.addCommandItem (&commandManager, CommandIDs::blankingToggleRequest);
+            menu.addCommandItem (&commandManager, CommandIDs::selectionDownRequest);
+            menu.addCommandItem (&commandManager, CommandIDs::selectionUpRequest);
+            if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+            {
+                menu.addSeparator();
+                menu.addCommandItem (&commandManager, CommandIDs::blankingToggleRequest);
+                menu.addCommandItem (&commandManager, CommandIDs::cycleColorsRequest);
+            }
         }
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::newFrame);
@@ -284,7 +289,18 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::deleteSelection,
                                 CommandIDs::cancelRequest,
                                 CommandIDs::deleteRequest,
-                                CommandIDs::blankingToggleRequest };
+                                CommandIDs::upRequest,
+                                CommandIDs::downRequest,
+                                CommandIDs::leftRequest,
+                                CommandIDs::rightRequest,
+                                CommandIDs::smallUpRequest,
+                                CommandIDs::smallDownRequest,
+                                CommandIDs::smallLeftRequest,
+                                CommandIDs::smallRightRequest,
+                                CommandIDs::blankingToggleRequest,
+                                CommandIDs::cycleColorsRequest,
+                                CommandIDs::selectionDownRequest,
+                                CommandIDs::selectionUpRequest };
     
     c.addArray (commands);
 }
@@ -430,11 +446,58 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
             result.setActive (frameEditor->hasSelection());
             break;
+        case CommandIDs::upRequest:
+            result.setInfo ("Move Up", "Move the current selectiop up", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::upKey, 0);
+            break;
+        case CommandIDs::downRequest:
+            result.setInfo ("Move Down", "Move the current selectiop down", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::downKey, 0);
+            break;
+        case CommandIDs::leftRequest:
+            result.setInfo ("Move Left", "Move the current selectiop left", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::leftKey, 0);
+            break;
+        case CommandIDs::rightRequest:
+            result.setInfo ("Move Right", "Move the current selectiop right", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::rightKey, 0);
+            break;
+        case CommandIDs::smallUpRequest:
+            result.setInfo ("Nudge Up", "Nudge the current selectiop up", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::upKey, ModifierKeys::shiftModifier);
+            break;
+        case CommandIDs::smallDownRequest:
+            result.setInfo ("Nudge Down", "Nudge the current selectiop down", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::downKey, ModifierKeys::shiftModifier);
+            break;
+        case CommandIDs::smallLeftRequest:
+            result.setInfo ("Nudge Left", "Nudge the current selectiop left", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::leftKey, ModifierKeys::shiftModifier);
+            break;
+        case CommandIDs::smallRightRequest:
+            result.setInfo ("Nudge Right", "Nudge the current selectiop right", "ShortCut", 0);
+            result.addDefaultKeypress(KeyPress::rightKey, ModifierKeys::shiftModifier);
+            break;
+
         case CommandIDs::blankingToggleRequest:
             result.setInfo ("Toggle Blanking", "Toggle Blanking on/off", "Menu", 0);
             result.addDefaultKeypress ('b', 0);
             break;
-            
+        case CommandIDs::cycleColorsRequest:
+            result.setInfo ("Cycle Colors", "Cycle through standard colors", "Menu", 0);
+            result.addDefaultKeypress ('c', 0);
+            break;
+        case CommandIDs::selectionUpRequest:
+            result.setInfo ("Shift Selection Up", "Shift selection to higher points", "Menu", 0);
+            result.addDefaultKeypress (']', 0);
+            result.setActive (frameEditor->hasMovableSelection());
+            break;
+        case CommandIDs::selectionDownRequest:
+            result.setInfo ("Shift Selection Down", "Shift selection to lower points", "Menu", 0);
+            result.addDefaultKeypress ('[', 0);
+            result.setActive (frameEditor->hasMovableSelection());
+            break;
+
         default:
             break;
     }
@@ -582,10 +645,33 @@ bool MainComponent::perform (const InvocationInfo& info)
             juce::JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         
+        case CommandIDs::upRequest:
+            frameEditor->upRequest();
+            break;
+        case CommandIDs::downRequest:
+            frameEditor->downRequest();
+            break;
+        case CommandIDs::leftRequest:
+            frameEditor->leftRequest();
+            break;
+        case CommandIDs::rightRequest:
+            frameEditor->rightRequest();
+            break;
+        case CommandIDs::smallUpRequest:
+            frameEditor->smallUpRequest();
+            break;
+        case CommandIDs::smallDownRequest:
+            frameEditor->smallDownRequest();
+            break;
+        case CommandIDs::smallLeftRequest:
+            frameEditor->smallLeftRequest();
+            break;
+        case CommandIDs::smallRightRequest:
+            frameEditor->smallRightRequest();
+            break;
         case CommandIDs::cancelRequest:
             frameEditor->cancelRequest();
             break;
-            
         case CommandIDs::deleteSelection:
         case CommandIDs::deleteRequest:
             frameEditor->deleteRequest();
@@ -593,6 +679,16 @@ bool MainComponent::perform (const InvocationInfo& info)
             
         case CommandIDs::blankingToggleRequest:
             frameEditor->toggleBlanking();
+            break;
+        case CommandIDs::cycleColorsRequest:
+            frameEditor->cycleColors();
+            break;
+        
+        case CommandIDs::selectionUpRequest:
+            frameEditor->adjustIldaSelection (1);
+            break;
+        case CommandIDs::selectionDownRequest:
+            frameEditor->adjustIldaSelection (-1);
             break;
     }
     return true;

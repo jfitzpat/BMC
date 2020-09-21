@@ -77,7 +77,10 @@ public:
         smallDownRequest,
         smallRightRequest,
         smallLeftRequest,
-        blankingToggleRequest
+        blankingToggleRequest,
+        cycleColorsRequest,
+        selectionDownRequest,
+        selectionUpRequest
     };
 
     //==============================================================================

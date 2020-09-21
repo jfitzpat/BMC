@@ -59,7 +59,6 @@ private:
     void updateSelection();
     void disableSelectionTools();
     void updateTools();
-    void adjustSelection (int offset);
     
     void refresh();
 

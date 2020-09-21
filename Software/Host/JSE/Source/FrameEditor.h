@@ -26,6 +26,40 @@
 #define MAX_ZOOM (16.0f)
 
 //==============================================================================
+// Keep the broadcast messages short and unique
+namespace EditorActions
+{
+    const String dirtyStatusChanged         ("DSC");
+    const String layerChanged               ("LC");
+    const String zoomFactorChanged          ("ZFC");
+    const String sketchVisibilityChanged    ("SVC");
+    const String ildaVisibilityChanged      ("IVC");
+    const String refVisibilityChanged       ("RVC");
+    const String backgroundImageChanged     ("BIC");
+    const String refOpacityChanged          ("ROC");
+    const String refDrawGridChanged         ("RGC");
+    const String backgroundImageAdjusted    ("BIA");
+    const String framesChanged              ("FC");
+    const String frameIndexChanged          ("FIC");
+    const String ildaShowBlankChanged       ("SBC");
+    const String ildaDrawLinesChanged       ("DLC");
+    const String ildaSelectionChanged       ("ISC");
+    const String ildaPointsChanged          ("IPC");
+    const String ildaToolChanged            ("ITC");
+    const String ildaPointToolColorChanged  ("PTC");
+    const String cancelRequest              ("CR");
+    const String deleteRequest              ("DR");
+    const String upRequest                  ("UPR");
+    const String downRequest                ("DNR");
+    const String leftRequest                ("LER");
+    const String rightRequest               ("RIR");
+    const String smallUpRequest             ("uPR");
+    const String smallDownRequest           ("dNR");
+    const String smallLeftRequest           ("lER");
+    const String smallRightRequest          ("rIR");
+}
+
+//==============================================================================
 class FrameEditor  : public ActionBroadcaster,
                      public UndoManager
 {
@@ -56,10 +90,20 @@ public:
     void fileIldaExport();
     
     // Tool helpers
-    void cancelRequest();
-    void deleteRequest();
+    void cancelRequest()    { sendActionMessage (EditorActions::cancelRequest); }
+    void deleteRequest()    { sendActionMessage (EditorActions::deleteRequest); }
+    void upRequest()        { sendActionMessage (EditorActions::upRequest); }
+    void downRequest()      { sendActionMessage (EditorActions::downRequest); }
+    void leftRequest()      { sendActionMessage (EditorActions::leftRequest); }
+    void rightRequest()     { sendActionMessage (EditorActions::rightRequest); }
+    void smallUpRequest()   { sendActionMessage (EditorActions::smallUpRequest); }
+    void smallDownRequest() { sendActionMessage (EditorActions::smallDownRequest); }
+    void smallLeftRequest() { sendActionMessage (EditorActions::smallLeftRequest); }
+    void smallRightRequest(){ sendActionMessage (EditorActions::smallRightRequest); }
     bool hasSelection();
+    bool hasMovableSelection();
     void toggleBlanking();
+    void cycleColors();
     
     // Polling
     uint32 getScanRate() { return scanRate; }
@@ -118,6 +162,7 @@ public:
     void setActiveIldaTool (IldaTool tool);
     void setPointToolColor (const Colour& color);
     void togglePointToolBlank();
+    void cyclePointToolColors();
 
     void selectImage();
     void clearImage();
@@ -146,6 +191,11 @@ public:
     void moveFrameDown();
     
     void setIldaSelection (const SparseSet<uint16>& selection);
+    void adjustIldaSelection (int offset);
+
+    void moveIldaSelected (int xOffset, int yOffset, bool constrain = true)
+        { moveIldaSelected (xOffset, yOffset, 0, constrain); }
+    void moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
 
     void setIldaSelectedX (int16 newX);
     void setIldaSelectedY (int16 newY);
@@ -154,7 +204,7 @@ public:
     void setIldaSelectedG (uint8 newR);
     void setIldaSelectedB (uint8 newR);
     void setIldaSelectedRGB (const Colour newColor);
-    
+        
     void insertPoint (const Frame::XYPoint& point);
     void deletePoints();
     
@@ -221,27 +271,3 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
 
-// Keep the broadcast messages short and unique
-namespace EditorActions
-{
-    const String dirtyStatusChanged         ("DSC");
-    const String layerChanged               ("LC");
-    const String zoomFactorChanged          ("ZFC");
-    const String sketchVisibilityChanged    ("SVC");
-    const String ildaVisibilityChanged      ("IVC");
-    const String refVisibilityChanged       ("RVC");
-    const String backgroundImageChanged     ("BIC");
-    const String refOpacityChanged          ("ROC");
-    const String refDrawGridChanged         ("RGC");
-    const String backgroundImageAdjusted    ("BIA");
-    const String framesChanged              ("FC");
-    const String frameIndexChanged          ("FIC");
-    const String ildaShowBlankChanged       ("SBC");
-    const String ildaDrawLinesChanged       ("DLC");
-    const String ildaSelectionChanged       ("ISC");
-    const String ildaPointsChanged          ("IPC");
-    const String ildaToolChanged            ("ITC");
-    const String ildaPointToolColorChanged  ("PTC");
-    const String cancelRequest              ("CR");
-    const String deleteRequest              ("DR");
-}

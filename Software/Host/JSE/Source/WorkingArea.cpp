@@ -641,6 +641,8 @@ void WorkingArea::actionListenerCallback (const String& message)
     }
     else if (message == EditorActions::ildaPointsChanged)
         repaint();
+    else if (message == EditorActions::ildaPointToolColorChanged)
+        repaint();
     else if (message == EditorActions::ildaToolChanged)
     {
         killMarkers();

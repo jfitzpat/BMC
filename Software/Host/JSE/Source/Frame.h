@@ -86,6 +86,27 @@ public:
     static int toIldaY (int y) { return 32767 - y; }
     static int toCompX (int x) { return x + 32768; }
     static int toCompY (int y) { return 32767 - y; }
+    static void blankPoint (XYPoint& point)
+    {
+        point.status = Frame::BlankedPoint;
+        point.red = point.green = point.blue = 0;
+    }
+    static bool clipIlda (int& val)
+    {
+        bool clipped = false;
+        if (val < -32768)
+        {
+            val = -32768;
+            clipped = true;
+        }
+        else if (val > 32767)
+        {
+            val = 32767;
+            clipped = true;
+        }
+        
+        return clipped;
+    }
 
 private:
     std::unique_ptr<Image> backgroundImage;
