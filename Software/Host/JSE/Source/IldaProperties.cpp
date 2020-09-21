@@ -243,6 +243,16 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     colorButton->setTooltip ("Select color for selected point(s)");
     colorButton->addChangeListener (this);
 
+    trashIcon = Drawable::createFromImageData (BinaryData::trash_png,
+                                               BinaryData::trash_pngSize);
+    
+    trashButton.reset (new DrawableButton ("trashButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (trashButton.get());
+    trashButton->setImages (trashIcon.get());
+    trashButton->setEdgeIndent (0);
+    trashButton->setTooltip ("Delete the selected point(s)");
+    trashButton->addListener (this);
+
     refresh();
 }
 
@@ -272,6 +282,9 @@ IldaProperties::~IldaProperties()
     selectionR = nullptr;
     selectionG = nullptr;
     selectionB = nullptr;
+    colorButton = nullptr;
+    trashButton = nullptr;
+    trashIcon = nullptr;
 }
 
 //==============================================================================
@@ -307,6 +320,7 @@ void IldaProperties::resized()
     selectionG->setBounds (16 + 56, 320, 54, 24);
     selectionB->setBounds (16 + 112, 320, 54, 24);
     colorButton->setBounds (89, 348, 20, 20);
+    trashButton->setBounds (16, 372, 32, 32);
 }
 
 //==============================================================================
@@ -326,6 +340,8 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->adjustIldaSelection (-1);
     else if (buttonThatWasClicked == incSelection.get())
         frameEditor->adjustIldaSelection (1);
+    else if (buttonThatWasClicked == trashButton.get())
+        frameEditor->deletePoints();
 }
 
 //==============================================================================
@@ -575,6 +591,7 @@ void IldaProperties::disableSelectionTools()
     selectionG->setEnabled (false); selectionB->setEnabled (false);
     colorButton->setEnabled (false);
     colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
+    trashButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -661,6 +678,8 @@ void IldaProperties::updateSelection()
                 selectionColour = Colour (lastPoint.red, lastPoint.green, lastPoint.blue);
             
             colorButton->setColour (TextButton::buttonColourId, selectionColour);
+            
+            trashButton->setEnabled(true);
         }
     }
 }

@@ -136,8 +136,28 @@ static const unsigned char temp_binary_data_4[] =
 
 const char* showall_png = (const char*) temp_binary_data_4;
 
-//================== up-white.png ==================
+//================== trash.png ==================
 static const unsigned char temp_binary_data_5[] =
+"\x89PNG\r\n"
+"\x1a\n"
+"\0\0\0\rIHDR\0\0\0\x14\0\0\0\x18\x08\x06\0\0\0\xfaK\xddv\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x05\xf7iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:"
+"meta/\" x:xmptk=\"Adobe XMP Core 6.0-c002 79.164352, 2020/01/30-15:50:38        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:dc=\"http://purl."
+"org/dc/elements/1.1/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmp:CreatorTool=\"Adobe Photoshop 21.1 (Macintosh)\" xmp:Cr"
+"eateDate=\"2020-09-21T13:52:53-07:00\" xmp:ModifyDate=\"2020-09-21T13:56:02-07:00\" xmp:MetadataDate=\"2020-09-21T13:56:02-07:00\" dc:format=\"image/png\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\" xmpMM:InstanceID=\"xmp.iid"
+":bfbf78d7-ce84-4ee8-8681-c62fccafa245\" xmpMM:DocumentID=\"adobe:docid:photoshop:bd78dab6-1f9c-a843-a689-b82f20b3abc0\" xmpMM:OriginalDocumentID=\"xmp.did:b7afc30a-a2b9-4aee-b0b5-e3007382023f\"> <xmpMM:History> <rdf:Seq> <rdf:li stEvt:action=\"create"
+"d\" stEvt:instanceID=\"xmp.iid:b7afc30a-a2b9-4aee-b0b5-e3007382023f\" stEvt:when=\"2020-09-21T13:52:53-07:00\" stEvt:softwareAgent=\"Adobe Photoshop 21.1 (Macintosh)\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:bfbf78d7-ce84-4ee8-868"
+"1-c62fccafa245\" stEvt:when=\"2020-09-21T13:56:02-07:00\" stEvt:softwareAgent=\"Adobe Photoshop 21.1 (Macintosh)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>]\x9a\x7f""2\0\0\x01m"
+"IDAT8\xcb\xed\x95=K\x03""A\x10\x86""7g\xc0\xa8""DD\xa2\xa0h@EA\x04""A\x0b\xd1""B[\xb5\xd6\xc6\xc2""F\x82\xa9\"h\xed_\xb0\xb4\x17\xf1\x17\xd8\xda\xe4\x0fXX\xa4\n"
+"(\x04?P.\x11\x1b\xe3W\\\xdf\t\xef\xc2r\xdc\xca\x19\xaf\x12\x07\x9e\x9b\x9d\xbb\x9d\xd9y\xef\x92]\xa5\xb5V\x0e\xd6\xb5\xdb\xb6]y\t\xb9""8\xec\x1c\xcc\x82\x13\xf0\0<\xd0\r\xb6\xc0""5\x18\x0eK2\x05\xdb\x98 \xc1\x07\x9f=\x81""7\xd0\x17\xc8\xb9\0\xd3 \t\x1a"
+"\xf4\x8a\xb9\ri\xb3\xa0\xe3\xb3}\xe9\xb0\x8e\xca)p\x08\xde""A;W\xbc\x13\x05`\x80\xabk*\xb9g\xe7\x83|.9\x9f\xa0\xd0\x9c\xc3\xca\xa5o>NT\x8aRH\xf4\x97\xc0\x14WN\x83\x0e\xf5""3{\xe5\xfb\xee\x07\x97\"y\x08\x83S0\x03\x8a\xa0\x02\xba\"\x16\xab\xf3\xa3-K1\xb0"
+"j\xda\xdd\xa5\xf4\x85\x16\xa4\x8e""3\xf7@bO\xc5l\xae\x82\x8b`\xc7\x8a\xd7\xc0\xa6\x15\xe7\xc1Jhf@\xf2<\xe3#\xc6)\xc6""e\xf0l\xc9\x14;\xe3x,\x8a\xe4""DH\xec\xfd""Fr\xec\xef\xf0\xbf\xe0_*\x98t\xdc\xaf\xd2\xbf\xd0\xdfr\xcf""3\xf6\x08\xfc\xb0\xdf\xac\xe9"
+"\xb0""F?B\xbf\x17\x98\xb8\x04&\xac\xb8\x17lp\x9c\xa5\xf7\xed""3\xa5\x07\xdc\x80Np\x0c\xae""8)\xc3]\xba\xc6\x0e""3\xdc\xb9}\x9e'\xb2\xf5\xe5""8w\xb4\x99g\xfd?'A\xa5\x85s\xa4\n"
+"\xe6L\x9d/{r\xe1\xeb\x17""d\xce\0\0\0\0\0IEND\xae""B`\x82";
+
+const char* trash_png = (const char*) temp_binary_data_5;
+
+//================== up-white.png ==================
+static const unsigned char temp_binary_data_6[] =
 "\x89PNG\r\n"
 "\x1a\n"
 "\0\0\0\rIHDR\0\0\0@\0\0\0-\x08\x06\0\0\0\x1e\x03mZ\0\0\0\tpHYs\0\0\x0b\x13\0\0\x0b\x13\x01\0\x9a\x9c\x18\0\0\x06\xc6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\""
@@ -158,10 +178,10 @@ static const unsigned char temp_binary_data_5[] =
 "(\x14""F~\xd9\xc7\xe0\xa2""D\x82\xe7""6\x89\xd7\xa9\x90""4\xa0""F\xa5\x0e\x10]\xda\xb2\x81\xe0\xbd""6\x8b\xd7\t\x19\x14\x7f\xdbL%\x98\x0b\xe6\xe2\x04\xefsH\xbcN\x18\xfc\x8ds~-\\\xcd\xd0""C\xf0uO\xe0i\xd0\xec\xb0\xf8\xbd\x15""c\x84\xba@\x8dj\x86\x11Pi"
 "d\xbe\xd1\x97\xa3""E\xe0&(\xa1\xcf\xef""A\x04\xec\xfa\xdc""1B\xb4""Cu\x14""Di\xafr\xd4-o\x87]=\xbc\x7f\x89y\x06x\x06\xa4\xf7\xf8\x07|\x84""a\x9f""3,\xb2\xd9\0\0\0\0IEND\xae""B`\x82";
 
-const char* upwhite_png = (const char*) temp_binary_data_5;
+const char* upwhite_png = (const char*) temp_binary_data_6;
 
 //================== zoomin.png ==================
-static const unsigned char temp_binary_data_6[] =
+static const unsigned char temp_binary_data_7[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,64,0,0,0,64,8,6,0,0,0,170,105,113,222,0,0,0,9,112,72,89,115,0,0,14,196,0,0,14,196,1,149,43,14,27,0,0,6,198,105,84,88,116,88,77,76,58,99,111,109,46,97,100,111,98,101,46,120,109,112,0,0,0,0,0,60,63,120,
 112,97,99,107,101,116,32,98,101,103,105,110,61,34,239,187,191,34,32,105,100,61,34,87,53,77,48,77,112,67,101,104,105,72,122,114,101,83,122,78,84,99,122,107,99,57,100,34,63,62,32,60,120,58,120,109,112,109,101,116,97,32,120,109,108,110,115,58,120,61,34,
 97,100,111,98,101,58,110,115,58,109,101,116,97,47,34,32,120,58,120,109,112,116,107,61,34,65,100,111,98,101,32,88,77,80,32,67,111,114,101,32,54,46,48,45,99,48,48,50,32,55,57,46,49,54,52,51,53,50,44,32,50,48,50,48,47,48,49,47,51,48,45,49,53,58,53,48,58,
@@ -210,10 +230,10 @@ static const unsigned char temp_binary_data_6[] =
 253,192,80,16,64,112,132,23,102,118,216,145,239,62,64,182,37,194,255,118,25,237,138,87,15,53,1,4,7,75,235,61,190,67,171,85,215,128,227,113,49,244,108,131,71,196,248,51,175,48,29,207,231,64,200,143,205,229,41,114,18,191,239,227,68,232,81,145,250,79,148,
 255,237,63,216,142,22,38,224,47,197,91,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* zoomin_png = (const char*) temp_binary_data_6;
+const char* zoomin_png = (const char*) temp_binary_data_7;
 
 //================== zoomout.png ==================
-static const unsigned char temp_binary_data_7[] =
+static const unsigned char temp_binary_data_8[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,0,64,0,0,0,64,8,6,0,0,0,170,105,113,222,0,0,0,9,112,72,89,115,0,0,14,196,0,0,14,196,1,149,43,14,27,0,0,6,198,105,84,88,116,88,77,76,58,99,111,109,46,97,100,111,98,101,46,120,109,112,0,0,0,0,0,60,63,120,
 112,97,99,107,101,116,32,98,101,103,105,110,61,34,239,187,191,34,32,105,100,61,34,87,53,77,48,77,112,67,101,104,105,72,122,114,101,83,122,78,84,99,122,107,99,57,100,34,63,62,32,60,120,58,120,109,112,109,101,116,97,32,120,109,108,110,115,58,120,61,34,
 97,100,111,98,101,58,110,115,58,109,101,116,97,47,34,32,120,58,120,109,112,116,107,61,34,65,100,111,98,101,32,88,77,80,32,67,111,114,101,32,54,46,48,45,99,48,48,50,32,55,57,46,49,54,52,51,53,50,44,32,50,48,50,48,47,48,49,47,51,48,45,49,53,58,53,48,58,
@@ -261,7 +281,7 @@ static const unsigned char temp_binary_data_7[] =
 154,6,15,235,156,140,149,186,1,108,35,172,15,235,7,38,130,1,44,142,240,194,172,14,187,75,221,7,136,178,22,108,241,249,44,157,138,55,76,52,3,88,28,44,109,246,120,134,178,85,116,247,184,51,99,77,60,217,226,17,49,254,204,25,166,206,82,14,132,252,200,50,
 94,34,103,241,223,99,188,17,122,220,26,63,2,252,95,254,3,36,86,113,168,103,129,203,248,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* zoomout_png = (const char*) temp_binary_data_7;
+const char* zoomout_png = (const char*) temp_binary_data_8;
 
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
@@ -279,6 +299,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x7ff4a068:  numBytes = 2727; return duplicatewhite_png;
         case 0xf3b5f8ab:  numBytes = 2438; return pointinghand_png;
         case 0x7d90e0ee:  numBytes = 2762; return showall_png;
+        case 0x46a878a2:  numBytes = 1982; return trash_png;
         case 0x8a0da0d8:  numBytes = 2501; return upwhite_png;
         case 0xfebd8da2:  numBytes = 3369; return zoomin_png;
         case 0x236bb285:  numBytes = 3300; return zoomout_png;
@@ -296,6 +317,7 @@ const char* namedResourceList[] =
     "duplicatewhite_png",
     "pointinghand_png",
     "showall_png",
+    "trash_png",
     "upwhite_png",
     "zoomin_png",
     "zoomout_png"
@@ -308,6 +330,7 @@ const char* originalFilenames[] =
     "duplicate-white.png",
     "pointinghand.png",
     "showall.png",
+    "trash.png",
     "up-white.png",
     "zoomin.png",
     "zoomout.png"

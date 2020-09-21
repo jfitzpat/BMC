@@ -91,6 +91,8 @@ private:
     std::unique_ptr<TextEditor> selectionG;
     std::unique_ptr<TextEditor> selectionB;
     std::unique_ptr<ColourButton> colorButton;
+    std::unique_ptr<Drawable> trashIcon;
+    std::unique_ptr<DrawableButton> trashButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

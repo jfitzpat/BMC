@@ -15,6 +15,7 @@
         <FILE id="MatEZ4" name="pointinghand.png" compile="0" resource="1"
               file="Graphics/pointinghand.png"/>
         <FILE id="RpuDEN" name="showall.png" compile="0" resource="1" file="Graphics/showall.png"/>
+        <FILE id="NCKhUw" name="trash.png" compile="0" resource="1" file="Graphics/trash.png"/>
         <FILE id="RczVdz" name="up-white.png" compile="0" resource="1" file="Graphics/up-white.png"/>
         <FILE id="vAcbvi" name="zoomin.png" compile="0" resource="1" file="Graphics/zoomin.png"/>
         <FILE id="pW91jU" name="zoomout.png" compile="0" resource="1" file="Graphics/zoomout.png"/>
