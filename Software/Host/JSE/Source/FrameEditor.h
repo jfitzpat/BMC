@@ -197,7 +197,13 @@ public:
         { return moveIldaSelected (xOffset, yOffset, 0, constrain); }
     bool moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
     bool centerIldaSelected (bool constrain = true);
-
+    
+    // Transform operaitons must be proceeded with startTransform
+    // and ended with endTransform
+    void startTransform (const String& name);
+    bool scaleIldaSelected (float xScale, float yScale, float zScale, bool centerOnSelection, bool constrain = true);
+    void endTransform();
+    
     void setIldaSelectedX (int16 newX);
     void setIldaSelectedY (int16 newY);
     void setIldaSelectedZ (int16 newZ);
@@ -269,6 +275,9 @@ private:
 
     SparseSet<uint16> ildaSelection;
     
+    Array<Frame::XYPoint> transformPoints;
+    Point<int16> transformCenter;
+    String transformName;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
 

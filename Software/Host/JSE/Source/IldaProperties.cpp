@@ -263,6 +263,15 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     centerButton->setTooltip ("Center the selected point(s)");
     centerButton->addListener (this);
 
+    scaleIcon = Drawable::createFromImageData (BinaryData::scale_png,
+                                            BinaryData::scale_pngSize);
+
+    scaleButton.reset (new ScaleButton (frameEditor));
+    addAndMakeVisible (scaleButton.get());
+    scaleButton->setImages (scaleIcon.get());
+    scaleButton->setEdgeIndent (0);
+    scaleButton->setTooltip ("Scale the selected point(s)");
+
     refresh();
 }
 
@@ -297,6 +306,8 @@ IldaProperties::~IldaProperties()
     trashIcon = nullptr;
     centerButton = nullptr;
     centerIcon = nullptr;
+    scaleButton = nullptr;
+    scaleIcon = nullptr;
 }
 
 //==============================================================================
@@ -332,8 +343,9 @@ void IldaProperties::resized()
     selectionG->setBounds (16 + 56, 320, 54, 24);
     selectionB->setBounds (16 + 112, 320, 54, 24);
     colorButton->setBounds (89, 348, 20, 20);
-    trashButton->setBounds (16, 372, 32, 32);
-    centerButton->setBounds (52, 372, 32, 32);
+    trashButton->setBounds (16, 376, 32, 32);
+    centerButton->setBounds (52, 376, 32, 32);
+    scaleButton->setBounds (88, 376, 32, 32);
 }
 
 //==============================================================================
@@ -608,6 +620,7 @@ void IldaProperties::disableSelectionTools()
     colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
     trashButton->setEnabled (false);
     centerButton->setEnabled (false);
+    scaleButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -697,6 +710,7 @@ void IldaProperties::updateSelection()
             
             trashButton->setEnabled (true);
             centerButton->setEnabled (true);
+            scaleButton->setEnabled (true);
         }
     }
 }

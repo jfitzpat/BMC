@@ -21,6 +21,7 @@
 
 #include <JuceHeader.h>
 #include "ColourButton.h"
+#include "ScalePopup.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -95,6 +96,8 @@ private:
     std::unique_ptr<DrawableButton> trashButton;
     std::unique_ptr<Drawable> centerIcon;
     std::unique_ptr<DrawableButton> centerButton;
+    std::unique_ptr<Drawable> scaleIcon;
+    std::unique_ptr<ScaleButton> scaleButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

@@ -876,6 +876,94 @@ bool FrameEditor::centerIldaSelected (bool constrain)
     return true;
 }
 
+void FrameEditor::startTransform (const String& name)
+{
+    getIldaSelectedPoints (transformPoints);
+    transformCenter = getCenterOfIldaSelection();
+    transformName = name;
+}
+
+bool FrameEditor::scaleIldaSelected (float xScale,
+                                     float yScale,
+                                     float zScale,
+                                     bool centerOnSelection,
+                                     bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+  
+    int xOffset = 0;
+    int yOffset = 0;
+    int zOffset = 0;
+    
+    if (centerOnSelection)
+    {
+        xOffset = (int)transformCenter.getX();
+        yOffset = (int)transformCenter.getY();
+    }
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        int x = point.x.w;
+        x -= xOffset;
+        x *= xScale;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+        
+        int y = point.y.w;
+        y -= yOffset;
+        y *= yScale;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+        
+        int z = point.z.w;
+        z -= zOffset;
+        z *= zScale;
+        z += zOffset;
+        if (Frame::clipIlda (z))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.z.w = (int16)z;
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
+void FrameEditor::endTransform()
+{
+    // Already Transformed! So grab!
+    Array<Frame::XYPoint> points;
+    getIldaSelectedPoints(points);
+
+    // Restore original
+    _setIldaPoints (ildaSelection, transformPoints);
+    
+    // Final undoable switch
+    beginNewTransaction (transformName);
+    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+}
+
 void FrameEditor::setIldaSelectedX (int16 newX)
 {
     Array<Frame::XYPoint> points;
