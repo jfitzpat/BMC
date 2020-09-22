@@ -178,9 +178,13 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     }
     else if (menuIndex == 2)
     {
-        menu.addCommandItem (&commandManager, CommandIDs::zoomAll);
         menu.addCommandItem (&commandManager, CommandIDs::zoomIn);
         menu.addCommandItem (&commandManager, CommandIDs::zoomOut);
+        menu.addCommandItem (&commandManager, CommandIDs::zoomAll);
+        menu.addSeparator();
+        menu.addCommandItem (&commandManager, CommandIDs::frontView);
+        menu.addCommandItem (&commandManager, CommandIDs::topView);
+        menu.addCommandItem (&commandManager, CommandIDs::sideView);
     }
     else if (menuIndex == 3)
     {
@@ -279,6 +283,9 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::appAbout,
                                 CommandIDs::appPreferences,
                                 CommandIDs::clearRecentFiles,
+                                CommandIDs::frontView,
+                                CommandIDs::topView,
+                                CommandIDs::sideView,
                                 CommandIDs::zoomAll,
                                 CommandIDs::zoomOut,
                                 CommandIDs::zoomIn,
@@ -382,6 +389,22 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::moveFrameUp:
             result.setInfo ("Move Frame Up", "Move the current frame up", "Menu", 0);
             result.setActive (frameEditor->getFrameIndex());
+            break;
+
+        case CommandIDs::frontView:
+            result.setInfo ("Front View", "View along Z axis", "Menu", 0);
+            result.addDefaultKeypress('1', ModifierKeys::commandModifier);
+            result.setActive (frameEditor->getActiveView() != Frame::front);
+            break;
+        case CommandIDs::topView:
+            result.setInfo ("Top View", "View along Y axis", "Menu", 0);
+            result.addDefaultKeypress('2', ModifierKeys::commandModifier);
+            result.setActive (frameEditor->getActiveView() != Frame::top);
+            break;
+        case CommandIDs::sideView:
+            result.setInfo ("Side View", "View along Xaxis", "Menu", 0);
+            result.addDefaultKeypress('3', ModifierKeys::commandModifier);
+            result.setActive (frameEditor->getActiveView() != Frame::side);
             break;
 
         case CommandIDs::zoomAll:
@@ -578,6 +601,16 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::panRight:
             mainEditor->panRight();
+            break;
+
+        case CommandIDs::frontView:
+            frameEditor->setActiveView (Frame::front);
+            break;
+        case CommandIDs::topView:
+            frameEditor->setActiveView (Frame::top);
+            break;
+        case CommandIDs::sideView:
+            frameEditor->setActiveView (Frame::side);
             break;
 
         case CommandIDs::fileOpen:

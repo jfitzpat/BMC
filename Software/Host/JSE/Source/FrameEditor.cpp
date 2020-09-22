@@ -32,6 +32,7 @@ FrameEditor::FrameEditor()
       scanRate (30000),
       zoomFactor (1.0),
       activeLayer (sketch),
+      activeView (Frame::front),
       activeIldaTool (selectTool),
       pointToolColor (Colours::white),
       lastVisiblePointToolColor (Colours::white),
@@ -165,15 +166,18 @@ void FrameEditor::cycleColors()
 }
 
 //==============================================================================
-const Point<int16> FrameEditor::getCenterOfIldaSelection()
+void FrameEditor::getCenterOfIldaSelection (int16& x, int16& y, int16& z)
 {
     // Don't bother if there is no selection visible
     if (ildaSelection.isEmpty() || activeLayer != ilda)
-        return Point<int16> (0, 0);
+    {
+        x = y = z = 0;
+        return;
+    }
     
     bool first = true;
-    int16 minx, maxx, miny, maxy;
-    minx = maxx = miny = maxy = 0;  // For Visual Studio warning
+    int minx, maxx, miny, maxy, minz, maxz;
+    minx = maxx = miny = maxy = minz = maxz = 0;  // For Visual Studio warning
     
     for (auto n = 0; n < ildaSelection.getNumRanges(); ++n)
     {
@@ -187,6 +191,7 @@ const Point<int16> FrameEditor::getCenterOfIldaSelection()
             {
                 minx = maxx = point.x.w;
                 miny = maxy = point.y.w;
+                minz = maxz = point.z.w;
                 first = false;
             }
             else
@@ -200,25 +205,38 @@ const Point<int16> FrameEditor::getCenterOfIldaSelection()
                     miny = point.y.w;
                 else if (point.y.w > maxy)
                     maxy = point.y.w;
+                
+                if (point.z.w < minz)
+                    minz = point.z.w;
+                else if (point.z.w > maxz)
+                    maxz = point.z.w;
             }
         }
     }
     
-    return Point<int16> ((minx + maxx) / 2, (miny + maxy) / 2);
+    x = (int16)((minx + maxx) / 2);
+    y = (int16)((miny + maxy) / 2);
+    z = (int16)((minz + maxz) / 2);
 }
 
 const Point<int> FrameEditor::getComponentCenterOfIldaSelection()
 {
-    Point<int16> c = getCenterOfIldaSelection();
-    return Point<int> (Frame::toCompX (c.getX()), Frame::toCompX (c.getY()));
+    int16 cx, cy, cz;
+    getCenterOfIldaSelection (cx, cy, cz);
+    
+    int x = Frame::toCompX (activeView == Frame::side ? cz : cx);
+    int y = Frame::toCompY (activeView == Frame::top ? cz : cy);
+
+    return Point<int> (x, y);
 }
 
 void FrameEditor::getComponentCenterOfIldaSelection (int&x, int&y)
 {
-    Point<int16> c = getCenterOfIldaSelection();
+    int16 cx, cy, cz;
+    getCenterOfIldaSelection (cx, cy, cz);
     
-    x = Frame::toCompX (c.getX());
-    y = Frame::toCompY (c.getY());
+    x = Frame::toCompX (activeView == Frame::side ? cz : cx);
+    y = Frame::toCompY (activeView == Frame::top ? cz : cy);
 }
 
 void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
@@ -264,7 +282,16 @@ void FrameEditor::setActiveLayer (Layer layer)
     if (layer != activeLayer)
     {
         beginNewTransaction ("Layer Change");
-        perform(new UndoableSetLayer (this, layer));
+        perform (new UndoableSetLayer (this, layer));
+    }
+}
+
+void FrameEditor::setActiveView (View view)
+{
+    if (view != activeView)
+    {
+        beginNewTransaction ("View Change");
+        perform (new UndoableSetView (this, view));
     }
 }
 
@@ -839,9 +866,11 @@ bool FrameEditor::centerIldaSelected (bool constrain)
     if (! points.size())
         return false;
     
-    Point<int16> p = getCenterOfIldaSelection();
-    int xOffset = 0 - (int)p.getX();
-    int yOffset = 0 - (int)p.getY();
+    int16 cx, cy, cz;
+    getCenterOfIldaSelection (cx, cy, cz);
+    int xOffset = 0 - cx;
+    int yOffset = 0 - cy;
+    int zOffset = 0 - cz;
     
     bool clipped = false;
     
@@ -866,6 +895,16 @@ bool FrameEditor::centerIldaSelected (bool constrain)
             clipped = true;
         }
         point.y.w = (int16)y;
+
+        int z = point.z.w;
+        z += zOffset;
+        if (Frame::clipIlda (z))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.z.w = (int16)z;
+
     }
     
     if (constrain && clipped)
@@ -879,7 +918,7 @@ bool FrameEditor::centerIldaSelected (bool constrain)
 void FrameEditor::startTransform (const String& name)
 {
     getIldaSelectedPoints (transformPoints);
-    transformCenter = getCenterOfIldaSelection();
+    getCenterOfIldaSelection (transformCenterX, transformCenterY, transformCenterZ);
     transformName = name;
 }
 
@@ -899,8 +938,9 @@ bool FrameEditor::scaleIldaSelected (float xScale,
     
     if (centerOnSelection)
     {
-        xOffset = (int)transformCenter.getX();
-        yOffset = (int)transformCenter.getY();
+        xOffset = transformCenterX;
+        yOffset = transformCenterY;
+        zOffset = transformCenterZ;
     }
     
     bool clipped = false;
@@ -1097,6 +1137,15 @@ void FrameEditor::_setActiveLayer (Layer layer)
     {
         activeLayer = layer;
         sendActionMessage (EditorActions::layerChanged);
+    }
+}
+
+void FrameEditor::_setActiveView (View view)
+{
+    if (view != activeView)
+    {
+        activeView = view;
+        sendActionMessage (EditorActions::viewChanged);
     }
 }
 

@@ -64,9 +64,11 @@ public:
 
 private:
     void updateZoomButtons();
+    void updateViewButton();
     
     FrameEditor* frameEditor;
     
+    std::unique_ptr<TextButton> viewButton;
     std::unique_ptr<Drawable> showAllIcon;
     std::unique_ptr<DrawableButton> showAllButton;
     std::unique_ptr<Drawable> zoomInIcon;

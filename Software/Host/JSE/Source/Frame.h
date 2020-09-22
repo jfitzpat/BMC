@@ -69,10 +69,40 @@ public:
     using Ptr = ReferenceCountedObjectPtr<Frame>;
     
     // Conversion helpers
-    static float getCompX (const XYPoint& point) { return (float)((float)point.x.w + 32768.0f); }
-    static float getCompY (const XYPoint& point) { return (float)(32767.0f - (float)point.y.w); }
-    static int getCompXInt (const XYPoint& point) { return (int)((int)point.x.w + 32768); }
-    static int getCompYInt (const XYPoint& point) { return (int)(32767 - (int)point.y.w); }
+    typedef enum {
+        front = 0,
+        top = 1,
+        side = 2
+    } ViewAngle;
+    
+    static float getCompX (const XYPoint& point, ViewAngle view = front)
+    {
+        if (view == side)
+            return (float)((float)point.z.w + 32768.0f);
+        else
+            return (float)((float)point.x.w + 32768.0f);
+    }
+    static float getCompY (const XYPoint& point, ViewAngle view = front)
+    {
+        if (view == top)
+            return (float)(32767.0f - (float)point.z.w);
+        else
+            return (float)(32767.0f - (float)point.y.w);
+    }
+    static int getCompXInt (const XYPoint& point, ViewAngle view = front)
+    {
+        if (view == side)
+            return (int)((int)point.z.w + 32768);
+        else
+            return (int)((int)point.x.w + 32768);
+    }
+    static int getCompYInt (const XYPoint& point, ViewAngle view = front)
+    {
+        if (view == top)
+            return (int)(32767 - (int)point.z.w);
+        else
+            return (int)(32767 - (int)point.y.w);
+    }
     static int16 getIldaX (const Point<int>& point) { return (int16)(point.getX() - 32768); }
     static int16 getIldaY (const Point<int>& point) { return (int16)(32767 - point.getY()); }
     static int getIldaX (const Rectangle<int>& rect) { return rect.getX() - 32768; }
@@ -81,7 +111,10 @@ public:
     {
         return Rectangle<int> (getIldaX(r), getIldaY(r), r.getWidth(), r.getHeight());
     }
-    static Point<int> getCompPoint (const XYPoint& point) { return Point<int>(point.x.w + 32768, 32767 - point.y.w); }
+    static Point<int> getCompPoint (const XYPoint& point, ViewAngle view = front)
+    {
+        return Point<int>(getCompXInt (point, view), getCompYInt (point, view));
+    }
     static int toIldaX (int x) { return x - 32768; }
     static int toIldaY (int y) { return 32767 - y; }
     static int toCompX (int x) { return x + 32768; }

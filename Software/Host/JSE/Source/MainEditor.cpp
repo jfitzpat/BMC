@@ -44,7 +44,15 @@ void MainEditor::paint (juce::Graphics& g)
     g.fillAll (Colours::black);
     
     // Outline working area
-    g.setColour (Colours::grey);
+    FrameEditor::View view = frameEditor->getActiveView();
+    
+    if (view == Frame::top)
+        g.setColour (Colour (0, Colours::grey.getGreen(), Colours::grey.getBlue()));
+    else if (view == Frame::side)
+        g.setColour (Colour (Colours::grey.getRed(), Colours::grey.getGreen(), 0));
+    else
+        g.setColour (Colours::grey);
+
     g.drawRect (activeArea, 1);
     
     if (frameEditor->getRefVisible() && frameEditor->getRefDrawGrid())
@@ -67,8 +75,13 @@ void MainEditor::paint (juce::Graphics& g)
         g.drawDashedLine (hline, dashes, 2);
         g.drawDashedLine (vline, dashes, 2);
         
-        g.setColour (Colours::darkgrey);
-        
+        if (view == Frame::top)
+            g.setColour (Colour (0, Colours::darkgrey.getGreen(), Colours::darkgrey.getBlue()));
+        else if (view == Frame::side)
+            g.setColour (Colour (Colours::darkgrey.getRed(), Colours::darkgrey.getGreen(), 0));
+        else
+            g.setColour (Colours::darkgrey);
+
         // Draw the dots
         float dotpitch = (float)activeArea.getWidth() / DotPitch;
         for (float y = 1; y < DotPitch; ++y)

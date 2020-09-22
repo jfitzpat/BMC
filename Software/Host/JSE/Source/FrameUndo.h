@@ -47,6 +47,31 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableSetView : public UndoableAction
+{
+public:
+    UndoableSetView (FrameEditor* editor, FrameEditor::View view)
+    : newView(view), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldView = frameEditor->getActiveView();
+        frameEditor->_setActiveView (newView);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setActiveView (oldView);
+        return true;
+    }
+    
+private:
+    FrameEditor::View oldView;
+    FrameEditor::View newView;
+    FrameEditor* frameEditor;
+};
+
 class UndoableSetIldaTool : public UndoableAction
 {
 public:

@@ -31,6 +31,7 @@ namespace EditorActions
 {
     const String dirtyStatusChanged         ("DSC");
     const String layerChanged               ("LC");
+    const String viewChanged                ("VC");
     const String zoomFactorChanged          ("ZFC");
     const String sketchVisibilityChanged    ("SVC");
     const String ildaVisibilityChanged      ("IVC");
@@ -73,8 +74,10 @@ public:
         reference
     } Layer;
 
+    typedef Frame::ViewAngle View;
+    
     typedef enum {
-        selectTool,
+        selectTool = 0,
         pointTool
     } IldaTool;
     
@@ -111,6 +114,7 @@ public:
     
     float getZoomFactor() { return zoomFactor; }
     Layer getActiveLayer() { return activeLayer; }
+    View getActiveView() { return activeView; }
     bool getSketchVisible() { return sketchVisible; }
     bool getIldaVisible() { return ildaVisible; }
     bool getRefVisible() { return refVisible; }
@@ -143,7 +147,7 @@ public:
     bool getIldaShowBlanked() { return ildaShowBlanked; }
     bool getIldaDrawLines() { return ildaDrawLines; }
     const SparseSet<uint16>& getIldaSelection() { return ildaSelection; }
-    const Point<int16> getCenterOfIldaSelection();
+    void getCenterOfIldaSelection (int16& x, int16& y, int16& z);
     const Point<int> getComponentCenterOfIldaSelection();
     void getComponentCenterOfIldaSelection (int&x, int&y);
     
@@ -155,6 +159,7 @@ public:
     
     // Undoable Commands
     void setActiveLayer (Layer layer);
+    void setActiveView (View view);
     void setSketchVisible (bool visible);
     void setIldaVisible (bool visible);
     void setRefVisible (bool visible);
@@ -219,6 +224,7 @@ public:
     void _setLoadedFile (const File& file) { loadedFile = file; }
     void _setZoomFactor (float zoom);
     void _setActiveLayer (Layer layer);
+    void _setActiveView (View view);
     void _setSketchVisible (bool visible);
     void _setIldaVisible (bool visible);
     void _setRefVisible (bool visible);
@@ -258,6 +264,7 @@ private:
     uint32 scanRate;
     float zoomFactor;
     Layer activeLayer;
+    View activeView;
     IldaTool activeIldaTool;
     Colour pointToolColor;
     Colour lastVisiblePointToolColor;
@@ -276,7 +283,9 @@ private:
     SparseSet<uint16> ildaSelection;
     
     Array<Frame::XYPoint> transformPoints;
-    Point<int16> transformCenter;
+    int16 transformCenterX;
+    int16 transformCenterY;
+    int16 transformCenterZ;
     String transformName;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };

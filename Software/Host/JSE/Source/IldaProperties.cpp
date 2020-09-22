@@ -413,42 +413,82 @@ void IldaProperties::actionListenerCallback (const String& message)
     else if (message == EditorActions::upRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (0, 256);
+        {
+            if (frameEditor->getActiveView() == Frame::top)
+                frameEditor->moveIldaSelected (0, 0, 256);
+            else
+                frameEditor->moveIldaSelected (0, 256, 0);
+        }
     }
     else if (message == EditorActions::downRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (0, -256);
+        {
+            if (frameEditor->getActiveView() == Frame::top)
+                frameEditor->moveIldaSelected (0, 0, -256);
+            else
+                frameEditor->moveIldaSelected (0, -256, 0);
+        }
     }
     else if (message == EditorActions::leftRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (-256, 0);
+        {
+            if (frameEditor->getActiveView() == Frame::side)
+                frameEditor->moveIldaSelected (0, 0, -256);
+            else
+                frameEditor->moveIldaSelected (-256, 0, 0);
+        }
     }
     else if (message == EditorActions::rightRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (256, 0);
+        {
+            if (frameEditor->getActiveView() == Frame::side)
+                frameEditor->moveIldaSelected (0, 0, 256);
+            else
+                frameEditor->moveIldaSelected (256, 0, 0);
+        }
     }
     else if (message == EditorActions::smallUpRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (0, 16);
+        {
+            if (frameEditor->getActiveView() == Frame::top)
+                frameEditor->moveIldaSelected (0, 0, 16);
+            else
+                frameEditor->moveIldaSelected (0, 16, 0);
+        }
     }
     else if (message == EditorActions::smallDownRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (0, -16);
+        {
+            if (frameEditor->getActiveView() == Frame::top)
+                frameEditor->moveIldaSelected (0, 0, -16);
+            else
+                frameEditor->moveIldaSelected (0, -16, 0);
+        }
     }
     else if (message == EditorActions::smallLeftRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (-16, 0);
+        {
+            if (frameEditor->getActiveView() == Frame::side)
+                frameEditor->moveIldaSelected (0, 0, -16);
+            else
+                frameEditor->moveIldaSelected (-16, 0, 0);
+        }
     }
     else if (message == EditorActions::smallRightRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-            frameEditor->moveIldaSelected (16, 0);
+        {
+            if (frameEditor->getActiveView() == Frame::side)
+                frameEditor->moveIldaSelected (0, 0, 16);
+            else
+                frameEditor->moveIldaSelected (16, 0, 0);
+        }
     }
 }
 

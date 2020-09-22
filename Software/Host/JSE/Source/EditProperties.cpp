@@ -31,6 +31,12 @@ EditProperties::EditProperties (FrameEditor* frame)
     frameEditor = frame;
     frameEditor->addActionListener (this);
     
+    viewButton.reset (new TextButton ("viewButton"));
+    viewButton->setButtonText ("Front");
+    viewButton->setTooltip ("Toggle Viewing Angle");
+    addAndMakeVisible (viewButton.get());
+    viewButton->addListener (this);
+
     zoomInIcon = Drawable::createFromImageData(BinaryData::zoomin_png, BinaryData::zoomin_pngSize);
 
     zoomInButton.reset (new DrawableButton ("zoomInButton", DrawableButton::ImageOnButtonBackground));
@@ -76,10 +82,12 @@ EditProperties::EditProperties (FrameEditor* frame)
     
     frameEditor->setActiveLayer (FrameEditor::sketch);
     updateZoomButtons();
+    updateViewButton();
 }
 
 EditProperties::~EditProperties()
 {
+    viewButton = nullptr;
     showAllButton = nullptr;
     showAllIcon = nullptr;
     zoomInButton = nullptr;
@@ -100,6 +108,7 @@ void EditProperties::paint (juce::Graphics& g)
 
 void EditProperties::resized()
 {
+    viewButton->setBounds (10, 8, 70, 32);
     zoomInButton->setBounds (getWidth() - 116, 8, 32, 32);
     zoomOutButton->setBounds (getWidth() - 80, 8, 32, 32);
     showAllButton->setBounds (getWidth() - 44, 8, 32, 32);
@@ -130,6 +139,25 @@ void EditProperties::updateZoomButtons()
 
 }
 
+void EditProperties::updateViewButton()
+{
+    switch (frameEditor->getActiveView())
+    {
+        case Frame::top:
+            viewButton->setButtonText ("Top");
+            viewButton->setColour (TextButton::textColourOffId, Colours::lightblue);
+            break;
+        case Frame::side:
+            viewButton->setButtonText ("Side");
+            viewButton->setColour (TextButton::textColourOffId, Colours::yellow);
+            break;
+        default:
+            viewButton->setButtonText ("Front");
+            viewButton->setColour (TextButton::textColourOffId, Colours::white);
+            break;
+    }
+}
+
 void EditProperties::actionListenerCallback (const String& message)
 {
     if (message == EditorActions::layerChanged)
@@ -139,6 +167,8 @@ void EditProperties::actionListenerCallback (const String& message)
     }
     else if (message == EditorActions::zoomFactorChanged)
         updateZoomButtons();
+    else if (message == EditorActions::viewChanged)
+        updateViewButton();
 }
 
 //==============================================================================
@@ -168,5 +198,19 @@ void EditProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         if (main != nullptr)
             main->commandManager.invokeDirectly (MainComponent::CommandIDs::zoomOut, true);
     }
-
+    else if (buttonThatWasClicked == viewButton.get())
+    {
+        switch (frameEditor->getActiveView())
+        {
+            case Frame::front:
+                frameEditor->setActiveView (Frame::top);
+                break;
+            case Frame::top:
+                frameEditor->setActiveView (Frame::side);
+                break;
+            default:
+                frameEditor->setActiveView (Frame::front);
+                break;
+        }
+    }
 }
