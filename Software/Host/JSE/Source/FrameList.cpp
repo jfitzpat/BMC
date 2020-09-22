@@ -70,7 +70,7 @@ FrameList::FrameList (FrameEditor* frame)
     addAndMakeVisible (frameList.get());
     frameList->setRowHeight (150);
     frameList->setColour (ListBox::backgroundColourId, getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-
+    frameList->setWantsKeyboardFocus (false);
 //    frameList->setMultipleSelectionEnabled (true);
     refresh();
 }
