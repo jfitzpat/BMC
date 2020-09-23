@@ -109,6 +109,8 @@ private:
     std::unique_ptr<ScaleButton> scaleButton;
     std::unique_ptr<Drawable> rotateIcon;
     std::unique_ptr<RotateButton> rotateButton;
+    std::unique_ptr<Drawable> duplicateIcon;
+    std::unique_ptr<DrawableButton> duplicateButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

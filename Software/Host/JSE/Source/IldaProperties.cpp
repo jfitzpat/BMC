@@ -321,6 +321,16 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     rotateButton->setEdgeIndent (0);
     rotateButton->setTooltip ("Rotate the selected point(s)");
 
+    duplicateIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
+                                                    BinaryData::duplicatewhite_pngSize);
+
+    duplicateButton.reset (new DrawableButton ("duplicateButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (duplicateButton.get());
+    duplicateButton->setImages (duplicateIcon.get());
+    duplicateButton->setEdgeIndent (0);
+    duplicateButton->setTooltip ("Duplicate the selected point(s)");
+    duplicateButton->addListener (this);
+
     refresh();
 }
 
@@ -367,6 +377,8 @@ IldaProperties::~IldaProperties()
     scaleIcon = nullptr;
     rotateButton = nullptr;
     rotateIcon = nullptr;
+    duplicateButton = nullptr;
+    duplicateIcon = nullptr;
 }
 
 //==============================================================================
@@ -409,7 +421,8 @@ void IldaProperties::resized()
     centerZButton->setBounds (154, 376, 32, 32);
     scaleButton->setBounds (118, 412, 32, 32);
     rotateButton->setBounds (154, 412, 32, 32);
-    trashButton->setBounds (154, 448, 32, 32);
+    duplicateButton->setBounds (154, 448, 32, 32);
+    trashButton->setBounds (154, 484, 32, 32);
 }
 
 //==============================================================================
@@ -441,6 +454,8 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->centerIldaSelected (true, false, false);
     else if (buttonThatWasClicked == centerZButton.get())
         frameEditor->centerIldaSelected (false, false, true);
+    else if (buttonThatWasClicked == duplicateButton.get())
+        frameEditor->duplicateIldaSelected();
 }
 
 //==============================================================================
@@ -736,6 +751,7 @@ void IldaProperties::disableSelectionTools()
     centerZButton->setEnabled (false);
     scaleButton->setEnabled (false);
     rotateButton->setEnabled (false);
+    duplicateButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -830,6 +846,7 @@ void IldaProperties::updateSelection()
             centerZButton->setEnabled (true);
             scaleButton->setEnabled (true);
             rotateButton->setEnabled (true);
+            duplicateButton->setEnabled (true);
         }
     }
 }

@@ -946,6 +946,44 @@ bool FrameEditor::centerIldaSelected (bool doX, bool doY, bool doZ, bool constra
     return true;
 }
 
+void FrameEditor::duplicateIldaSelected()
+{
+    Array<Frame::XYPoint> points;
+    getIldaSelectedPoints (points);
+    if (! points.size())
+        return;
+    
+    int pIndex = points.size() - 1;
+    
+    beginNewTransaction ("Duplicate Point(s)");
+    
+    // Loop backwards through selection to insert points
+    for (auto n = ildaSelection.getNumRanges() - 1; n >= 0; --n)
+    {
+        Range<uint16> r = ildaSelection.getRange (n);
+        for (auto i = r.getEnd() - 1; i >= r.getStart(); --i)
+            perform (new UndoableInsertPoint (this, i + 1, points[pIndex--]));
+    }
+    
+    // Loop forwards to build new selection
+    int pOffset = 1;
+    SparseSet<uint16> newSelection;
+    
+    // Loop forwards to insert
+    for (auto n = 0; n < ildaSelection.getNumRanges(); ++n)
+    {
+        Range<uint16> r = ildaSelection.getRange (n);
+        for (auto i = r.getStart(); i < r.getEnd(); ++i)
+        {
+            int index = i + pOffset;
+            newSelection.addRange (Range<uint16>(index, index + 1));
+            pOffset++;
+        }
+    }
+
+    perform (new UndoableSetIldaSelection (this, newSelection));
+}
+
 void FrameEditor::startTransform (const String& name)
 {
     getIldaSelectedPoints (transformPoints);

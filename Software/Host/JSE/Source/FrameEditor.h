@@ -219,7 +219,8 @@ public:
         { return moveIldaSelected (xOffset, yOffset, 0, constrain); }
     bool moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
     bool centerIldaSelected (bool doX = true, bool doY = true, bool doZ = true, bool constrain = true);
-        
+    void duplicateIldaSelected();
+
     void setIldaSelectedX (int16 newX);
     void setIldaSelectedY (int16 newY);
     void setIldaSelectedZ (int16 newZ);
@@ -227,7 +228,7 @@ public:
     void setIldaSelectedG (uint8 newR);
     void setIldaSelectedB (uint8 newR);
     void setIldaSelectedRGB (const Colour newColor);
-        
+    
     void insertPoint (const Frame::XYPoint& point);
     void deletePoints();
     
