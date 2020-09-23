@@ -169,7 +169,8 @@ void FrameList::buttonClicked (juce::Button* buttonThatWasClicked)
 //==============================================================================
 void FrameList::actionListenerCallback (const String& message)
 {
-    if (message == EditorActions::framesChanged)
+    if (message == EditorActions::framesChanged ||
+        message == EditorActions::frameThumbsChanged)
     {
         frameList->updateContent();
         frameList->repaint();

@@ -67,7 +67,10 @@ void FrameEditor::incDirtyCounter()
     dirtyCounter++;
 
     if (dirtyCounter == 1)
+    {
         sendActionMessage (EditorActions::dirtyStatusChanged);
+        refreshThumb();
+    }
 }
 
 void FrameEditor::decDirtyCounter()
@@ -77,13 +80,24 @@ void FrameEditor::decDirtyCounter()
         dirtyCounter--;
         
         if (! dirtyCounter)
+        {
             sendActionMessage (EditorActions::dirtyStatusChanged);
+            refreshThumb();
+        }
     }
+}
+
+void FrameEditor::refreshThumb()
+{
+    currentFrame->buildThumbNail();
+    sendActionMessage (EditorActions::frameThumbsChanged);
 }
 
 //==============================================================================
 void FrameEditor::fileSave()
 {
+    refreshThumb();
+    
     File f = getLoadedFile();
     
     if ((! f.getFileName().length()) || (f.getFileExtension() == ".ild"))
@@ -103,6 +117,8 @@ void FrameEditor::fileSave()
 
 void FrameEditor::fileSaveAs()
 {
+    refreshThumb();
+    
     FileChooser myChooser ("Choose File to Save As...",
                            File::getSpecialLocation (File::userDocumentsDirectory),
                            "*.jse");
@@ -126,6 +142,8 @@ void FrameEditor::fileSaveAs()
 
 void FrameEditor::fileIldaExport()
 {
+    refreshThumb();
+    
     FileChooser myChooser ("Choose File to Export to...",
                            File::getSpecialLocation (File::userDocumentsDirectory),
                            "*.ild");
@@ -913,6 +931,9 @@ bool FrameEditor::centerIldaSelected (bool constrain)
 
     beginNewTransaction ("Center Point(s)");
     perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+    
+    refreshThumb();
+    
     return true;
 }
 
@@ -1062,6 +1083,8 @@ void FrameEditor::endTransform()
         beginNewTransaction (transformName);
         perform (new UndoableSetIldaPoints (this, ildaSelection, points));
         transformUsed = false;
+
+        refreshThumb();
     }
 }
 
@@ -1198,6 +1221,7 @@ void FrameEditor::_setActiveLayer (Layer layer)
     {
         activeLayer = layer;
         sendActionMessage (EditorActions::layerChanged);
+        refreshThumb();
     }
 }
 
@@ -1207,6 +1231,7 @@ void FrameEditor::_setActiveView (View view)
     {
         activeView = view;
         sendActionMessage (EditorActions::viewChanged);
+        refreshThumb();
     }
 }
 
@@ -1228,6 +1253,8 @@ void FrameEditor::_setActiveIldaTool (IldaTool tool)
     {
         activeIldaTool = tool;
         sendActionMessage (EditorActions::ildaToolChanged);
+
+        refreshThumb();
     }
 }
 

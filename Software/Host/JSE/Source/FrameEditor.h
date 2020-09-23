@@ -41,6 +41,7 @@ namespace EditorActions
     const String refDrawGridChanged         ("RGC");
     const String backgroundImageAdjusted    ("BIA");
     const String framesChanged              ("FC");
+    const String frameThumbsChanged         ("FTC");
     const String frameIndexChanged          ("FIC");
     const String ildaShowBlankChanged       ("SBC");
     const String ildaDrawLinesChanged       ("DLC");
@@ -87,6 +88,7 @@ public:
     void setDirtyCounter (uint32 count);
     void incDirtyCounter();
     void decDirtyCounter();
+    void refreshThumb();
     
     // Save/Export
     void fileSave();
@@ -94,7 +96,11 @@ public:
     void fileIldaExport();
     
     // Tool helpers
-    void cancelRequest()    { sendActionMessage (EditorActions::cancelRequest); }
+    void cancelRequest()
+    {
+        sendActionMessage (EditorActions::cancelRequest);
+        refreshThumb();
+    }
     void deleteRequest()    { sendActionMessage (EditorActions::deleteRequest); }
     void upRequest()        { sendActionMessage (EditorActions::upRequest); }
     void downRequest()      { sendActionMessage (EditorActions::downRequest); }
