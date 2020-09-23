@@ -282,6 +282,15 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     scaleButton->setEdgeIndent (0);
     scaleButton->setTooltip ("Scale the selected point(s)");
 
+    rotateIcon = Drawable::createFromImageData (BinaryData::rotate_png,
+                                                BinaryData::rotate_pngSize);
+
+    rotateButton.reset (new RotateButton (frameEditor));
+    addAndMakeVisible (rotateButton.get());
+    rotateButton->setImages (rotateIcon.get());
+    rotateButton->setEdgeIndent (0);
+    rotateButton->setTooltip ("Rotate the selected point(s)");
+
     refresh();
 }
 
@@ -320,6 +329,8 @@ IldaProperties::~IldaProperties()
     centerIcon = nullptr;
     scaleButton = nullptr;
     scaleIcon = nullptr;
+    rotateButton = nullptr;
+    rotateIcon = nullptr;
 }
 
 //==============================================================================
@@ -359,6 +370,7 @@ void IldaProperties::resized()
     trashButton->setBounds (16, 376, 32, 32);
     centerButton->setBounds (52, 376, 32, 32);
     scaleButton->setBounds (88, 376, 32, 32);
+    rotateButton->setBounds (124, 376, 32, 32);
 }
 
 //==============================================================================
@@ -675,6 +687,7 @@ void IldaProperties::disableSelectionTools()
     trashButton->setEnabled (false);
     centerButton->setEnabled (false);
     scaleButton->setEnabled (false);
+    rotateButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -765,6 +778,7 @@ void IldaProperties::updateSelection()
             trashButton->setEnabled (true);
             centerButton->setEnabled (true);
             scaleButton->setEnabled (true);
+            rotateButton->setEnabled (true);
         }
     }
 }

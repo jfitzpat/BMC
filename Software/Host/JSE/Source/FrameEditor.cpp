@@ -1015,6 +1015,163 @@ bool FrameEditor::scaleIldaSelected (float xScale,
     return true;
 }
 
+static void Multiply3by3(double in1[3][3], double in2[3][3], double out[3][3])
+{
+    for (int col = 0 ; col < 3; ++col)
+    {
+        for (int row = 0; row < 3; ++row)
+        {
+            double d = 0;
+            d += in1[row][0] * in2[0][col];
+            d += in1[row][1] * in2[1][col];
+            d += in1[row][2] * in2[2][col];
+            out[row][col] = d;
+        }
+    }
+}
+
+bool FrameEditor::rotateIldaSelected (float xAngle,
+                                      float yAngle,
+                                      float zAngle,
+                                      bool centerOnSelection,
+                                      bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+  
+    int xOffset = 0;
+    int yOffset = 0;
+    int zOffset = 0;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformCenterX;
+        yOffset = transformCenterY;
+        zOffset = transformCenterZ;
+    }
+    
+    bool clipped = false;
+    
+    // Build our rotation matrices
+    double rx[3][3] = {{1, 0, 0},
+                       {0, 1, 0},
+                       {0, 0, 1}};
+    double ry[3][3] = {{1, 0, 0},
+                       {0, 1, 0},
+                       {0, 0, 1}};
+    double rz[3][3] = {{1, 0, 0},
+                       {0, 1, 0},
+                       {0, 0, 1}};
+
+    double rotX = xAngle < 0 ? 360.0 + xAngle : xAngle;
+    double rotY = yAngle < 0 ? 360.0 + yAngle : yAngle;
+    double rotZ = zAngle < 0 ? 360.0 + zAngle : zAngle;
+    
+    // Clip rotation
+    if (rotX > 359.9)
+        rotX = 0.0;
+
+    // Get sin and cos, sin is straight lookup,
+    // cos is 90 degres offset from sin
+    const double pi = MathConstants<double>::pi;
+    double sin = ::sin (rotX * pi / 180.0);
+    double cos = ::cos (rotX * pi / 180.0);
+
+    rx[1][1] = cos;
+    rx[2][2] = cos;
+    rx[1][2] = 0 - sin;
+    rx[2][1] = sin;
+
+    // Repeat for Y
+    if (rotY > 359.9)
+        rotY = 0.0;
+
+    sin = ::sin (rotY * pi / 180.0);
+    cos = ::cos (rotY * pi / 180.0);
+
+    ry[0][0] = cos;
+    ry[2][2] = cos;
+    ry[2][0] = 0 - sin;
+    ry[0][2] = sin;
+
+    // And Z
+    if (rotZ > 359.9)
+        rotZ = 0.0;
+
+    sin = ::sin (rotZ * pi / 180.0);
+    cos = ::cos (rotZ * pi / 180.0);
+
+    rz[0][0] = cos;
+    rz[1][1] = cos;
+    rz[0][1] = 0 - sin;
+    rz[1][0] = sin;
+
+    double out1[3][3];
+    Multiply3by3(rx, ry, out1);
+    double out2[3][3];
+    Multiply3by3(out1, rz, out2);
+
+//    pendingTransform.matrix11 = out2[0][0];
+//    pendingTransform.matrix12 = out2[1][0];
+//    pendingTransform.matrix13 = out2[2][0];
+//    pendingTransform.matrix21 = out2[0][1];
+//    pendingTransform.matrix22 = out2[1][1];
+//    pendingTransform.matrix23 = out2[2][1];
+//    pendingTransform.matrix31 = out2[0][2];
+//    pendingTransform.matrix32 = out2[1][2];
+//    pendingTransform.matrix33 = out2[2][2];
+
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        double d;
+        double dx, dy, dz;
+        
+        Frame::XYPoint& point = points.getReference (n);
+
+        dx = point.x.w - xOffset;
+        dy = point.y.w - yOffset;
+        dz = point.z.w - zOffset;
+        
+        d = dx * out2[0][0] + dy * out2[1][0] + dz * out2[2][0];
+        int x = (int)d;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+       
+        d = dx * out2[0][1] + dy * out2[1][1] + dz * out2[2][1];
+        int y = (int)d;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+
+        d = dx * out2[0][2] + dy * out2[1][2] + dz * out2[2][2];
+        int z = (int)d;
+        z += zOffset;
+        if (Frame::clipIlda (z))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.z.w = (int16)z;
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
 bool FrameEditor::translateIldaSelected (int xOffset,
                                          int yOffset,
                                          int zOffset,
@@ -1076,6 +1233,7 @@ void FrameEditor::endTransform()
     _setIldaPoints (ildaSelection, transformPoints);
     
     tranformInProgress = false;
+    transformPoints.clear();
     
     // Final undoable switch
     if (transformUsed)

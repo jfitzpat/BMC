@@ -165,6 +165,16 @@ public:
     const Image& getThumbNail (uint16 index) { return Frames[index]->getThumbNail(); }
     
     // Undoable Commands
+    // Transform operaitons must be proceeded with startTransform
+    // and ended with endTransform
+    void startTransform (const String& name);
+    bool isTransforming() { return tranformInProgress; }
+    bool scaleIldaSelected (float xScale, float yScale, float zScale, bool centerOnSelection, bool constrain = true);
+    bool rotateIldaSelected (float xAngle, float yAngle, float zAngle, bool centerOnSelection, bool constrain = true);
+    bool translateIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
+    void endTransform();
+
+    // Non transform (atomic) undoable operations
     void setActiveLayer (Layer layer);
     void setActiveView (View view);
     void setSketchVisible (bool visible);
@@ -209,15 +219,7 @@ public:
         { return moveIldaSelected (xOffset, yOffset, 0, constrain); }
     bool moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
     bool centerIldaSelected (bool constrain = true);
-    
-    // Transform operaitons must be proceeded with startTransform
-    // and ended with endTransform
-    void startTransform (const String& name);
-    bool isTransforming() { return tranformInProgress; }
-    bool scaleIldaSelected (float xScale, float yScale, float zScale, bool centerOnSelection, bool constrain = true);
-    bool translateIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
-    void endTransform();
-    
+        
     void setIldaSelectedX (int16 newX);
     void setIldaSelectedY (int16 newY);
     void setIldaSelectedZ (int16 newZ);

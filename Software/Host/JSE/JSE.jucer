@@ -16,6 +16,7 @@
         <FILE id="iWP9Vt" name="move.png" compile="0" resource="1" file="Graphics/move.png"/>
         <FILE id="MatEZ4" name="pointinghand.png" compile="0" resource="1"
               file="Graphics/pointinghand.png"/>
+        <FILE id="JXnNQE" name="rotate.png" compile="0" resource="1" file="Graphics/rotate.png"/>
         <FILE id="TtnrYe" name="scale.png" compile="0" resource="1" file="Graphics/scale.png"/>
         <FILE id="RpuDEN" name="showall.png" compile="0" resource="1" file="Graphics/showall.png"/>
         <FILE id="NCKhUw" name="trash.png" compile="0" resource="1" file="Graphics/trash.png"/>
@@ -39,6 +40,7 @@
                 file="Source/JSEFileSaver.cpp"/>
           <FILE id="cb1uL4" name="JSEFileSaver.h" compile="0" resource="0" file="Source/JSEFileSaver.h"/>
           <FILE id="zF8dd2" name="PopupTool.h" compile="0" resource="0" file="Source/PopupTool.h"/>
+          <FILE id="MdAhEP" name="RotatePopup.h" compile="0" resource="0" file="Source/RotatePopup.h"/>
           <FILE id="SbIKdp" name="ScalePopup.h" compile="0" resource="0" file="Source/ScalePopup.h"/>
           <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
                 file="Source/ThumbBuilder.cpp"/>

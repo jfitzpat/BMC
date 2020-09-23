@@ -26,6 +26,9 @@ namespace BinaryData
     extern const char*   pointinghand_png;
     const int            pointinghand_pngSize = 2438;
 
+    extern const char*   rotate_png;
+    const int            rotate_pngSize = 2059;
+
     extern const char*   scale_png;
     const int            scale_pngSize = 2176;
 
@@ -45,7 +48,7 @@ namespace BinaryData
     const int            zoomout_pngSize = 3300;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 12;
+    const int namedResourceListSize = 13;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];
