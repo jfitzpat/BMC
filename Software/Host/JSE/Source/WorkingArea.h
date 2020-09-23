@@ -59,8 +59,10 @@ private:
     void insertAnchor (uint16 index, Colour c);
     int findCloseMouseMatch (const MouseEvent& event);
     void mouseDownIldaSelect (const MouseEvent& event);
+    void mouseDownIldaMove (const MouseEvent& event);
     void mouseDownIldaPoint (const MouseEvent& event);
     void mouseMoveIldaSelect (const MouseEvent& event);
+    void mouseMoveIldaMove (const MouseEvent& event);
     void mouseMoveIldaPoint (const MouseEvent& event);
 
     FrameEditor* frameEditor;

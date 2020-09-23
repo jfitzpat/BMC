@@ -68,8 +68,31 @@ void WorkingArea::insertAnchor (uint16 index, Colour c)
     frameEditor->insertPoint (point);
 }
 
+void WorkingArea::mouseDownIldaMove (const MouseEvent& event)
+{
+    // Left mouse only for now
+    if (! event.mods.isLeftButtonDown())
+        return;
+
+    if (drawMark)
+    {
+        // Select the point in question
+        SparseSet<uint16> selection;
+        selection.addRange (Range<uint16>(markIndex, markIndex + 1));
+        drawMark = false;
+        frameEditor->setIldaSelection (selection);
+    }
+
+    if (! frameEditor->getIldaSelection().isEmpty())
+        frameEditor->startTransform ("Move Selection");
+}
+
 void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
 {
+    // Left mouse only for now
+    if (! event.mods.isLeftButtonDown())
+        return;
+
     if (drawMark)
     {
         // Select the point in question
@@ -79,7 +102,7 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
         frameEditor->setIldaSelection (selection);
 
         // Right click insert an anchor
-        if (event.mods.isRightButtonDown())
+        if (event.mods.isAltDown())
             insertAnchor (markIndex, frameEditor->getPointToolColor());
     }
     else if (drawDot)
@@ -155,6 +178,8 @@ void WorkingArea::mouseDown (const MouseEvent& event)
         mouseDownIldaSelect (event);
     else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
         mouseDownIldaPoint (event);
+    else if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
+        mouseDownIldaMove (event);
 }
 
 void WorkingArea::mouseUp (const MouseEvent& event)
@@ -204,6 +229,17 @@ void WorkingArea::mouseUp (const MouseEvent& event)
         // Discard the rect
         lastDrawRect = Rectangle<int>();
     }
+    
+    if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
+    {
+        if (frameEditor->isTransforming())
+            frameEditor->endTransform();
+    }
+}
+
+void WorkingArea::mouseMoveIldaMove (const MouseEvent& event)
+{
+    mouseMoveIldaSelect(event);
 }
 
 void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
@@ -372,16 +408,44 @@ void WorkingArea::mouseMove (const MouseEvent& event)
         mouseMoveIldaSelect (event);
     else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
         mouseMoveIldaPoint (event);
+    else if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
+        mouseMoveIldaMove (event);
 }
 
 void WorkingArea::mouseDrag (const MouseEvent& event)
 {
+    // Left mouse only for now
+    if (! event.mods.isLeftButtonDown())
+        return;
+
     if (drawRect)
     {
         int expansion = (int)(activeInvScale * 3);
         repaint (lastDrawRect.expanded (expansion, expansion));
         lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
         repaint (lastDrawRect.expanded (expansion, expansion));
+    }
+    
+    if (frameEditor->getActiveLayer() == FrameEditor::ilda &&
+        frameEditor->getActiveIldaTool() == FrameEditor::moveTool &&
+        frameEditor->isTransforming())
+    {
+        FrameEditor::View view = frameEditor->getActiveView();
+        
+        int dx = event.getDistanceFromDragStartX();
+        int dy = 0 - event.getDistanceFromDragStartY();
+        
+        int xOffset = view == Frame::side ? 0 : dx;
+        int yOffset = view == Frame::top ? 0 : dy;
+        int zOffset;
+        if (view == Frame::side)
+            zOffset = dx;
+        else if (view == Frame::top)
+            zOffset = dy;
+        else
+            zOffset = 0;
+        
+        frameEditor->translateIldaSelected (xOffset, yOffset, zOffset, false);
     }
 }
 
@@ -622,6 +686,10 @@ void WorkingArea::updateCursor()
                 
             case FrameEditor::pointTool:
                 setMouseCursor (MouseCursor (MouseCursor::CrosshairCursor));
+                break;
+
+            case FrameEditor::moveTool:
+                setMouseCursor (MouseCursor (MouseCursor::UpDownLeftRightResizeCursor));
                 break;
 
             default:

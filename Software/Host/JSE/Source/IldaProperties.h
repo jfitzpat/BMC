@@ -72,6 +72,8 @@ private:
     std::unique_ptr<Label> pointLabel;
     std::unique_ptr<Drawable> selectIcon;
     std::unique_ptr<DrawableButton> selectToolButton;
+    std::unique_ptr<Drawable> moveIcon;
+    std::unique_ptr<DrawableButton> moveToolButton;
     std::unique_ptr <Drawable> pointIcon;
     std::unique_ptr<DrawableButton> pointToolButton;
     std::unique_ptr<ColourButton> pointToolColorButton;

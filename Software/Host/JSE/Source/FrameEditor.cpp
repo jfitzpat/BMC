@@ -43,7 +43,8 @@ FrameEditor::FrameEditor()
       refVisible (true),
       refDrawGrid (true),
       refOpacity (1.0),
-      frameIndex (0)
+      frameIndex (0),
+      tranformInProgress (false)
 {
     Frames.add (new Frame());
     currentFrame = Frames[frameIndex];    
@@ -920,6 +921,8 @@ void FrameEditor::startTransform (const String& name)
     getIldaSelectedPoints (transformPoints);
     getCenterOfIldaSelection (transformCenterX, transformCenterY, transformCenterZ);
     transformName = name;
+    transformUsed = false;
+    tranformInProgress = true;
 }
 
 bool FrameEditor::scaleIldaSelected (float xScale,
@@ -986,6 +989,58 @@ bool FrameEditor::scaleIldaSelected (float xScale,
     if (constrain && clipped)
         return false;
 
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
+bool FrameEditor::translateIldaSelected (int xOffset,
+                                         int yOffset,
+                                         int zOffset,
+                                         bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+
+    bool clipped = false;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        int x = point.x.w;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+        
+        int y = point.y.w;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+        
+        int z = point.z.w;
+        z += zOffset;
+        if (Frame::clipIlda (z))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.z.w = (int16)z;
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
     _setIldaPoints (ildaSelection, points);
     return true;
 }
@@ -999,9 +1054,15 @@ void FrameEditor::endTransform()
     // Restore original
     _setIldaPoints (ildaSelection, transformPoints);
     
+    tranformInProgress = false;
+    
     // Final undoable switch
-    beginNewTransaction (transformName);
-    perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+    if (transformUsed)
+    {
+        beginNewTransaction (transformName);
+        perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+        transformUsed = false;
+    }
 }
 
 void FrameEditor::setIldaSelectedX (int16 newX)

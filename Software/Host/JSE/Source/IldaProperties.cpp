@@ -63,6 +63,16 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     selectToolButton->setTooltip ("Point Selection tool");
     selectToolButton->addListener (this);
 
+    moveIcon = Drawable::createFromImageData (BinaryData::move_png,
+                                              BinaryData::move_pngSize);
+    
+    moveToolButton.reset (new DrawableButton ("moveToolButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (moveToolButton.get());
+    moveToolButton->setImages (moveIcon.get());
+    moveToolButton->setEdgeIndent (0);
+    moveToolButton->setTooltip ("Move Selection tool");
+    moveToolButton->addListener (this);
+
     pointIcon = Drawable::createFromImageData (BinaryData::croshair_png,
                                                BinaryData::croshair_pngSize);
     
@@ -283,6 +293,8 @@ IldaProperties::~IldaProperties()
     pointLabel = nullptr;
     selectToolButton = nullptr;
     selectIcon = nullptr;
+    moveToolButton = nullptr;
+    moveIcon = nullptr;
     pointToolButton = nullptr;
     pointToolColorButton = nullptr;
     pointIcon = nullptr;
@@ -323,7 +335,8 @@ void IldaProperties::resized()
     drawLines->setBounds (16, 48, getWidth() - 32, 24);
     showBlanking->setBounds (16, 80, getWidth() - 32, 24);
     pointLabel->setBounds (16, 112, getWidth() - 32, 24);
-    selectToolButton->setBounds (76 + 16, 144, 32, 32);
+    selectToolButton->setBounds (76 + 16 - 36, 144, 32, 32);
+    moveToolButton->setBounds (76 + 16, 144, 32, 32);
     pointToolButton->setBounds (76 + 52, 144, 32, 32);
     pointToolColorButton->setBounds (76 + 88, 150, 20, 20);
     selectionLabel->setBounds (16, 184, getWidth() - 32, 12);
@@ -359,6 +372,8 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->setIldaDrawLines (drawLines->getToggleState());
     else if (buttonThatWasClicked == selectToolButton.get())
         frameEditor->setActiveIldaTool (FrameEditor::selectTool);
+    else if (buttonThatWasClicked == moveToolButton.get())
+        frameEditor->setActiveIldaTool (FrameEditor::moveTool);
     else if (buttonThatWasClicked == pointToolButton.get())
         frameEditor->setActiveIldaTool (FrameEditor::pointTool);
     else if (buttonThatWasClicked == decSelection.get())
@@ -398,8 +413,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool ||
-                frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+            if (! frameEditor->isTransforming())
                 frameEditor->setIldaSelection (SparseSet<uint16>());
         }
     }
@@ -760,11 +774,19 @@ void IldaProperties::updateTools()
     if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
     {
         selectToolButton->setToggleState (true, dontSendNotification);
+        moveToolButton->setToggleState (false, dontSendNotification);
+        pointToolButton->setToggleState (false, dontSendNotification);
+    }
+    else if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
+    {
+        selectToolButton->setToggleState (false, dontSendNotification);
+        moveToolButton->setToggleState (true, dontSendNotification);
         pointToolButton->setToggleState (false, dontSendNotification);
     }
     else
     {
         selectToolButton->setToggleState (false, dontSendNotification);
+        moveToolButton->setToggleState (false, dontSendNotification);
         pointToolButton->setToggleState (true, dontSendNotification);
     }
 

@@ -78,6 +78,7 @@ public:
     
     typedef enum {
         selectTool = 0,
+        moveTool,
         pointTool
     } IldaTool;
     
@@ -206,7 +207,9 @@ public:
     // Transform operaitons must be proceeded with startTransform
     // and ended with endTransform
     void startTransform (const String& name);
+    bool isTransforming() { return tranformInProgress; }
     bool scaleIldaSelected (float xScale, float yScale, float zScale, bool centerOnSelection, bool constrain = true);
+    bool translateIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
     void endTransform();
     
     void setIldaSelectedX (int16 newX);
@@ -282,6 +285,8 @@ private:
 
     SparseSet<uint16> ildaSelection;
     
+    bool tranformInProgress;
+    bool transformUsed;
     Array<Frame::XYPoint> transformPoints;
     int16 transformCenterX;
     int16 transformCenterY;
