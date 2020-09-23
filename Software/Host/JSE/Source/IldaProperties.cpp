@@ -60,7 +60,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     addAndMakeVisible (selectToolButton.get());
     selectToolButton->setImages (selectIcon.get());
     selectToolButton->setEdgeIndent (0);
-    selectToolButton->setTooltip ("Point Selection tool");
+    selectToolButton->setTooltip ("Point Selection Tool");
     selectToolButton->addListener (this);
 
     moveIcon = Drawable::createFromImageData (BinaryData::move_png,
@@ -70,7 +70,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     addAndMakeVisible (moveToolButton.get());
     moveToolButton->setImages (moveIcon.get());
     moveToolButton->setEdgeIndent (0);
-    moveToolButton->setTooltip ("Move Selection tool");
+    moveToolButton->setTooltip ("Move Selection Tool");
     moveToolButton->addListener (this);
 
     pointIcon = Drawable::createFromImageData (BinaryData::croshair_png,
@@ -80,12 +80,12 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     addAndMakeVisible (pointToolButton.get());
     pointToolButton->setImages (pointIcon.get());
     pointToolButton->setEdgeIndent (0);
-    pointToolButton->setTooltip ("Point Insertion tool");
+    pointToolButton->setTooltip ("Point Insertion Tool");
     pointToolButton->addListener (this);
 
     pointToolColorButton.reset (new ColourButton ());
     addAndMakeVisible (pointToolColorButton.get());
-    pointToolColorButton->setTooltip ("Select color for point tool");
+    pointToolColorButton->setTooltip ("Select color for Point Insertion Tool");
     pointToolColorButton->addChangeListener (this);
     pointToolColorButton->setColour (TextButton::buttonColourId, frameEditor->getPointToolColor());
 
@@ -273,6 +273,36 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     centerButton->setTooltip ("Center the selected point(s)");
     centerButton->addListener (this);
 
+    centerXIcon = Drawable::createFromImageData (BinaryData::centerx_png,
+                                                 BinaryData::centerx_pngSize);
+    
+    centerXButton.reset (new DrawableButton ("centerXButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerXButton.get());
+    centerXButton->setImages (centerXIcon.get());
+    centerXButton->setEdgeIndent (0);
+    centerXButton->setTooltip ("Center the selected point(s) up/down");
+    centerXButton->addListener (this);
+
+    centerYIcon = Drawable::createFromImageData (BinaryData::centery_png,
+                                                 BinaryData::centery_pngSize);
+    
+    centerYButton.reset (new DrawableButton ("centerYButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerYButton.get());
+    centerYButton->setImages (centerYIcon.get());
+    centerYButton->setEdgeIndent (0);
+    centerYButton->setTooltip ("Center the selected point(s) left/right");
+    centerYButton->addListener (this);
+
+    centerZIcon = Drawable::createFromImageData (BinaryData::centerz_png,
+                                                 BinaryData::centerz_pngSize);
+    
+    centerZButton.reset (new DrawableButton ("centerZButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerZButton.get());
+    centerZButton->setImages (centerZIcon.get());
+    centerZButton->setEdgeIndent (0);
+    centerZButton->setTooltip ("Center the selected point(s) front/back");
+    centerZButton->addListener (this);
+
     scaleIcon = Drawable::createFromImageData (BinaryData::scale_png,
                                             BinaryData::scale_pngSize);
 
@@ -327,6 +357,12 @@ IldaProperties::~IldaProperties()
     trashIcon = nullptr;
     centerButton = nullptr;
     centerIcon = nullptr;
+    centerXButton = nullptr;
+    centerXIcon = nullptr;
+    centerYButton = nullptr;
+    centerYIcon = nullptr;
+    centerZButton = nullptr;
+    centerZIcon = nullptr;
     scaleButton = nullptr;
     scaleIcon = nullptr;
     rotateButton = nullptr;
@@ -346,12 +382,12 @@ void IldaProperties::resized()
     drawLines->setBounds (16, 48, getWidth() - 32, 24);
     showBlanking->setBounds (16, 80, getWidth() - 32, 24);
     pointLabel->setBounds (16, 112, getWidth() - 32, 24);
-    selectToolButton->setBounds (76 + 16 - 36, 144, 32, 32);
-    moveToolButton->setBounds (76 + 16, 144, 32, 32);
-    pointToolButton->setBounds (76 + 52, 144, 32, 32);
-    pointToolColorButton->setBounds (76 + 88, 150, 20, 20);
+    selectToolButton->setBounds (46 + 12, 144, 32, 32);
+    moveToolButton->setBounds (82 + 12, 144, 32, 32);
+    pointToolButton->setBounds (118 + 12, 144, 32, 32);
+    pointToolColorButton->setBounds (154 + 12, 150, 20, 20);
     selectionLabel->setBounds (16, 184, getWidth() - 32, 12);
-    currentSelection->setBounds (16, 200, getWidth() - 32, 24);
+    currentSelection->setBounds (10, 200, getWidth() - 20, 24);
     decSelection->setBounds (59, 228, 40, 20);
     incSelection->setBounds (101, 228, 40, 20);
     xLabel->setBounds(16, 256, 54, 12);
@@ -367,10 +403,13 @@ void IldaProperties::resized()
     selectionG->setBounds (16 + 56, 320, 54, 24);
     selectionB->setBounds (16 + 112, 320, 54, 24);
     colorButton->setBounds (89, 348, 20, 20);
-    trashButton->setBounds (16, 376, 32, 32);
-    centerButton->setBounds (52, 376, 32, 32);
-    scaleButton->setBounds (88, 376, 32, 32);
-    rotateButton->setBounds (124, 376, 32, 32);
+    centerButton->setBounds (46, 376, 32, 32);
+    centerXButton->setBounds (82, 376, 32, 32);
+    centerYButton->setBounds (118, 376, 32, 32);
+    centerZButton->setBounds (154, 376, 32, 32);
+    scaleButton->setBounds (118, 412, 32, 32);
+    rotateButton->setBounds (154, 412, 32, 32);
+    trashButton->setBounds (154, 448, 32, 32);
 }
 
 //==============================================================================
@@ -396,6 +435,12 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->deletePoints();
     else if (buttonThatWasClicked == centerButton.get())
         frameEditor->centerIldaSelected();
+    else if (buttonThatWasClicked == centerXButton.get())
+        frameEditor->centerIldaSelected (false, true, false);
+    else if (buttonThatWasClicked == centerYButton.get())
+        frameEditor->centerIldaSelected (true, false, false);
+    else if (buttonThatWasClicked == centerZButton.get())
+        frameEditor->centerIldaSelected (false, false, true);
 }
 
 //==============================================================================
@@ -686,6 +731,9 @@ void IldaProperties::disableSelectionTools()
     colorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
     trashButton->setEnabled (false);
     centerButton->setEnabled (false);
+    centerXButton->setEnabled (false);
+    centerYButton->setEnabled (false);
+    centerZButton->setEnabled (false);
     scaleButton->setEnabled (false);
     rotateButton->setEnabled (false);
 }
@@ -777,6 +825,9 @@ void IldaProperties::updateSelection()
             
             trashButton->setEnabled (true);
             centerButton->setEnabled (true);
+            centerXButton->setEnabled (true);
+            centerYButton->setEnabled (true);
+            centerZButton->setEnabled (true);
             scaleButton->setEnabled (true);
             rotateButton->setEnabled (true);
         }

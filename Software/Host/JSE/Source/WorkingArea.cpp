@@ -681,24 +681,24 @@ void WorkingArea::updateCursor()
         switch (frameEditor->getActiveIldaTool())
         {
             case FrameEditor::selectTool:
-                setMouseCursor (MouseCursor (MouseCursor::PointingHandCursor));
+                setMouseCursor (MouseCursor::PointingHandCursor);
                 break;
                 
             case FrameEditor::pointTool:
-                setMouseCursor (MouseCursor (MouseCursor::CrosshairCursor));
+                setMouseCursor (MouseCursor::CrosshairCursor);
                 break;
 
             case FrameEditor::moveTool:
-                setMouseCursor (MouseCursor (MouseCursor::UpDownLeftRightResizeCursor));
+                setMouseCursor (MouseCursor::UpDownLeftRightResizeCursor);
                 break;
 
             default:
-                setMouseCursor (MouseCursor (MouseCursor::NormalCursor));
+                setMouseCursor (MouseCursor::NormalCursor);
                 break;
         }
     }
     else
-        setMouseCursor (MouseCursor (MouseCursor::NormalCursor));
+        setMouseCursor (MouseCursor::NormalCursor);
 }
 
 void WorkingArea::actionListenerCallback (const String& message)

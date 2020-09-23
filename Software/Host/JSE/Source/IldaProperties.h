@@ -99,6 +99,12 @@ private:
     std::unique_ptr<DrawableButton> trashButton;
     std::unique_ptr<Drawable> centerIcon;
     std::unique_ptr<DrawableButton> centerButton;
+    std::unique_ptr<Drawable> centerXIcon;
+    std::unique_ptr<DrawableButton> centerXButton;
+    std::unique_ptr<Drawable> centerYIcon;
+    std::unique_ptr<DrawableButton> centerYButton;
+    std::unique_ptr<Drawable> centerZIcon;
+    std::unique_ptr<DrawableButton> centerZButton;
     std::unique_ptr<Drawable> scaleIcon;
     std::unique_ptr<ScaleButton> scaleButton;
     std::unique_ptr<Drawable> rotateIcon;

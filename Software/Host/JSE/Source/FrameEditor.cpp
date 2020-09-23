@@ -878,7 +878,7 @@ bool FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool 
     return true;
 }
 
-bool FrameEditor::centerIldaSelected (bool constrain)
+bool FrameEditor::centerIldaSelected (bool doX, bool doY, bool doZ, bool constrain)
 {
     Array<Frame::XYPoint> points;
     getIldaSelectedPoints (points);
@@ -896,31 +896,40 @@ bool FrameEditor::centerIldaSelected (bool constrain)
     for (auto n = 0; n < points.size(); ++n)
     {
         Frame::XYPoint& point = points.getReference (n);
-
+        
         int x = point.x.w;
-        x += xOffset;
-        if (Frame::clipIlda (x))
+        if (doX)
         {
-            Frame::blankPoint (point);
-            clipped = true;
+            x += xOffset;
+            if (Frame::clipIlda (x))
+            {
+                Frame::blankPoint (point);
+                clipped = true;
+            }
         }
         point.x.w = (int16)x;
         
         int y = point.y.w;
-        y += yOffset;
-        if (Frame::clipIlda (y))
+        if (doY)
         {
-            Frame::blankPoint (point);
-            clipped = true;
+            y += yOffset;
+            if (Frame::clipIlda (y))
+            {
+                Frame::blankPoint (point);
+                clipped = true;
+            }
         }
         point.y.w = (int16)y;
 
         int z = point.z.w;
-        z += zOffset;
-        if (Frame::clipIlda (z))
+        if (doZ)
         {
-            Frame::blankPoint (point);
-            clipped = true;
+            z += zOffset;
+            if (Frame::clipIlda (z))
+            {
+                Frame::blankPoint (point);
+                clipped = true;
+            }
         }
         point.z.w = (int16)z;
 
