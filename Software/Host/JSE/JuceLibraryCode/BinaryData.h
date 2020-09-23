@@ -8,6 +8,9 @@
 
 namespace BinaryData
 {
+    extern const char*   anchor_png;
+    const int            anchor_pngSize = 2045;
+
     extern const char*   center_png;
     const int            center_pngSize = 2066;
 
@@ -57,7 +60,7 @@ namespace BinaryData
     const int            zoomout_pngSize = 3300;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 16;
+    const int namedResourceListSize = 17;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

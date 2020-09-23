@@ -7,6 +7,7 @@
   <MAINGROUP id="dkE1Q5" name="JSE">
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{419AAC25-6FF2-599E-C3D9-334E04C580EF}" name="Binary Resources">
+        <FILE id="geJK2T" name="anchor.png" compile="0" resource="1" file="Graphics/anchor.png"/>
         <FILE id="SdCzqH" name="center.png" compile="0" resource="1" file="Graphics/center.png"/>
         <FILE id="pR9Plt" name="centerx.png" compile="0" resource="1" file="Graphics/centerx.png"/>
         <FILE id="mgXFTs" name="centery.png" compile="0" resource="1" file="Graphics/centery.png"/>

@@ -331,6 +331,16 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     duplicateButton->setTooltip ("Duplicate the selected point(s)");
     duplicateButton->addListener (this);
 
+    anchorIcon = Drawable::createFromImageData (BinaryData::anchor_png,
+                                                BinaryData::anchor_pngSize);
+
+    anchorButton.reset (new DrawableButton ("anchorButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (anchorButton.get());
+    anchorButton->setImages (anchorIcon.get());
+    anchorButton->setEdgeIndent (0);
+    anchorButton->setTooltip ("Insert a blanked anchor point before each selected point");
+    anchorButton->addListener (this);
+
     refresh();
 }
 
@@ -379,6 +389,8 @@ IldaProperties::~IldaProperties()
     rotateIcon = nullptr;
     duplicateButton = nullptr;
     duplicateIcon = nullptr;
+    anchorButton = nullptr;
+    anchorIcon = nullptr;
 }
 
 //==============================================================================
@@ -421,7 +433,8 @@ void IldaProperties::resized()
     centerZButton->setBounds (154, 376, 32, 32);
     scaleButton->setBounds (118, 412, 32, 32);
     rotateButton->setBounds (154, 412, 32, 32);
-    duplicateButton->setBounds (154, 448, 32, 32);
+    duplicateButton->setBounds (118, 448, 32, 32);
+    anchorButton->setBounds (154, 448, 32, 32);
     trashButton->setBounds (154, 484, 32, 32);
 }
 
@@ -456,6 +469,8 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->centerIldaSelected (false, false, true);
     else if (buttonThatWasClicked == duplicateButton.get())
         frameEditor->duplicateIldaSelected();
+    else if (buttonThatWasClicked == anchorButton.get())
+        frameEditor->anchorIldaSelected();
 }
 
 //==============================================================================
@@ -752,6 +767,7 @@ void IldaProperties::disableSelectionTools()
     scaleButton->setEnabled (false);
     rotateButton->setEnabled (false);
     duplicateButton->setEnabled (false);
+    anchorButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -847,6 +863,7 @@ void IldaProperties::updateSelection()
             scaleButton->setEnabled (true);
             rotateButton->setEnabled (true);
             duplicateButton->setEnabled (true);
+            anchorButton->setEnabled (true);
         }
     }
 }
