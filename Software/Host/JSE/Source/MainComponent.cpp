@@ -49,8 +49,8 @@ MainComponent::MainComponent()
     // GUI components
     mainEditor.reset (new MainEditor (frameEditor.get()));
     addAndMakeVisible (mainEditor.get());
-    laserControls.reset (new LaserControls (frameEditor.get()));
-    addAndMakeVisible (laserControls.get());
+//    laserControls.reset (new LaserControls (frameEditor.get()));
+//    addAndMakeVisible (laserControls.get());
     editProperties.reset (new EditProperties (frameEditor.get()));
     addAndMakeVisible (editProperties.get());
     frameList.reset (new FrameList (frameEditor.get()));
@@ -102,8 +102,8 @@ void MainComponent::paint (juce::Graphics& g)
 
 void MainComponent::resized()
 {
-    laserControls->setBounds (getWidth() - 200, 0, 200, 64);
-    frameList->setBounds (getWidth() - 200, 64, 200, getHeight() - 64);
+//    laserControls->setBounds (getWidth() - 200, 0, 200, 64);
+    frameList->setBounds (getWidth() - 200, 0 /*64*/, 200, getHeight() /*- 64*/);
 
     editProperties->setBounds (0, 0, 200, getHeight());
     mainEditor->setBounds (200, 0, getWidth() - 400, getHeight());

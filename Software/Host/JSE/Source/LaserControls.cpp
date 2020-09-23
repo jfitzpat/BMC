@@ -47,7 +47,7 @@ void LaserControls::paint (juce::Graphics& g)
 
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
-    g.drawText ("LaserControls", getLocalBounds(),
+    g.drawText ("Laser Controls", getLocalBounds(),
                 juce::Justification::centred, true);   // draw some placeholder text
 }
 

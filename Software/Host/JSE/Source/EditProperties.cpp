@@ -80,7 +80,7 @@ EditProperties::EditProperties (FrameEditor* frame)
                       tabColor,
                       new RefProperties (frame), true);
     
-    frameEditor->setActiveLayer (FrameEditor::sketch);
+    frameEditor->setActiveLayer (FrameEditor::ilda);
     updateZoomButtons();
     updateViewButton();
 }
