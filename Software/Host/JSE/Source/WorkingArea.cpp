@@ -110,7 +110,7 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
         Frame::XYPoint fromPoint;
         zerostruct (fromPoint);
         if (dotFrom >= 0)
-            frameEditor->getPoint (dotFrom, fromPoint);
+            frameEditor->getPoint ((uint16)dotFrom, fromPoint);
         
         Frame::XYPoint point;
         zerostruct (point);
@@ -285,7 +285,7 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
             // do this more efficiently with two distances and ratio
             // but this is easy...
             Frame::XYPoint point;
-            frameEditor->getPoint (dotFrom, point);
+            frameEditor->getPoint ((uint16)dotFrom, point);
             Point<int> p = Frame::getCompPoint (point, view);
             float angle = p.getAngleToPoint (Point<int>(x, y));
             
@@ -319,11 +319,11 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
         // and repaint it
         Path p;
         Frame::XYPoint point;
-        frameEditor->getPoint (dotFrom, point);
+        frameEditor->getPoint ((uint16)dotFrom, point);
         p.startNewSubPath (Frame::getCompX (point, view),
                            Frame::getCompY (point, view) );
-        p.lineTo (dotAt.getX(), dotAt.getY());
-        frameEditor->getPoint (dotTo, point);
+        p.lineTo ((float)dotAt.getX(), (float)dotAt.getY());
+        frameEditor->getPoint ((uint16)dotTo, point);
         p.lineTo (Frame::getCompX (point, view),
                   Frame::getCompY (point, view));
         
@@ -345,7 +345,7 @@ int WorkingArea::findCloseMouseMatch (const MouseEvent& event)
     int x = Frame::toIldaX (event.x);
     int y = Frame::toIldaY (event.y);
     
-    Rectangle<int16> r(x - (int16)(3 * activeInvScale), y - (int16)(3 * activeInvScale), (int16)(6 * activeInvScale), (int16)(6 * activeInvScale));
+    Rectangle<int16> r((int16)x - (int16)(3 * activeInvScale), (int16)y - (int16)(3 * activeInvScale), (int16)(6 * activeInvScale), (int16)(6 * activeInvScale));
     
     // Loop through the points and look for a match
     uint16 n;
@@ -604,7 +604,7 @@ void WorkingArea::paint (juce::Graphics& g)
             if (dotFrom != -1)
             {
                 Frame::XYPoint point;
-                frameEditor->getPoint (dotFrom, point);
+                frameEditor->getPoint ((uint16)dotFrom, point);
                 
                 if (point.status & Frame::BlankedPoint)
                 {
@@ -629,7 +629,7 @@ void WorkingArea::paint (juce::Graphics& g)
             if (dotTo != -1)
             {
                 Frame::XYPoint point;
-                frameEditor->getPoint (dotTo, point);
+                frameEditor->getPoint ((uint16)dotTo, point);
                 
                 if (c == Colours::black)
                 {
@@ -754,7 +754,7 @@ void WorkingArea::actionListenerCallback (const String& message)
     {
         if (drawDot)
         {
-            uint16 i = dotFrom;
+            uint16 i = (uint16)dotFrom;
             
             if (i > 0)
                 i--;

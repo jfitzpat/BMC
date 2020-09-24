@@ -134,18 +134,18 @@ public:
     {
     }
     
-    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override
+    void sliderValueChanged (juce::Slider* /*sliderThatWasMoved*/) override
     {
         buttonClicked (nullptr);
     }
 
-    void buttonClicked (juce::Button* buttonThatWasClicked) override
+    void buttonClicked (juce::Button* /*buttonThatWasClicked*/) override
     {
-        float x = scaleXSlider->getValue();
-        float y = scaleYSlider->getValue();
-        float z = scaleZSlider->getValue();
+        float x = (float)scaleXSlider->getValue();
+        float y = (float)scaleYSlider->getValue();
+        float z = (float)scaleZSlider->getValue();
         bool b = centerButton->getToggleState();
-        frameEditor->scaleIldaSelected (x / 100.0, y / 100.0, z / 100.0, b, false);
+        frameEditor->scaleIldaSelected (x / 100.0f, y / 100.0f, z / 100.0f, b, false);
     }
 
 private:

@@ -513,7 +513,7 @@ class UndoableDeletePoints : public UndoableAction
             {
                 Range<uint16> r = selection.getRange (n);
                 for (auto i = r.getEnd() - 1; i >= r.getStart(); --i)
-                    frameEditor->_deletePoint (i);
+                    frameEditor->_deletePoint ((uint16)i);
             }
             return true;
         }

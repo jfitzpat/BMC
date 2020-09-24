@@ -204,7 +204,7 @@ void FrameEditor::getCenterOfIldaSelection (int16& x, int16& y, int16& z)
         for (auto i=0; i < r.getLength(); ++i)
         {
             Frame::XYPoint point;
-            currentFrame->getPoint (r.getStart() + i, point);
+            currentFrame->getPoint (r.getStart() + (uint16)i, point);
             
             if (first)
             {
@@ -962,7 +962,7 @@ void FrameEditor::duplicateIldaSelected()
     {
         Range<uint16> r = ildaSelection.getRange (n);
         for (auto i = r.getEnd() - 1; i >= r.getStart(); --i)
-            perform (new UndoableInsertPoint (this, i + 1, points[pIndex--]));
+            perform (new UndoableInsertPoint (this, (uint16)i + 1, points[pIndex--]));
     }
     
     // Loop forwards to build new selection
@@ -976,7 +976,7 @@ void FrameEditor::duplicateIldaSelected()
         for (auto i = r.getStart(); i < r.getEnd(); ++i)
         {
             int index = i + pOffset;
-            newSelection.addRange (Range<uint16>(index, index + 1));
+            newSelection.addRange (Range<uint16>((uint16)index, (uint16)index + 1));
             pOffset++;
         }
     }
@@ -1008,7 +1008,7 @@ void FrameEditor::anchorIldaSelected()
             point.x.w = points[pIndex].x.w;
             point.y.w = points[pIndex].y.w;
             point.z.w = points[pIndex].z.w;
-            perform (new UndoableInsertPoint (this, i, point));
+            perform (new UndoableInsertPoint (this, (uint16)i, point));
             pIndex--;
         }
     }
@@ -1024,7 +1024,7 @@ void FrameEditor::anchorIldaSelected()
         for (auto i = r.getStart(); i < r.getEnd(); ++i)
         {
             int index = i + pOffset;
-            newSelection.addRange (Range<uint16>(index, index + 1));
+            newSelection.addRange (Range<uint16>((uint16)index, (uint16)index + 1));
             pOffset++;
         }
     }
@@ -1070,7 +1070,7 @@ bool FrameEditor::scaleIldaSelected (float xScale,
 
         int x = point.x.w;
         x -= xOffset;
-        x *= xScale;
+        x = (int)((float)x * xScale + 0.5f);
         x += xOffset;
         if (Frame::clipIlda (x))
         {
@@ -1081,7 +1081,7 @@ bool FrameEditor::scaleIldaSelected (float xScale,
         
         int y = point.y.w;
         y -= yOffset;
-        y *= yScale;
+        y = (int)((float)y * yScale + 0.5f);
         y += yOffset;
         if (Frame::clipIlda (y))
         {
@@ -1092,7 +1092,7 @@ bool FrameEditor::scaleIldaSelected (float xScale,
         
         int z = point.z.w;
         z -= zOffset;
-        z *= zScale;
+        z = (int)((float)z * zScale + 0.5f);
         z += zOffset;
         if (Frame::clipIlda (z))
         {
