@@ -23,6 +23,7 @@
 #include "ColourButton.h"
 #include "ScalePopup.h"
 #include "RotatePopup.h"
+#include "ShearPopup.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -109,6 +110,8 @@ private:
     std::unique_ptr<ScaleButton> scaleButton;
     std::unique_ptr<Drawable> rotateIcon;
     std::unique_ptr<RotateButton> rotateButton;
+    std::unique_ptr<Drawable> shearIcon;
+    std::unique_ptr<ShearButton> shearButton;
     std::unique_ptr<Drawable> duplicateIcon;
     std::unique_ptr<DrawableButton> duplicateButton;
     std::unique_ptr<Drawable> anchorIcon;

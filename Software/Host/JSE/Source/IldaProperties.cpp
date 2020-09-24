@@ -321,6 +321,15 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     rotateButton->setEdgeIndent (0);
     rotateButton->setTooltip ("Rotate the selected point(s)");
 
+    shearIcon = Drawable::createFromImageData  (BinaryData::rotate_png,
+                                                BinaryData::rotate_pngSize);
+
+    shearButton.reset (new ShearButton (frameEditor));
+    addAndMakeVisible (shearButton.get());
+    shearButton->setImages (shearIcon.get());
+    shearButton->setEdgeIndent (0);
+    shearButton->setTooltip ("Shear the selected point(s)");
+
     duplicateIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
                                                     BinaryData::duplicatewhite_pngSize);
 
@@ -391,6 +400,8 @@ IldaProperties::~IldaProperties()
     duplicateIcon = nullptr;
     anchorButton = nullptr;
     anchorIcon = nullptr;
+    shearButton = nullptr;
+    shearIcon = nullptr;
 }
 
 //==============================================================================
@@ -431,8 +442,9 @@ void IldaProperties::resized()
     centerXButton->setBounds (82, 376, 32, 32);
     centerYButton->setBounds (118, 376, 32, 32);
     centerZButton->setBounds (154, 376, 32, 32);
-    scaleButton->setBounds (118, 412, 32, 32);
-    rotateButton->setBounds (154, 412, 32, 32);
+    scaleButton->setBounds (82, 412, 32, 32);
+    rotateButton->setBounds (118, 412, 32, 32);
+    shearButton->setBounds (154, 412, 32, 32);
     duplicateButton->setBounds (118, 448, 32, 32);
     anchorButton->setBounds (154, 448, 32, 32);
     trashButton->setBounds (154, 484, 32, 32);
@@ -768,6 +780,7 @@ void IldaProperties::disableSelectionTools()
     rotateButton->setEnabled (false);
     duplicateButton->setEnabled (false);
     anchorButton->setEnabled (false);
+    shearButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -864,6 +877,7 @@ void IldaProperties::updateSelection()
             rotateButton->setEnabled (true);
             duplicateButton->setEnabled (true);
             anchorButton->setEnabled (true);
+            shearButton->setEnabled (true);
         }
     }
 }

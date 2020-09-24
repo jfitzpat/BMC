@@ -1207,16 +1207,6 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
     double out2[3][3];
     Multiply3by3(out1, rz, out2);
 
-//    pendingTransform.matrix11 = out2[0][0];
-//    pendingTransform.matrix12 = out2[1][0];
-//    pendingTransform.matrix13 = out2[2][0];
-//    pendingTransform.matrix21 = out2[0][1];
-//    pendingTransform.matrix22 = out2[1][1];
-//    pendingTransform.matrix23 = out2[2][1];
-//    pendingTransform.matrix31 = out2[0][2];
-//    pendingTransform.matrix32 = out2[1][2];
-//    pendingTransform.matrix33 = out2[2][2];
-
     for (auto n = 0; n < points.size(); ++n)
     {
         double d;
@@ -1257,6 +1247,64 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
             clipped = true;
         }
         point.z.w = (int16)z;
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
+bool FrameEditor::shearIldaSelected (float xShear,
+                                     float yShear,
+                                     bool centerOnSelection,
+                                     bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+  
+    int xOffset = 0;
+    int yOffset = 0;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformCenterX;
+        yOffset = transformCenterY;
+    }
+    
+    AffineTransform matrix = AffineTransform::shear (xShear, yShear);
+    bool clipped = false;
+
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        int x = point.x.w;
+        x -= xOffset;
+        int y = point.y.w;
+        y -= yOffset;
+
+        matrix.transformPoint(x,y);
+        
+        x += xOffset;
+        y += yOffset;
+        
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+        
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;        
     }
     
     if (constrain && clipped)

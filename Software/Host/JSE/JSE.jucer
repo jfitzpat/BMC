@@ -46,6 +46,7 @@
           <FILE id="zF8dd2" name="PopupTool.h" compile="0" resource="0" file="Source/PopupTool.h"/>
           <FILE id="MdAhEP" name="RotatePopup.h" compile="0" resource="0" file="Source/RotatePopup.h"/>
           <FILE id="SbIKdp" name="ScalePopup.h" compile="0" resource="0" file="Source/ScalePopup.h"/>
+          <FILE id="dLKYqi" name="ShearPopup.h" compile="0" resource="0" file="Source/ShearPopup.h"/>
           <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
                 file="Source/ThumbBuilder.cpp"/>
           <FILE id="QR21o4" name="ThumbBuilder.h" compile="0" resource="0" file="Source/ThumbBuilder.h"/>

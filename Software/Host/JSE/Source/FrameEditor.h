@@ -171,6 +171,7 @@ public:
     bool isTransforming() { return tranformInProgress; }
     bool scaleIldaSelected (float xScale, float yScale, float zScale, bool centerOnSelection, bool constrain = true);
     bool rotateIldaSelected (float xAngle, float yAngle, float zAngle, bool centerOnSelection, bool constrain = true);
+    bool shearIldaSelected (float shearX, float shearY, bool centerOnSelection, bool constrain = true);
     bool translateIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
     void endTransform();
 
