@@ -32,26 +32,26 @@ public:
     {
         scaleXSlider.reset (new juce::Slider ("scaleXSlider"));
         addAndMakeVisible (scaleXSlider.get());
-        scaleXSlider->setRange (-3, 3, 0.1);
+        scaleXSlider->setRange (-3, 3, 0.05);
         scaleXSlider->setSliderStyle (juce::Slider::LinearVertical);
         scaleXSlider->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
         scaleXSlider->setColour (juce::Slider::backgroundColourId, juce::Colour (0xff0d1112));
         scaleXSlider->addListener (this);
 
-        scaleXSlider->setBounds (36, 32, 56, 216);
+        scaleXSlider->setBounds (26, 32, 56, 216);
 
         scaleYSlider.reset (new juce::Slider ("scaleYSlider"));
         addAndMakeVisible (scaleYSlider.get());
-        scaleYSlider->setRange (-3, 3, 0.1);
+        scaleYSlider->setRange (-3, 3, 0.05);
         scaleYSlider->setSliderStyle (juce::Slider::LinearVertical);
         scaleYSlider->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
         scaleYSlider->setColour (juce::Slider::backgroundColourId, juce::Colour (0xff0d1112));
         scaleYSlider->addListener (this);
 
-        scaleYSlider->setBounds (100, 32, 56, 216);
+        scaleYSlider->setBounds (90, 32, 56, 216);
 
         xlabel.reset (new juce::Label ("xlabel",
-                                       TRANS("X")));
+                                       TRANS("L/R")));
         addAndMakeVisible (xlabel.get());
         xlabel->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
         xlabel->setJustificationType (juce::Justification::centred);
@@ -59,10 +59,10 @@ public:
         xlabel->setColour (juce::TextEditor::textColourId, juce::Colours::black);
         xlabel->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-        xlabel->setBounds (44, 8, 40, 24);
+        xlabel->setBounds (34, 8, 40, 24);
 
         ylabel.reset (new juce::Label ("ylabel",
-                                       TRANS("Y")));
+                                       TRANS("U/D")));
         addAndMakeVisible (ylabel.get());
         ylabel->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
         ylabel->setJustificationType (juce::Justification::centred);
@@ -70,16 +70,16 @@ public:
         ylabel->setColour (juce::TextEditor::textColourId, juce::Colours::black);
         ylabel->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-        ylabel->setBounds (108, 8, 40, 24);
+        ylabel->setBounds (98, 8, 40, 24);
 
         centerButton.reset (new juce::ToggleButton ("centerButton"));
         addAndMakeVisible (centerButton.get());
         centerButton->setButtonText (TRANS("Center on selection"));
         centerButton->addListener (this);
 
-        centerButton->setBounds (24, 260, 150, 24);
+        centerButton->setBounds (14, 260, 150, 24);
 
-        setSize (200, 300);
+        setSize (180, 300);
         
         scaleXSlider->setValue (0, dontSendNotification);
         scaleYSlider->setValue (0, dontSendNotification);

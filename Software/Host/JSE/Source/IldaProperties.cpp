@@ -321,14 +321,14 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     rotateButton->setEdgeIndent (0);
     rotateButton->setTooltip ("Rotate the selected point(s)");
 
-    shearIcon = Drawable::createFromImageData  (BinaryData::rotate_png,
-                                                BinaryData::rotate_pngSize);
+    shearIcon = Drawable::createFromImageData  (BinaryData::shear_png,
+                                                BinaryData::shear_pngSize);
 
     shearButton.reset (new ShearButton (frameEditor));
     addAndMakeVisible (shearButton.get());
     shearButton->setImages (shearIcon.get());
     shearButton->setEdgeIndent (0);
-    shearButton->setTooltip ("Shear the selected point(s)");
+    shearButton->setTooltip ("Shear/Skew the selected point(s)");
 
     duplicateIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
                                                     BinaryData::duplicatewhite_pngSize);

@@ -1282,9 +1282,9 @@ bool FrameEditor::shearIldaSelected (float xShear,
     {
         Frame::XYPoint& point = points.getReference (n);
 
-        int x = point.x.w;
+        int x = activeView == Frame::side ? point.z.w : point.x.w;
         x -= xOffset;
-        int y = point.y.w;
+        int y = activeView == Frame::top ? point.z.w : point.y.w;
         y -= yOffset;
 
         matrix.transformPoint(x,y);
@@ -1297,14 +1297,20 @@ bool FrameEditor::shearIldaSelected (float xShear,
             Frame::blankPoint (point);
             clipped = true;
         }
-        point.x.w = (int16)x;
+        if (activeView == Frame::side)
+            point.z.w = (int16)x;
+        else
+            point.x.w = (int16)x;
         
         if (Frame::clipIlda (y))
         {
             Frame::blankPoint (point);
             clipped = true;
         }
-        point.y.w = (int16)y;        
+        if (activeView == Frame::top)
+            point.z.w = (int16)y;
+        else
+            point.y.w = (int16)y;        
     }
     
     if (constrain && clipped)

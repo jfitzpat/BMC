@@ -22,6 +22,7 @@
               file="Graphics/pointinghand.png"/>
         <FILE id="JXnNQE" name="rotate.png" compile="0" resource="1" file="Graphics/rotate.png"/>
         <FILE id="TtnrYe" name="scale.png" compile="0" resource="1" file="Graphics/scale.png"/>
+        <FILE id="CIUduD" name="shear.png" compile="0" resource="1" file="Graphics/shear.png"/>
         <FILE id="RpuDEN" name="showall.png" compile="0" resource="1" file="Graphics/showall.png"/>
         <FILE id="NCKhUw" name="trash.png" compile="0" resource="1" file="Graphics/trash.png"/>
         <FILE id="RczVdz" name="up-white.png" compile="0" resource="1" file="Graphics/up-white.png"/>
