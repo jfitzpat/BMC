@@ -243,8 +243,8 @@ const Point<int> FrameEditor::getComponentCenterOfIldaSelection()
     int16 cx, cy, cz;
     getCenterOfIldaSelection (cx, cy, cz);
     
-    int x = Frame::toCompX (activeView == Frame::side ? cz : cx);
-    int y = Frame::toCompY (activeView == Frame::top ? cz : cy);
+    int x = Frame::toCompX (activeView == Frame::left ? cz : cx);
+    int y = Frame::toCompY (activeView == Frame::bottom ? cz : cy);
 
     return Point<int> (x, y);
 }
@@ -254,8 +254,8 @@ void FrameEditor::getComponentCenterOfIldaSelection (int&x, int&y)
     int16 cx, cy, cz;
     getCenterOfIldaSelection (cx, cy, cz);
     
-    x = Frame::toCompX (activeView == Frame::side ? cz : cx);
-    y = Frame::toCompY (activeView == Frame::top ? cz : cy);
+    x = Frame::toCompX (activeView == Frame::left ? cz : cx);
+    y = Frame::toCompY (activeView == Frame::bottom ? cz : cy);
 }
 
 void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
@@ -1163,7 +1163,7 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
     double rotY = yAngle < 0 ? 360.0 + yAngle : yAngle;
     double rotZ = zAngle < 0 ? 360.0 + zAngle : zAngle;
     
-    // Clip rotation
+    // Clip X rotation
     if (rotX > 359.9)
         rotX = 0.0;
 
@@ -1175,8 +1175,8 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
 
     rx[1][1] = cos;
     rx[2][2] = cos;
-    rx[1][2] = 0 - sin;
-    rx[2][1] = sin;
+    rx[1][2] = sin;
+    rx[2][1] = 0 - sin;
 
     // Repeat for Y
     if (rotY > 359.9)
@@ -1187,8 +1187,8 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
 
     ry[0][0] = cos;
     ry[2][2] = cos;
-    ry[2][0] = 0 - sin;
-    ry[0][2] = sin;
+    ry[2][0] = sin;
+    ry[0][2] = 0 - sin;
 
     // And Z
     if (rotZ > 359.9)
@@ -1282,9 +1282,9 @@ bool FrameEditor::shearIldaSelected (float xShear,
     {
         Frame::XYPoint& point = points.getReference (n);
 
-        int x = activeView == Frame::side ? point.z.w : point.x.w;
+        int x = activeView == Frame::left ? point.z.w : point.x.w;
         x -= xOffset;
-        int y = activeView == Frame::top ? point.z.w : point.y.w;
+        int y = activeView == Frame::bottom ? point.z.w : point.y.w;
         y -= yOffset;
 
         matrix.transformPoint(x,y);
@@ -1297,7 +1297,7 @@ bool FrameEditor::shearIldaSelected (float xShear,
             Frame::blankPoint (point);
             clipped = true;
         }
-        if (activeView == Frame::side)
+        if (activeView == Frame::left)
             point.z.w = (int16)x;
         else
             point.x.w = (int16)x;
@@ -1307,7 +1307,7 @@ bool FrameEditor::shearIldaSelected (float xShear,
             Frame::blankPoint (point);
             clipped = true;
         }
-        if (activeView == Frame::top)
+        if (activeView == Frame::bottom)
             point.z.w = (int16)y;
         else
             point.y.w = (int16)y;        

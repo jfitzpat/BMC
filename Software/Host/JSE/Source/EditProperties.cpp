@@ -143,12 +143,12 @@ void EditProperties::updateViewButton()
 {
     switch (frameEditor->getActiveView())
     {
-        case Frame::top:
-            viewButton->setButtonText ("Top");
+        case Frame::bottom:
+            viewButton->setButtonText ("Bottom");
             viewButton->setColour (TextButton::textColourOffId, Colours::lightblue);
             break;
-        case Frame::side:
-            viewButton->setButtonText ("Side");
+        case Frame::left:
+            viewButton->setButtonText ("Left");
             viewButton->setColour (TextButton::textColourOffId, Colours::yellow);
             break;
         default:
@@ -203,10 +203,10 @@ void EditProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         switch (frameEditor->getActiveView())
         {
             case Frame::front:
-                frameEditor->setActiveView (Frame::top);
+                frameEditor->setActiveView (Frame::bottom);
                 break;
-            case Frame::top:
-                frameEditor->setActiveView (Frame::side);
+            case Frame::bottom:
+                frameEditor->setActiveView (Frame::left);
                 break;
             default:
                 frameEditor->setActiveView (Frame::front);

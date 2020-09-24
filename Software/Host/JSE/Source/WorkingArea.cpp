@@ -117,11 +117,11 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
     
         FrameEditor::View view = frameEditor->getActiveView();
         
-        point.x.w = view == Frame::side ? fromPoint.x.w : Frame::getIldaX (dotAt);
-        point.y.w = view == Frame::top ? fromPoint.y.w : Frame::getIldaY (dotAt);
+        point.x.w = view == Frame::left ? fromPoint.x.w : Frame::getIldaX (dotAt);
+        point.y.w = view == Frame::bottom ? fromPoint.y.w : Frame::getIldaY (dotAt);
         if (view == Frame::front)
             point.z.w = fromPoint.z.w;
-        else if (view == Frame::top)
+        else if (view == Frame::bottom)
             point.z.w = Frame::getIldaY (dotAt);
         else
             point.z.w = Frame::getIldaX (dotAt);
@@ -207,8 +207,8 @@ void WorkingArea::mouseUp (const MouseEvent& event)
             Frame::XYPoint point;
             frameEditor->getPoint (n, point);
 
-            int tx = view == Frame::side ? point.z.w : point.x.w;
-            int ty = view == Frame::top ? point.z.w : point.y.w;
+            int tx = view == Frame::left ? point.z.w : point.x.w;
+            int ty = view == Frame::bottom ? point.z.w : point.y.w;
 
             if (r.contains (tx, ty))
             {
@@ -354,8 +354,8 @@ int WorkingArea::findCloseMouseMatch (const MouseEvent& event)
         Frame::XYPoint point;
         frameEditor->getPoint (n, point);
         
-        uint16 tx = view == Frame::side ? point.z.w : point.x.w;
-        uint16 ty = view == Frame::top ? point.z.w : point.y.w;
+        uint16 tx = view == Frame::left ? point.z.w : point.x.w;
+        uint16 ty = view == Frame::bottom ? point.z.w : point.y.w;
         
         if (r.contains (tx, ty))
             if (frameEditor->getIldaShowBlanked() ||
@@ -435,12 +435,12 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
         int dx = event.getDistanceFromDragStartX();
         int dy = 0 - event.getDistanceFromDragStartY();
         
-        int xOffset = view == Frame::side ? 0 : dx;
-        int yOffset = view == Frame::top ? 0 : dy;
+        int xOffset = view == Frame::left ? 0 : dx;
+        int yOffset = view == Frame::bottom ? 0 : dy;
         int zOffset;
-        if (view == Frame::side)
+        if (view == Frame::left)
             zOffset = dx;
-        else if (view == Frame::top)
+        else if (view == Frame::bottom)
             zOffset = dy;
         else
             zOffset = 0;

@@ -399,12 +399,12 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::topView:
             result.setInfo ("Top View", "View along Y axis", "Menu", 0);
             result.addDefaultKeypress('2', ModifierKeys::commandModifier);
-            result.setActive (frameEditor->getActiveView() != Frame::top);
+            result.setActive (frameEditor->getActiveView() != Frame::bottom);
             break;
         case CommandIDs::sideView:
             result.setInfo ("Side View", "View along Xaxis", "Menu", 0);
             result.addDefaultKeypress('3', ModifierKeys::commandModifier);
-            result.setActive (frameEditor->getActiveView() != Frame::side);
+            result.setActive (frameEditor->getActiveView() != Frame::left);
             break;
 
         case CommandIDs::zoomAll:
@@ -607,10 +607,10 @@ bool MainComponent::perform (const InvocationInfo& info)
             frameEditor->setActiveView (Frame::front);
             break;
         case CommandIDs::topView:
-            frameEditor->setActiveView (Frame::top);
+            frameEditor->setActiveView (Frame::bottom);
             break;
         case CommandIDs::sideView:
-            frameEditor->setActiveView (Frame::side);
+            frameEditor->setActiveView (Frame::left);
             break;
 
         case CommandIDs::fileOpen:

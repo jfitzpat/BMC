@@ -527,7 +527,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::top)
+            if (frameEditor->getActiveView() == Frame::bottom)
                 frameEditor->moveIldaSelected (0, 0, 256);
             else
                 frameEditor->moveIldaSelected (0, 256, 0);
@@ -537,7 +537,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::top)
+            if (frameEditor->getActiveView() == Frame::bottom)
                 frameEditor->moveIldaSelected (0, 0, -256);
             else
                 frameEditor->moveIldaSelected (0, -256, 0);
@@ -547,7 +547,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::side)
+            if (frameEditor->getActiveView() == Frame::left)
                 frameEditor->moveIldaSelected (0, 0, -256);
             else
                 frameEditor->moveIldaSelected (-256, 0, 0);
@@ -557,7 +557,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::side)
+            if (frameEditor->getActiveView() == Frame::left)
                 frameEditor->moveIldaSelected (0, 0, 256);
             else
                 frameEditor->moveIldaSelected (256, 0, 0);
@@ -567,7 +567,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::top)
+            if (frameEditor->getActiveView() == Frame::bottom)
                 frameEditor->moveIldaSelected (0, 0, 16);
             else
                 frameEditor->moveIldaSelected (0, 16, 0);
@@ -577,7 +577,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::top)
+            if (frameEditor->getActiveView() == Frame::bottom)
                 frameEditor->moveIldaSelected (0, 0, -16);
             else
                 frameEditor->moveIldaSelected (0, -16, 0);
@@ -587,7 +587,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::side)
+            if (frameEditor->getActiveView() == Frame::left)
                 frameEditor->moveIldaSelected (0, 0, -16);
             else
                 frameEditor->moveIldaSelected (-16, 0, 0);
@@ -597,7 +597,7 @@ void IldaProperties::actionListenerCallback (const String& message)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
-            if (frameEditor->getActiveView() == Frame::side)
+            if (frameEditor->getActiveView() == Frame::left)
                 frameEditor->moveIldaSelected (0, 0, 16);
             else
                 frameEditor->moveIldaSelected (16, 0, 0);

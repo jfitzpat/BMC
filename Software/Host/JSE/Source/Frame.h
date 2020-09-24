@@ -71,34 +71,34 @@ public:
     // Conversion helpers
     typedef enum {
         front = 0,
-        top = 1,
-        side = 2
+        bottom = 1,
+        left = 2
     } ViewAngle;
     
     static float getCompX (const XYPoint& point, ViewAngle view = front)
     {
-        if (view == side)
+        if (view == left)
             return (float)((float)point.z.w + 32768.0f);
         else
             return (float)((float)point.x.w + 32768.0f);
     }
     static float getCompY (const XYPoint& point, ViewAngle view = front)
     {
-        if (view == top)
+        if (view == bottom)
             return (float)(32767.0f - (float)point.z.w);
         else
             return (float)(32767.0f - (float)point.y.w);
     }
     static int getCompXInt (const XYPoint& point, ViewAngle view = front)
     {
-        if (view == side)
+        if (view == left)
             return (int)((int)point.z.w + 32768);
         else
             return (int)((int)point.x.w + 32768);
     }
     static int getCompYInt (const XYPoint& point, ViewAngle view = front)
     {
-        if (view == top)
+        if (view == bottom)
             return (int)(32767 - (int)point.z.w);
         else
             return (int)(32767 - (int)point.y.w);

@@ -46,9 +46,9 @@ void MainEditor::paint (juce::Graphics& g)
     // Outline working area
     FrameEditor::View view = frameEditor->getActiveView();
     
-    if (view == Frame::top)
+    if (view == Frame::bottom)
         g.setColour (Colour (0, Colours::grey.getGreen(), Colours::grey.getBlue()));
-    else if (view == Frame::side)
+    else if (view == Frame::left)
         g.setColour (Colour (Colours::grey.getRed(), Colours::grey.getGreen(), 0));
     else
         g.setColour (Colours::grey);
@@ -75,9 +75,9 @@ void MainEditor::paint (juce::Graphics& g)
         g.drawDashedLine (hline, dashes, 2);
         g.drawDashedLine (vline, dashes, 2);
         
-        if (view == Frame::top)
+        if (view == Frame::bottom)
             g.setColour (Colour (0, Colours::darkgrey.getGreen(), Colours::darkgrey.getBlue()));
-        else if (view == Frame::side)
+        else if (view == Frame::left)
             g.setColour (Colour (Colours::darkgrey.getRed(), Colours::darkgrey.getGreen(), 0));
         else
             g.setColour (Colours::darkgrey);

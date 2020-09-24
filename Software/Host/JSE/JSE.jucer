@@ -3,7 +3,7 @@
 <JUCERPROJECT id="qW4wAR" name="JSE" projectType="guiapp" useAppConfig="0"
               addUsingNamespaceToJuceHeader="1" jucerFormatVersion="1" companyName="ScrootchMe"
               companyCopyright="Copyright 2020 Scrootch.Me!" companyWebsite="http://scrootch.me/bmc"
-              version="0.1.0">
+              version="0.1.1">
   <MAINGROUP id="dkE1Q5" name="JSE">
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{419AAC25-6FF2-599E-C3D9-334E04C580EF}" name="Binary Resources">
