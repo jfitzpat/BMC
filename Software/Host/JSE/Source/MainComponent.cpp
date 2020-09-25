@@ -397,12 +397,12 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setActive (frameEditor->getActiveView() != Frame::front);
             break;
         case CommandIDs::topView:
-            result.setInfo ("Top View", "View along Y axis", "Menu", 0);
+            result.setInfo ("Bottom View", "View along Y axis", "Menu", 0);
             result.addDefaultKeypress('2', ModifierKeys::commandModifier);
             result.setActive (frameEditor->getActiveView() != Frame::bottom);
             break;
         case CommandIDs::sideView:
-            result.setInfo ("Side View", "View along Xaxis", "Menu", 0);
+            result.setInfo ("Left View", "View along Xaxis", "Menu", 0);
             result.addDefaultKeypress('3', ModifierKeys::commandModifier);
             result.setActive (frameEditor->getActiveView() != Frame::left);
             break;

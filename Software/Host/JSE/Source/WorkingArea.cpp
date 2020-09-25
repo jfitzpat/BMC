@@ -171,7 +171,8 @@ void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
 void WorkingArea::mouseDown (const MouseEvent& event)
 {
     // Only dealing with ILDA layer
-    if (frameEditor->getActiveLayer() != FrameEditor::ilda)
+    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
+        frameEditor->getIldaVisible() == false)
         return;
     
     if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
@@ -398,7 +399,8 @@ void WorkingArea::mouseMove (const MouseEvent& event)
 {
     // If we aren't the ILDA layer case, clear all hover marks
     // and bail
-    if (frameEditor->getActiveLayer() != FrameEditor::ilda)
+    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
+        frameEditor->getIldaVisible() == false)
     {
         killMarkers();
         return;
@@ -427,6 +429,7 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
     }
     
     if (frameEditor->getActiveLayer() == FrameEditor::ilda &&
+        frameEditor->getIldaVisible() &&
         frameEditor->getActiveIldaTool() == FrameEditor::moveTool &&
         frameEditor->isTransforming())
     {

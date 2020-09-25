@@ -775,6 +775,9 @@ void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
     if (selection.getTotalRange().getEnd() > getPointCount())
         return;
     
+    if (! getIldaVisible())
+        return;
+    
     if (selection != ildaSelection)
     {
         beginNewTransaction ("Selection Change");
@@ -1772,6 +1775,9 @@ void FrameEditor::_setDrawGrid (bool draw)
 void FrameEditor::_setIldaSelection (const SparseSet<uint16>& selection)
 {
     if (selection.getTotalRange().getEnd() > getPointCount())
+        return;
+    
+    if (! getIldaVisible())
         return;
     
     if (selection != ildaSelection)
