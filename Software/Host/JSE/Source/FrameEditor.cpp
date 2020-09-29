@@ -1418,12 +1418,11 @@ bool FrameEditor::barberPoleIldaSelected (float radius,
     AffineTransform matrix = AffineTransform::shear (0, skew);
 
     double rad = (double)radius;
-    double pi2 = (2.0 * pi) / (2.0 * pi * rad);
+    double pi2 = 1.0 / rad; // (2.0 * pi) / (2.0 * pi * rad);
     bool clipped = false;
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        
         Frame::XYPoint& point = points.getReference (n);
 
         // fetch next point
@@ -1470,6 +1469,81 @@ bool FrameEditor::barberPoleIldaSelected (float radius,
             clipped = true;
         }
         point.z.w = (int16)z;
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
+bool FrameEditor::bulgeIldaSelected (float radius,
+                                     float gain,
+                                     bool centerOnSelection,
+                                     bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+
+    int xOffset = 0;
+    int yOffset = 0;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformCenterX;
+        yOffset = transformCenterY;
+    }
+
+    double dgain = gain;
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        // fetch next point
+        int x = point.x.w;
+        x -= xOffset;
+        int y = point.y.w;
+        y -= yOffset;
+
+        double dx = x;
+        double dy = y;
+        
+        // Distance
+        double r = ::sqrt ((dx * dx) + (dy * dy));
+        // Angle
+        double a = atan2 (dy, dx);
+        
+        double pow = 1.0 + (double)radius; // 0.01 to 1.99
+        double rn = ::pow (r, pow);
+        double d;
+        
+        d = cos(a) * rn;    // adjusted X
+        d *= dgain;
+        x = (int)d;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+
+        d = sin(a) * rn;    // Adjusted Y
+        d *= dgain;
+        y = (int)d;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
     }
     
     if (constrain && clipped)
