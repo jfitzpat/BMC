@@ -573,21 +573,19 @@ class UndoableDeleteFrame : public UndoableAction
         bool perform() override
         {
             frameEditor->incDirtyCounter();
-            oldIndex = frameEditor->getFrameIndex();
-            oldFrame = frameEditor->getFrame();
+            oldFrame = frameEditor->getFrame (delIndex);
             frameEditor->_deleteFrame (delIndex);
             return true;
         }
         
         bool undo() override
         {
-            frameEditor->_insertFrame (oldIndex, oldFrame);
+            frameEditor->_insertFrame (delIndex, oldFrame);
             frameEditor->decDirtyCounter();
             return true;
         }
         
     private:
-        uint16 oldIndex;
         Frame::Ptr oldFrame;
         uint16 delIndex;
         FrameEditor* frameEditor;

@@ -324,6 +324,15 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     shearIcon = Drawable::createFromImageData  (BinaryData::shear_png,
                                                 BinaryData::shear_pngSize);
 
+    barberIcon = Drawable::createFromImageData (BinaryData::barber_png,
+                                                BinaryData::barber_pngSize);
+    
+    barberButton.reset (new BarberButton (frameEditor));
+    addAndMakeVisible (barberButton.get());
+    barberButton->setImages (barberIcon.get());
+    barberButton->setEdgeIndent (0);
+    barberButton->setTooltip ("Barber Pole transform selected point(s)");
+    
     shearButton.reset (new ShearButton (frameEditor));
     addAndMakeVisible (shearButton.get());
     shearButton->setImages (shearIcon.get());
@@ -349,6 +358,16 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     anchorButton->setEdgeIndent (0);
     anchorButton->setTooltip ("Insert a blanked anchor point before each selected point");
     anchorButton->addListener (this);
+
+    invertIcon = Drawable::createFromImageData (BinaryData::invert_png,
+                                                BinaryData::invert_pngSize);
+
+    invertButton.reset (new DrawableButton ("invertButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (invertButton.get());
+    invertButton->setImages (invertIcon.get());
+    invertButton->setEdgeIndent (0);
+    invertButton->setTooltip ("Invert X, Y, and Z for the selected point(s)");
+    invertButton->addListener (this);
 
     refresh();
 }
@@ -396,12 +415,16 @@ IldaProperties::~IldaProperties()
     scaleIcon = nullptr;
     rotateButton = nullptr;
     rotateIcon = nullptr;
+    barberButton = nullptr;
+    barberIcon = nullptr;
     duplicateButton = nullptr;
     duplicateIcon = nullptr;
     anchorButton = nullptr;
     anchorIcon = nullptr;
     shearButton = nullptr;
     shearIcon = nullptr;
+    invertButton = nullptr;
+    invertIcon = nullptr;
 }
 
 //==============================================================================
@@ -442,12 +465,14 @@ void IldaProperties::resized()
     centerXButton->setBounds (82, 376, 32, 32);
     centerYButton->setBounds (118, 376, 32, 32);
     centerZButton->setBounds (154, 376, 32, 32);
-    scaleButton->setBounds (82, 412, 32, 32);
-    rotateButton->setBounds (118, 412, 32, 32);
-    shearButton->setBounds (154, 412, 32, 32);
-    duplicateButton->setBounds (118, 448, 32, 32);
-    anchorButton->setBounds (154, 448, 32, 32);
-    trashButton->setBounds (154, 484, 32, 32);
+    invertButton->setBounds (46, 412, 32, 32);
+    scaleButton->setBounds (46, 448, 32, 32);
+    rotateButton->setBounds (82, 448, 32, 32);
+    shearButton->setBounds (118, 448, 32, 32);
+    barberButton->setBounds (154, 448, 32, 32);
+    duplicateButton->setBounds (118, 484, 32, 32);
+    anchorButton->setBounds (154, 484, 32, 32);
+    trashButton->setBounds (154, 520, 32, 32);
 }
 
 //==============================================================================
@@ -781,6 +806,8 @@ void IldaProperties::disableSelectionTools()
     duplicateButton->setEnabled (false);
     anchorButton->setEnabled (false);
     shearButton->setEnabled (false);
+    invertButton->setEnabled (false);
+    barberButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -878,6 +905,8 @@ void IldaProperties::updateSelection()
             duplicateButton->setEnabled (true);
             anchorButton->setEnabled (true);
             shearButton->setEnabled (true);
+            invertButton->setEnabled (true);
+            barberButton->setEnabled (true);
         }
     }
 }

@@ -686,6 +686,8 @@ void FrameEditor::deleteFrame ()
     if ((Frames.size() > 1) && (index < Frames.size()))
     {
         beginNewTransaction ("Delete Frame");
+        if (index == (Frames.size() - 1))
+            perform (new UndoableSetFrameIndex (this, index - 1));
         perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform (new UndoableDeleteFrame (this, index));
     }
@@ -1170,8 +1172,7 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
     if (rotX > 359.9)
         rotX = 0.0;
 
-    // Get sin and cos, sin is straight lookup,
-    // cos is 90 degres offset from sin
+    // Get sin and cos
     const double pi = MathConstants<double>::pi;
     double sin = ::sin (rotX * pi / 180.0);
     double cos = ::cos (rotX * pi / 180.0);
@@ -1359,6 +1360,110 @@ bool FrameEditor::translateIldaSelected (int xOffset,
         
         int z = point.z.w;
         z += zOffset;
+        if (Frame::clipIlda (z))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.z.w = (int16)z;
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
+bool FrameEditor::barberPoleIldaSelected (float radius,
+                                          float skew,
+                                          float zAngle,
+                                          bool centerOnSelection,
+                                          bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+
+    int xOffset = 0;
+    int yOffset = 0;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformCenterX;
+        yOffset = transformCenterY;
+    }
+
+    double rz[3][3] = {{1, 0, 0},
+                       {0, 1, 0},
+                       {0, 0, 1}};
+
+    double rotZ = zAngle < 0 ? 360.0 + zAngle : zAngle;
+    
+    // Clip X rotation
+    if (rotZ > 359.9)
+        rotZ = 0.0;
+
+    // Get sin and cos
+    const double pi = MathConstants<double>::pi;
+    double sin = ::sin (rotZ * pi / 180.0);
+    double cos = ::cos (rotZ * pi / 180.0);
+
+    rz[0][0] = cos;
+    rz[2][2] = cos;
+    rz[2][0] = sin;
+    rz[0][2] = 0 - sin;
+
+    AffineTransform matrix = AffineTransform::shear (0, skew);
+
+    double rad = (double)radius;
+    double pi2 = (2.0 * pi) / (2.0 * pi * rad);
+    bool clipped = false;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        
+        Frame::XYPoint& point = points.getReference (n);
+
+        // fetch next point
+        int x = point.x.w;
+        x -= xOffset;
+        int y = point.y.w;
+        y -= yOffset;
+
+        // skew
+        matrix.transformPoint(x,y);
+                
+        // rap
+        double dx = 0 - ::cos ((double)x * pi2) * rad;
+        double dy = (double)y;
+        double dz = ::sin ((double)x * pi2) * rad;
+
+        // rotate
+        double d;
+        d = dx * rz[0][0] + dy * rz[1][0] + dz * rz[2][0];
+        x = (int)d;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+
+        d = dx * rz[0][1] + dy * rz[1][1] + dz * rz[2][1];
+        y = (int)d;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+
+        d = dx * rz[0][2] + dy * rz[1][2] + dz * rz[2][2];
+        int z = (int)d;
         if (Frame::clipIlda (z))
         {
             Frame::blankPoint (point);
@@ -1711,7 +1816,7 @@ void FrameEditor::_deleteFrame (uint16 index)
 
 void FrameEditor::_insertFrame (uint16 index, Frame::Ptr frame)
 {
-    if (index < Frames.size())
+    if (index <= Frames.size())
     {
         Frames.insert(index, frame);
         sendActionMessage (EditorActions::framesChanged);

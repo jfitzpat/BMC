@@ -173,6 +173,7 @@ public:
     bool rotateIldaSelected (float xAngle, float yAngle, float zAngle, bool centerOnSelection, bool constrain = true);
     bool shearIldaSelected (float shearX, float shearY, bool centerOnSelection, bool constrain = true);
     bool translateIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
+    bool barberPoleIldaSelected (float radius, float skew, float zAngle, bool centeredOnSelection, bool constrain = true);
     void endTransform();
 
     // Non transform (atomic) undoable operations

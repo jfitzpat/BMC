@@ -24,6 +24,7 @@
 #include "ScalePopup.h"
 #include "RotatePopup.h"
 #include "ShearPopup.h"
+#include "BarberPopup.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -116,6 +117,10 @@ private:
     std::unique_ptr<DrawableButton> duplicateButton;
     std::unique_ptr<Drawable> anchorIcon;
     std::unique_ptr<DrawableButton> anchorButton;
+    std::unique_ptr<Drawable> invertIcon;
+    std::unique_ptr<DrawableButton> invertButton;
+    std::unique_ptr<Drawable> barberIcon;
+    std::unique_ptr<BarberButton> barberButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };
