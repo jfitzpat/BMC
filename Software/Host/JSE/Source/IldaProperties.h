@@ -122,8 +122,11 @@ private:
     std::unique_ptr<DrawableButton> anchorButton;
     std::unique_ptr<Drawable> barberIcon;
     std::unique_ptr<BarberButton> barberButton;
+    std::unique_ptr<Drawable> bulgeIcon;
     std::unique_ptr<BulgeButton> bulgeButton;
+    std::unique_ptr<Drawable> pinchIcon;
     std::unique_ptr<PinchButton> pinchButton;
+    std::unique_ptr<Drawable> spiralIcon;
     std::unique_ptr<SpiralButton> spiralButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)

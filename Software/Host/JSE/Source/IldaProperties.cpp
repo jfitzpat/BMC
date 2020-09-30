@@ -339,21 +339,30 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     shearButton->setEdgeIndent (0);
     shearButton->setTooltip ("Shear/Skew the selected point(s)");
 
+    bulgeIcon = Drawable::createFromImageData (BinaryData::bulge_png,
+                                               BinaryData::bulge_pngSize);
+
     bulgeButton.reset (new BulgeButton (frameEditor));
     addAndMakeVisible (bulgeButton.get());
-//    bulgeButton->setImages (bulgeIcon.get());
+    bulgeButton->setImages (bulgeIcon.get());
     bulgeButton->setEdgeIndent (0);
     bulgeButton->setTooltip ("Bulge (2D) selected point(s)");
 
+    pinchIcon = Drawable::createFromImageData (BinaryData::pinch_png,
+                                               BinaryData::pinch_pngSize);
+
     pinchButton.reset (new PinchButton (frameEditor));
     addAndMakeVisible (pinchButton.get());
-//    pinchButton->setImages (pinchIcon.get());
+    pinchButton->setImages (pinchIcon.get());
     pinchButton->setEdgeIndent (0);
     pinchButton->setTooltip ("Pinch (2D) selected point(s)");
 
+    spiralIcon = Drawable::createFromImageData (BinaryData::spiral_png,
+                                                BinaryData::spiral_pngSize);
+
     spiralButton.reset (new SpiralButton (frameEditor));
     addAndMakeVisible (spiralButton.get());
-//    spiralButton->setImages (spiralIcon.get());
+    spiralButton->setImages (spiralIcon.get());
     spiralButton->setEdgeIndent (0);
     spiralButton->setTooltip ("Spiral selected point(s)");
 
@@ -426,8 +435,11 @@ IldaProperties::~IldaProperties()
     barberButton = nullptr;
     barberIcon = nullptr;
     bulgeButton = nullptr;
+    bulgeIcon = nullptr;
     pinchButton = nullptr;
+    pinchIcon = nullptr;
     spiralButton = nullptr;
+    spiralIcon = nullptr;
     duplicateButton = nullptr;
     duplicateIcon = nullptr;
     anchorButton = nullptr;

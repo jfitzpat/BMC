@@ -1435,7 +1435,7 @@ bool FrameEditor::barberPoleIldaSelected (float radius,
         // skew
         matrix.transformPoint(x,y);
                 
-        // rap
+        // wrap
         double dx = 0 - ::cos ((double)x * pi2) * rad;
         double dy = (double)y;
         double dz = ::sin ((double)x * pi2) * rad;
