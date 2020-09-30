@@ -331,7 +331,7 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     addAndMakeVisible (barberButton.get());
     barberButton->setImages (barberIcon.get());
     barberButton->setEdgeIndent (0);
-    barberButton->setTooltip ("Barber Pole transform selected point(s)");
+    barberButton->setTooltip ("Barber Pole selected point(s)");
     
     shearButton.reset (new ShearButton (frameEditor));
     addAndMakeVisible (shearButton.get());
@@ -343,13 +343,19 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     addAndMakeVisible (bulgeButton.get());
 //    bulgeButton->setImages (bulgeIcon.get());
     bulgeButton->setEdgeIndent (0);
-    bulgeButton->setTooltip ("Bulge selected point(s)");
+    bulgeButton->setTooltip ("Bulge (2D) selected point(s)");
 
     pinchButton.reset (new PinchButton (frameEditor));
     addAndMakeVisible (pinchButton.get());
 //    pinchButton->setImages (pinchIcon.get());
     pinchButton->setEdgeIndent (0);
-    pinchButton->setTooltip ("Pinch selected point(s)");
+    pinchButton->setTooltip ("Pinch (2D) selected point(s)");
+
+    spiralButton.reset (new SpiralButton (frameEditor));
+    addAndMakeVisible (spiralButton.get());
+//    spiralButton->setImages (spiralIcon.get());
+    spiralButton->setEdgeIndent (0);
+    spiralButton->setTooltip ("Spiral selected point(s)");
 
     duplicateIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
                                                     BinaryData::duplicatewhite_pngSize);
@@ -421,6 +427,7 @@ IldaProperties::~IldaProperties()
     barberIcon = nullptr;
     bulgeButton = nullptr;
     pinchButton = nullptr;
+    spiralButton = nullptr;
     duplicateButton = nullptr;
     duplicateIcon = nullptr;
     anchorButton = nullptr;
@@ -471,8 +478,9 @@ void IldaProperties::resized()
     rotateButton->setBounds (82, 412, 32, 32);
     shearButton->setBounds (118, 412, 32, 32);
     barberButton->setBounds (154, 412, 32, 32);
-    bulgeButton->setBounds (118, 448, 32, 32);
-    pinchButton->setBounds (154, 448, 32, 32);
+    bulgeButton->setBounds (82, 448, 32, 32);
+    pinchButton->setBounds (118, 448, 32, 32);
+    spiralButton->setBounds (154, 448, 32, 32);
     duplicateButton->setBounds (118, 484, 32, 32);
     anchorButton->setBounds (154, 484, 32, 32);
     trashButton->setBounds (154, 520, 32, 32);
@@ -811,6 +819,8 @@ void IldaProperties::disableSelectionTools()
     shearButton->setEnabled (false);
     barberButton->setEnabled (false);
     bulgeButton->setEnabled (false);
+    pinchButton->setEnabled (false);
+    spiralButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -910,6 +920,8 @@ void IldaProperties::updateSelection()
             shearButton->setEnabled (true);
             barberButton->setEnabled (true);
             bulgeButton->setEnabled (true);
+            pinchButton->setEnabled (true);
+            spiralButton->setEnabled (true);
         }
     }
 }

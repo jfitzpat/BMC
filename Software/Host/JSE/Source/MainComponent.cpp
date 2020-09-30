@@ -126,7 +126,7 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::fileOpen);
 
         PopupMenu recentFilesMenu;
-        if (recentFileList->getNumFiles())
+        if (recentFileList->getNumFiles() && (! frameEditor->isTransforming()))
         {
             recentFileList->createPopupMenuItems(recentFilesMenu,
                                                  RECENT_BASE_ID, true, false);
@@ -524,6 +524,10 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         default:
             break;
     }
+    
+    // If we are transforming (quasi modal), disable all the action keys/menus
+    if (frameEditor->isTransforming())
+        result.setActive (false);
 }
 
 bool MainComponent::perform (const InvocationInfo& info)

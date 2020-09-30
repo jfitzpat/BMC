@@ -27,6 +27,7 @@
 #include "BarberPopup.h"
 #include "BulgePopup.h"
 #include "PinchPopup.h"
+#include "SpiralPopup.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -123,6 +124,7 @@ private:
     std::unique_ptr<BarberButton> barberButton;
     std::unique_ptr<BulgeButton> bulgeButton;
     std::unique_ptr<PinchButton> pinchButton;
+    std::unique_ptr<SpiralButton> spiralButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

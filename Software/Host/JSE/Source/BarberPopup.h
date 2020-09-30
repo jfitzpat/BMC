@@ -107,7 +107,7 @@ public:
         rotateSlider->setValue (0, dontSendNotification);
         centerButton->setToggleState (true, dontSendNotification);
         
-        frameEditor->startTransform ("Barber Pole Transform");
+        frameEditor->startTransform ("Barber Pole");
         buttonClicked (nullptr);
     }
     

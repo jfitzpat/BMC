@@ -60,7 +60,7 @@ namespace EditorActions
     const String smallLeftRequest           ("lER");
     const String smallRightRequest          ("rIR");
     const String transformStarted           ("TS");
-    const String transfromEnded             ("TE");
+    const String transformEnded             ("TE");
 }
 
 //==============================================================================
@@ -177,6 +177,7 @@ public:
     bool translateIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain = true);
     bool barberPoleIldaSelected (float radius, float skew, float zAngle, bool centeredOnSelection, bool constrain = true);
     bool bulgeIldaSelected (float radius, float gain, bool centeredOnSelection, bool constrain = true);
+    bool spiralIldaSelected (float angle, int size, bool centerOnSelection, bool constrain = true);
     void endTransform();
 
     // Non transform (atomic) undoable operations

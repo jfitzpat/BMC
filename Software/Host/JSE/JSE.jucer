@@ -52,6 +52,7 @@
           <FILE id="MdAhEP" name="RotatePopup.h" compile="0" resource="0" file="Source/RotatePopup.h"/>
           <FILE id="SbIKdp" name="ScalePopup.h" compile="0" resource="0" file="Source/ScalePopup.h"/>
           <FILE id="dLKYqi" name="ShearPopup.h" compile="0" resource="0" file="Source/ShearPopup.h"/>
+          <FILE id="LZM5GV" name="SpiralPopup.h" compile="0" resource="0" file="Source/SpiralPopup.h"/>
           <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
                 file="Source/ThumbBuilder.cpp"/>
           <FILE id="QR21o4" name="ThumbBuilder.h" compile="0" resource="0" file="Source/ThumbBuilder.h"/>

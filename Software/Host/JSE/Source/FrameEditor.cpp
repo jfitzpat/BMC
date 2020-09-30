@@ -1044,6 +1044,7 @@ void FrameEditor::startTransform (const String& name)
     transformName = name;
     transformUsed = false;
     tranformInProgress = true;
+    sendActionMessage (EditorActions::transformStarted);
 }
 
 bool FrameEditor::scaleIldaSelected (float xScale,
@@ -1554,6 +1555,82 @@ bool FrameEditor::bulgeIldaSelected (float radius,
     return true;
 }
 
+bool FrameEditor::spiralIldaSelected (float angle,
+                                      int eSize,
+                                      bool centerOnSelection,
+                                      bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+
+    int xOffset = 0;
+    int yOffset = 0;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformCenterX;
+        yOffset = transformCenterY;
+    }
+    
+    double a = (double)angle;
+    double b = (double)eSize;
+    b *= b;
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+        double dx = point.x.w - xOffset;
+        double dy = point.y.w - yOffset;
+        double dist = (dx * dx + dy * dy) / b;
+        double edist = ::exp (-dist);
+        double rad = a * edist;
+        double d;
+        
+        d = cos(rad) * dx + sin(rad) * dy;
+        int x = (int)d;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+
+        d = -sin(rad) * dx + cos(rad) * dy;
+        int y = (int)d;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+        
+//        if (dist <= 1.0)
+        {
+            double es = (double)eSize;
+            es = (edist * es);
+            double ez = (double)point.z.w;
+            ez -= (es / 2.0);
+            int z = (int)ez;
+            if (z < -32768)
+                z = -32768;
+            
+            point.z.w = (int16)z;
+        }
+    }
+
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
 void FrameEditor::endTransform()
 {
     // Already Transformed! So grab!
@@ -1575,6 +1652,7 @@ void FrameEditor::endTransform()
 
         refreshThumb();
     }
+    sendActionMessage (EditorActions::transformEnded);
 }
 
 void FrameEditor::setIldaSelectedX (int16 newX)
