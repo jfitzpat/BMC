@@ -32,7 +32,7 @@ public:
     {
         scaleXSlider.reset (new juce::Slider ("scaleXSlider"));
         addAndMakeVisible (scaleXSlider.get());
-        scaleXSlider->setRange (-2000, 2000, 1);
+        scaleXSlider->setRange (-300, 300, 1);
         scaleXSlider->setSliderStyle (juce::Slider::LinearVertical);
         scaleXSlider->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
         scaleXSlider->setColour (juce::Slider::backgroundColourId, juce::Colour (0xff0d1112));
@@ -43,7 +43,7 @@ public:
 
         scaleYSlider.reset (new juce::Slider ("scaleYSlider"));
         addAndMakeVisible (scaleYSlider.get());
-        scaleYSlider->setRange (-2000, 2000, 1);
+        scaleYSlider->setRange (-300, 300, 1);
         scaleYSlider->setSliderStyle (juce::Slider::LinearVertical);
         scaleYSlider->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
         scaleYSlider->setColour (juce::Slider::backgroundColourId, juce::Colour (0xff0d1112));
