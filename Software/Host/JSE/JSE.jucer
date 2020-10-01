@@ -27,6 +27,7 @@
         <FILE id="TtnrYe" name="scale.png" compile="0" resource="1" file="Graphics/scale.png"/>
         <FILE id="CIUduD" name="shear.png" compile="0" resource="1" file="Graphics/shear.png"/>
         <FILE id="RpuDEN" name="showall.png" compile="0" resource="1" file="Graphics/showall.png"/>
+        <FILE id="bNfHB9" name="sphere.png" compile="0" resource="1" file="Graphics/sphere.png"/>
         <FILE id="dh7X9e" name="spiral.png" compile="0" resource="1" file="Graphics/spiral.png"/>
         <FILE id="NCKhUw" name="trash.png" compile="0" resource="1" file="Graphics/trash.png"/>
         <FILE id="RczVdz" name="up-white.png" compile="0" resource="1" file="Graphics/up-white.png"/>
@@ -55,6 +56,7 @@
           <FILE id="MdAhEP" name="RotatePopup.h" compile="0" resource="0" file="Source/RotatePopup.h"/>
           <FILE id="SbIKdp" name="ScalePopup.h" compile="0" resource="0" file="Source/ScalePopup.h"/>
           <FILE id="dLKYqi" name="ShearPopup.h" compile="0" resource="0" file="Source/ShearPopup.h"/>
+          <FILE id="E38Kl9" name="SpherePopup.h" compile="0" resource="0" file="Source/SpherePopup.h"/>
           <FILE id="LZM5GV" name="SpiralPopup.h" compile="0" resource="0" file="Source/SpiralPopup.h"/>
           <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
                 file="Source/ThumbBuilder.cpp"/>

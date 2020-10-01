@@ -366,6 +366,15 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     spiralButton->setEdgeIndent (0);
     spiralButton->setTooltip ("Spiral selected point(s)");
 
+    sphereIcon = Drawable::createFromImageData (BinaryData::sphere_png,
+                                                BinaryData::sphere_pngSize);
+
+    sphereButton.reset (new SphereButton (frameEditor));
+    addAndMakeVisible (sphereButton.get());
+    sphereButton->setImages (sphereIcon.get());
+    sphereButton->setEdgeIndent (0);
+    sphereButton->setTooltip ("Map selected point(s) to a sphere");
+
     duplicateIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
                                                     BinaryData::duplicatewhite_pngSize);
 
@@ -440,6 +449,8 @@ IldaProperties::~IldaProperties()
     pinchIcon = nullptr;
     spiralButton = nullptr;
     spiralIcon = nullptr;
+    sphereButton = nullptr;
+    sphereIcon = nullptr;
     duplicateButton = nullptr;
     duplicateIcon = nullptr;
     anchorButton = nullptr;
@@ -490,9 +501,10 @@ void IldaProperties::resized()
     rotateButton->setBounds (82, 412, 32, 32);
     shearButton->setBounds (118, 412, 32, 32);
     barberButton->setBounds (154, 412, 32, 32);
-    bulgeButton->setBounds (82, 448, 32, 32);
-    pinchButton->setBounds (118, 448, 32, 32);
-    spiralButton->setBounds (154, 448, 32, 32);
+    bulgeButton->setBounds (46, 448, 32, 32);
+    pinchButton->setBounds (82, 448, 32, 32);
+    spiralButton->setBounds (118, 448, 32, 32);
+    sphereButton->setBounds(154, 448, 32, 32);
     duplicateButton->setBounds (118, 484, 32, 32);
     anchorButton->setBounds (154, 484, 32, 32);
     trashButton->setBounds (154, 520, 32, 32);
@@ -833,6 +845,7 @@ void IldaProperties::disableSelectionTools()
     bulgeButton->setEnabled (false);
     pinchButton->setEnabled (false);
     spiralButton->setEnabled (false);
+    sphereButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -934,6 +947,7 @@ void IldaProperties::updateSelection()
             bulgeButton->setEnabled (true);
             pinchButton->setEnabled (true);
             spiralButton->setEnabled (true);
+            sphereButton->setEnabled (true);
         }
     }
 }

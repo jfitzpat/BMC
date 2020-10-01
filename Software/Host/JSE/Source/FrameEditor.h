@@ -178,6 +178,7 @@ public:
     bool barberPoleIldaSelected (float radius, float skew, float zAngle, bool centeredOnSelection, bool constrain = true);
     bool bulgeIldaSelected (float radius, float gain, bool centeredOnSelection, bool constrain = true);
     bool spiralIldaSelected (float angle, int size, bool centerOnSelection, bool constrain = true);
+    bool sphereIldaSelected (double xScale, double yScale, double rScale, bool centerOnSelection, bool constrain = true);
     void endTransform();
 
     // Non transform (atomic) undoable operations

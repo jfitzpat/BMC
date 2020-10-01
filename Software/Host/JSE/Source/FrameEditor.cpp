@@ -1419,7 +1419,7 @@ bool FrameEditor::barberPoleIldaSelected (float radius,
     AffineTransform matrix = AffineTransform::shear (0, skew);
 
     double rad = (double)radius;
-    double pi2 = 1.0 / rad; // (2.0 * pi) / (2.0 * pi * rad);
+    double theta = 1.0 / rad; // (2.0 * pi) / (2.0 * pi * rad);
     bool clipped = false;
     
     for (auto n = 0; n < points.size(); ++n)
@@ -1436,9 +1436,9 @@ bool FrameEditor::barberPoleIldaSelected (float radius,
         matrix.transformPoint(x,y);
                 
         // wrap
-        double dx = 0 - ::cos ((double)x * pi2) * rad;
+        double dx = 0 - ::cos ((double)x * theta) * rad;
         double dy = (double)y;
-        double dz = ::sin ((double)x * pi2) * rad;
+        double dz = ::sin ((double)x * theta) * rad;
 
         // rotate
         double d;
@@ -1609,20 +1609,88 @@ bool FrameEditor::spiralIldaSelected (float angle,
         }
         point.y.w = (int16)y;
         
-//        if (dist <= 1.0)
-        {
-            double es = (double)eSize;
-            es = (edist * es);
-            double ez = (double)point.z.w;
-            ez -= (es / 2.0);
-            int z = (int)ez;
-            if (z < -32768)
-                z = -32768;
-            
-            point.z.w = (int16)z;
-        }
+        double es = (double)eSize;
+        es = (edist * es);
+        double ez = (double)point.z.w;
+        ez -= (es / 2.0);
+        int z = (int)ez;
+        Frame::clipIlda (z);
+        
+        point.z.w = (int16)z;
     }
 
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
+bool FrameEditor::sphereIldaSelected (double xScale,
+                                      double yScale,
+                                      double rScale,
+                                      bool centerOnSelection,
+                                      bool constrain)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+
+    int xOffset = 0;
+    int yOffset = 0;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformCenterX;
+        yOffset = transformCenterY;
+    }
+    
+    const double pi = MathConstants<double>::pi;
+    double xrad = (2.0 * pi) / 65536.0;
+    double yrad = pi / 65536.0;
+    double r = 65536.0 / (2.0 * pi);
+    r *= rScale;
+    
+    bool clipped = false;
+
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+        double dx = point.x.w - xOffset;
+        double dy = point.y.w - yOffset;
+        double d;
+        
+        d = r * ::sin (dx * xScale * xrad) * ::sin ((32767.0 - (dy * yScale)) * yrad);
+        int x = (int)d;
+        x += xOffset;
+        if (Frame::clipIlda (x))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.x.w = (int16)x;
+
+        d = r * ::cos ((32767.0 - (dy * yScale)) * yrad);
+        int y = (int)d;
+        y += yOffset;
+        if (Frame::clipIlda (y))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.y.w = (int16)y;
+        
+        d = r * ::sin ((32767.0 - (dy * yScale)) * yrad) * ::cos (dx * xScale * xrad);
+        int z = (int)d;
+        if (Frame::clipIlda (z))
+        {
+            Frame::blankPoint (point);
+            clipped = true;
+        }
+        point.z.w = (int16)z;
+    }
+    
     if (constrain && clipped)
         return false;
 
