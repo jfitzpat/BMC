@@ -139,7 +139,7 @@ public:
 
     void buttonClicked (juce::Button* /*buttonThatWasClicked*/) override
     {
-        float rad = (float)radiusSlider->getValue() * 10.0;
+        float rad = (float)radiusSlider->getValue() * 10.0f;
         float skew = (float)skewSlider->getValue();
         float rot = (float)rotateSlider->getValue();
         bool b = centerButton->getToggleState();
