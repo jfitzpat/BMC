@@ -138,9 +138,53 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
     }
 }
 
+void WorkingArea::rightClickIldaSelect (const MouseEvent& /*event*/)
+{
+    PopupMenu menu;
+    
+    if (drawMark)
+    {
+        menu.addItem (100, "Select All...", false);
+        menu.addItem (1, "Stacked Here");
+        menu.addItem (2, "Same Color");
+        menu.addItem (3, "Same Visibility");
+        int choice = menu.show();
+        
+        SparseSet<uint16> selection;
+
+        if (choice == 1)
+            findAllCloseSiblings (markIndex, selection);
+        else if (choice == 2)
+            findAllSameColor (markIndex, selection);
+        else if (choice == 3)
+            findAllSameVisibility (markIndex, selection);
+        
+        if (! selection.isEmpty())
+            frameEditor->setIldaSelection (selection);
+    }
+    else
+    {
+        menu.addItem (1, "Select All");
+        menu.addItem (2, "Clear Selection");
+        int choice = menu.show();
+        
+        if (choice == 1)
+            frameEditor->selectAll();
+        else if (choice == 2)
+            frameEditor->clearSelection();
+    }
+}
+
 void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
 {
     // Left mouse only for now
+    if (event.mods.isRightButtonDown())
+    {
+        rightClickIldaSelect (event);
+        return;
+    }
+    
+    
     if (! event.mods.isLeftButtonDown())
         return;
     
@@ -336,6 +380,90 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
     }
     else
         mouseMoveIldaSelect (event);
+}
+
+void WorkingArea::findAllSameColor (Colour color, SparseSet<uint16>& set)
+{
+    set.clear();
+
+    // Loop through the points and look for matches
+    for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
+    {
+        Frame::XYPoint point;
+        frameEditor->getPoint (n, point);
+   
+        Colour c;
+        if (point.status & Frame::BlankedPoint)
+            c = Colours::black;
+        else
+            c = Colour (point.red, point.green, point.blue);
+
+        if (c == color)
+            set.addRange (Range<uint16> (n, n+1));
+    }
+}
+
+void WorkingArea::findAllSameColor (uint16 index, SparseSet<uint16>& set)
+{
+    set.clear();
+    
+    Frame::XYPoint point;
+    if (frameEditor->getPoint (index, point))
+        findAllSameColor (Colour (point.red, point.green, point.blue), set);
+}
+
+void WorkingArea::findAllSameVisibility (bool blanked, SparseSet<uint16>& set)
+{
+     set.clear();
+
+     // Loop through the points and look for matches
+     for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
+     {
+         Frame::XYPoint point;
+         frameEditor->getPoint (n, point);
+    
+         if ((bool)(point.status & Frame::BlankedPoint) == blanked)
+             set.addRange (Range<uint16> (n, n+1));
+     }
+}
+
+void WorkingArea::findAllSameVisibility (uint16 index, SparseSet<uint16>& set)
+{
+    set.clear();
+    
+    Frame::XYPoint point;
+    if (frameEditor->getPoint (index, point))
+        findAllSameVisibility ((bool)(point.status & Frame::BlankedPoint), set);
+}
+
+void WorkingArea::findAllCloseSiblings (uint16 index, SparseSet<uint16>& set)
+{
+    set.clear();
+    
+    Frame::XYPoint point;
+    if (! frameEditor->getPoint (index, point))
+        return;
+
+    int x = point.x.w;
+    int y = point.y.w;
+
+    Rectangle<int16> r((int16)x - (int16)(3 * activeInvScale), (int16)y - (int16)(3 * activeInvScale), (int16)(6 * activeInvScale), (int16)(6 * activeInvScale));
+
+    FrameEditor::View view = frameEditor->getActiveView();
+
+    // Loop through the points and look for matches
+    for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
+    {
+        frameEditor->getPoint (n, point);
+        
+        uint16 tx = view == Frame::left ? point.z.w : point.x.w;
+        uint16 ty = view == Frame::bottom ? point.z.w : point.y.w;
+        
+        if (r.contains (tx, ty))
+            if (frameEditor->getIldaShowBlanked() ||
+                (! (point.status & Frame::BlankedPoint)))
+                set.addRange (Range<uint16> (n, n+1));
+    }
 }
 
 int WorkingArea::findCloseMouseMatch (const MouseEvent& event)

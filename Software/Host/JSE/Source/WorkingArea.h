@@ -58,6 +58,12 @@ private:
     void killMarkers();
     void insertAnchor (uint16 index, Colour c);
     int findCloseMouseMatch (const MouseEvent& event);
+    void findAllCloseSiblings (uint16 index, SparseSet<uint16>& set);
+    void findAllSameColor (Colour color, SparseSet<uint16>& set);
+    void findAllSameColor (uint16 index, SparseSet<uint16>& set);
+    void findAllSameVisibility (bool blanked, SparseSet<uint16>& set);
+    void findAllSameVisibility (uint16 index, SparseSet<uint16>& set);
+    void rightClickIldaSelect (const MouseEvent& event);
     void mouseDownIldaSelect (const MouseEvent& event);
     void mouseDownIldaMove (const MouseEvent& event);
     void mouseDownIldaPoint (const MouseEvent& event);
