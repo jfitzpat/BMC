@@ -142,7 +142,7 @@ public:
         {
             lockout = true;
             auto colourSelector = std::make_unique<CBSelector>(this, findColour (TextButton::buttonColourId));
-            CallOutBox::launchAsynchronously (std::move(colourSelector), getScreenBounds(), nullptr);
+            CallOutBox::launchAsynchronously (std::move(colourSelector), getScreenBounds(), nullptr).setDismissalMouseClicksAreAlwaysConsumed (true);
         }
     }
 

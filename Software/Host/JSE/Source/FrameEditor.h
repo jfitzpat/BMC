@@ -179,6 +179,8 @@ public:
     bool bulgeIldaSelected (float radius, float gain, bool centeredOnSelection, bool constrain = true);
     bool spiralIldaSelected (float angle, int size, bool centerOnSelection, bool constrain = true);
     bool sphereIldaSelected (double xScale, double yScale, double rScale, bool centerOnSelection, bool constrain = true);
+    bool gradientIldaSelected (const Colour& color1, const Colour& color2, float angle, float length, bool radial, bool centerOnSelection, const Colour& color3 = Colours::transparentBlack);
+    bool adjustHueIldaSelected (float hshift, float saturation, float brightness);
     void endTransform();
 
     // Non transform (atomic) undoable operations

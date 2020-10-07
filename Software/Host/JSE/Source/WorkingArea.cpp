@@ -683,7 +683,8 @@ void WorkingArea::paint (juce::Graphics& g)
 
                     // Mark selected even if ShowBlanked is off, since can be edited
                     if (frameEditor->getIldaSelection().contains (n) &&
-                        frameEditor->getActiveLayer() == FrameEditor::ilda)
+                        frameEditor->getActiveLayer() == FrameEditor::ilda &&
+                        (! frameEditor->isTransforming()))
                     {
                         g.setColour (Colours::lightblue);
                         g.drawEllipse(Frame::getCompX (point, view) - halfSelectSize,
@@ -699,7 +700,8 @@ void WorkingArea::paint (juce::Graphics& g)
                                   dotSize, dotSize);
                     
                     if (frameEditor->getIldaSelection().contains (n) &&
-                        frameEditor->getActiveLayer() == FrameEditor::ilda)
+                        frameEditor->getActiveLayer() == FrameEditor::ilda &&
+                        (! frameEditor->isTransforming()))
                     {
                         g.setColour (Colours::whitesmoke);
                         g.drawEllipse(Frame::getCompX (point, view) - halfSelectSize,
@@ -897,4 +899,8 @@ void WorkingArea::actionListenerCallback (const String& message)
             frameEditor->setIldaSelection (selection);
         }
     }
+    else if (message == EditorActions::transformStarted)
+        repaint();
+    else if (message == EditorActions::transformEnded)
+        repaint();
 }

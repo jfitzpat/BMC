@@ -37,7 +37,7 @@ public:
             lockout = true;
             auto controls = makeComponent();
             controls->addComponentListener (this);
-            CallOutBox::launchAsynchronously (std::move(controls), getScreenBounds(), nullptr);
+            CallOutBox::launchAsynchronously (std::move(controls), getScreenBounds(), nullptr).setDismissalMouseClicksAreAlwaysConsumed (true);
         }
     }
 

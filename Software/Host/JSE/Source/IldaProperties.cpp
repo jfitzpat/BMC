@@ -375,6 +375,36 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     sphereButton->setEdgeIndent (0);
     sphereButton->setTooltip ("Map selected point(s) to a sphere");
 
+    gradientIcon = Drawable::createFromImageData (BinaryData::gradient_png,
+                                                  BinaryData::gradient_pngSize);
+
+    gradientButton.reset (new GradientButton (frameEditor));
+    addAndMakeVisible (gradientButton.get());
+    gradientButton->setImages (gradientIcon.get());
+    gradientButton->setEdgeIndent (0);
+    gradientButton->setTooltip ("Apply a 2 color gradient to the selected point(s)");
+
+    duplicateIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
+                                                    BinaryData::duplicatewhite_pngSize);
+
+    gradient3Icon = Drawable::createFromImageData (BinaryData::gradient3_png,
+                                                   BinaryData::gradient3_pngSize);
+
+    gradient3Button.reset (new Gradient3Button (frameEditor));
+    addAndMakeVisible (gradient3Button.get());
+    gradient3Button->setImages (gradient3Icon.get());
+    gradient3Button->setEdgeIndent (0);
+    gradient3Button->setTooltip ("Apply a 3 color gradient to the selected point(s)");
+
+    hueIcon = Drawable::createFromImageData (BinaryData::coloradjust_png,
+                                             BinaryData::coloradjust_pngSize);
+
+    hueButton.reset (new HueButton (frameEditor));
+    addAndMakeVisible (hueButton.get());
+    hueButton->setImages (hueIcon.get());
+    hueButton->setEdgeIndent (0);
+    hueButton->setTooltip ("Adjust hue, saturation, and brightness");
+
     duplicateIcon = Drawable::createFromImageData (BinaryData::duplicatewhite_png,
                                                     BinaryData::duplicatewhite_pngSize);
 
@@ -451,6 +481,12 @@ IldaProperties::~IldaProperties()
     spiralIcon = nullptr;
     sphereButton = nullptr;
     sphereIcon = nullptr;
+    gradientButton = nullptr;
+    gradientIcon = nullptr;
+    gradient3Button = nullptr;
+    gradient3Icon = nullptr;
+    hueButton = nullptr;
+    hueIcon = nullptr;
     duplicateButton = nullptr;
     duplicateIcon = nullptr;
     anchorButton = nullptr;
@@ -505,9 +541,12 @@ void IldaProperties::resized()
     pinchButton->setBounds (82, 448, 32, 32);
     spiralButton->setBounds (118, 448, 32, 32);
     sphereButton->setBounds(154, 448, 32, 32);
-    duplicateButton->setBounds (118, 484, 32, 32);
-    anchorButton->setBounds (154, 484, 32, 32);
-    trashButton->setBounds (154, 520, 32, 32);
+    gradientButton->setBounds (82, 484, 32, 32);
+    gradient3Button->setBounds (118, 484, 32, 32);
+    hueButton->setBounds(154, 484, 32, 32);
+    duplicateButton->setBounds (118, 520, 32, 32);
+    anchorButton->setBounds (154, 520, 32, 32);
+    trashButton->setBounds (154, 556, 32, 32);
 }
 
 //==============================================================================
@@ -846,6 +885,9 @@ void IldaProperties::disableSelectionTools()
     pinchButton->setEnabled (false);
     spiralButton->setEnabled (false);
     sphereButton->setEnabled (false);
+    gradientButton->setEnabled (false);
+    gradient3Button->setEnabled (false);
+    hueButton->setEnabled (false);
 }
 
 void IldaProperties::updateSelection()
@@ -948,6 +990,9 @@ void IldaProperties::updateSelection()
             pinchButton->setEnabled (true);
             spiralButton->setEnabled (true);
             sphereButton->setEnabled (true);
+            gradientButton->setEnabled (true);
+            gradient3Button->setEnabled (true);
+            hueButton->setEnabled (true);
         }
     }
 }

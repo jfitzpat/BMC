@@ -29,6 +29,9 @@
 #include "PinchPopup.h"
 #include "SpiralPopup.h"
 #include "SpherePopup.h"
+#include "GradientPopup.h"
+#include "Gradient3Popup.h"
+#include "HuePopup.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -131,6 +134,12 @@ private:
     std::unique_ptr<SpiralButton> spiralButton;
     std::unique_ptr<Drawable> sphereIcon;
     std::unique_ptr<SphereButton> sphereButton;
+    std::unique_ptr<Drawable> gradientIcon;
+    std::unique_ptr<GradientButton> gradientButton;
+    std::unique_ptr<Drawable> gradient3Icon;
+    std::unique_ptr<Gradient3Button> gradient3Button;
+    std::unique_ptr<Drawable> hueIcon;
+    std::unique_ptr<HueButton> hueButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IldaProperties)
 };

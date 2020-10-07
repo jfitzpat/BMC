@@ -1699,6 +1699,135 @@ bool FrameEditor::sphereIldaSelected (double xScale,
     return true;
 }
 
+bool FrameEditor::gradientIldaSelected (const Colour& color1,
+                                        const Colour& color2,
+                                        float angle,
+                                        float length,
+                                        bool radial,
+                                        bool centerOnSelection,
+                                        const Colour& color3)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+
+    // We work this one in component space, since nothing is moving
+    int xOffset = 32768;
+    int yOffset = 32768;
+    
+    if (centerOnSelection)
+        getComponentCenterOfIldaSelection (xOffset, yOffset);
+
+    Point<float> center = Point<float> (xOffset, yOffset);
+    
+    float flength = length * 32768.0 / 100.0f;
+    double rot = angle < 0 ? 360.0 + angle : angle;
+    
+    // Clip rotation
+    if (rot > 359.9)
+        rot = 0.0;
+
+    // Convert to radians
+    const double pi = MathConstants<double>::pi;
+    float ang = (float)(rot * pi / 180.0);
+
+    // Build our line
+    Line<float> l1 = Line<float>::fromStartAndAngle (center, flength, ang);
+    Line<float> l2 = Line<float>::fromStartAndAngle (center, -flength, ang);
+    Line<float> line = Line<float>(l1.getEnd(), l2.getEnd());
+
+    // Make a color gradient
+    ColourGradient cg;
+    if (radial)
+        cg = ColourGradient(color1, 32768.0f, 32768.0f, color2, 32768.0f, 32768.0f - flength, true);
+    else
+        cg = ColourGradient (color1, line.getStartX(), line.getStartY(), color2, line.getEndX(), line.getEndY(), false);
+    
+    if (color3.isOpaque())
+        cg.addColour (0.5, color3);
+    
+    // Walk the selected points
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        int x = Frame::getCompXInt (point);
+        int y = Frame::getCompYInt (point);
+                
+        float proportion = 0.0;
+        
+        if (radial)
+        {
+            Line<float> l(center.getX(), center.getY(), (float)x, (float)y);
+            proportion = flength / l.getLength();
+        }
+        else
+        {
+            proportion = line.findNearestProportionalPositionTo (Point<float> ((float)x, (float)y));
+        }
+        if (proportion < 0)
+            proportion = 0.0f;
+        else if (proportion > 1.0f)
+            proportion = 1.0f;
+        
+        Colour c = cg.getColourAtPosition ((double)proportion);
+        point.red = c.getRed();
+        point.green = c.getGreen();
+        point.blue = c.getBlue();
+        
+        if (c == Colours::black)
+            point.status = Frame::BlankedPoint;
+        else
+            point.status = 0;
+    }
+    
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
+bool FrameEditor::adjustHueIldaSelected (float hshift,
+                                         float saturation,
+                                         float brightness)
+{
+    Array<Frame::XYPoint> points = transformPoints;
+    if (! points.size())
+        return false;
+
+    for (auto n = 0; n < points.size(); ++n)
+    {
+        Frame::XYPoint& point = points.getReference (n);
+
+        Colour c = Colour (point.red, point.green, point.blue).withRotatedHue (hshift);
+        float sat = c.getSaturation() + saturation;
+        if (sat < 0.0f)
+            sat = 0.0f;
+        else if (sat > 1.0f)
+            sat = 1.0f;
+        c = c.withSaturation (sat);
+        
+        float b = c.getBrightness() + brightness;
+        if (b < 0.0f)
+            b = 0.0f;
+        else if (b > 1.0f)
+            b = 1.0f;
+        c = c.withBrightness (b);
+        
+        point.red = c.getRed();
+        point.green = c.getGreen();
+        point.blue = c.getBlue();
+        
+        if (c == Colours::black)
+            point.status = Frame::BlankedPoint;
+        else
+            point.status = 0;
+    }
+    
+    transformUsed = true;
+    _setIldaPoints (ildaSelection, points);
+    return true;
+}
+
 void FrameEditor::endTransform()
 {
     // Already Transformed! So grab!

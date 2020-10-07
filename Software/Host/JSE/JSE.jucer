@@ -3,7 +3,7 @@
 <JUCERPROJECT id="qW4wAR" name="JSE" projectType="guiapp" useAppConfig="0"
               addUsingNamespaceToJuceHeader="1" jucerFormatVersion="1" companyName="ScrootchMe"
               companyCopyright="Copyright 2020 Scrootch.Me!" companyWebsite="http://scrootch.me/bmc"
-              version="0.1.2">
+              version="0.1.3">
   <MAINGROUP id="dkE1Q5" name="JSE">
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{419AAC25-6FF2-599E-C3D9-334E04C580EF}" name="Binary Resources">
@@ -14,10 +14,13 @@
         <FILE id="pR9Plt" name="centerx.png" compile="0" resource="1" file="Graphics/centerx.png"/>
         <FILE id="mgXFTs" name="centery.png" compile="0" resource="1" file="Graphics/centery.png"/>
         <FILE id="kGVlt1" name="centerz.png" compile="0" resource="1" file="Graphics/centerz.png"/>
+        <FILE id="FbVlUv" name="coloradjust.png" compile="0" resource="1" file="Graphics/coloradjust.png"/>
         <FILE id="Ji38Wl" name="croshair.png" compile="0" resource="1" file="Graphics/croshair.png"/>
         <FILE id="OVPQcf" name="down-white.png" compile="0" resource="1" file="Graphics/down-white.png"/>
         <FILE id="NfqRkZ" name="duplicate-white.png" compile="0" resource="1"
               file="Graphics/duplicate-white.png"/>
+        <FILE id="bY1Kdi" name="gradient.png" compile="0" resource="1" file="Graphics/gradient.png"/>
+        <FILE id="jNaIci" name="gradient3.png" compile="0" resource="1" file="Graphics/gradient3.png"/>
         <FILE id="VuLuq9" name="jse2.png" compile="0" resource="0" file="Graphics/jse2.png"/>
         <FILE id="iWP9Vt" name="move.png" compile="0" resource="1" file="Graphics/move.png"/>
         <FILE id="Enw2eq" name="pinch.png" compile="0" resource="1" file="Graphics/pinch.png"/>
@@ -39,6 +42,10 @@
           <FILE id="SALXLE" name="BarberPopup.h" compile="0" resource="0" file="Source/BarberPopup.h"/>
           <FILE id="Hu94PP" name="BulgePopup.h" compile="0" resource="0" file="Source/BulgePopup.h"/>
           <FILE id="xoFsB2" name="ColourButton.h" compile="0" resource="0" file="Source/ColourButton.h"/>
+          <FILE id="TqKhR0" name="Gradient3Popup.h" compile="0" resource="0"
+                file="Source/Gradient3Popup.h"/>
+          <FILE id="SkbCt2" name="GradientPopup.h" compile="0" resource="0" file="Source/GradientPopup.h"/>
+          <FILE id="ugzkVo" name="HuePopup.h" compile="0" resource="0" file="Source/HuePopup.h"/>
           <FILE id="CRErzo" name="IldaExporter.cpp" compile="1" resource="0"
                 file="Source/IldaExporter.cpp"/>
           <FILE id="T65gnl" name="IldaExporter.h" compile="0" resource="0" file="Source/IldaExporter.h"/>
@@ -54,6 +61,8 @@
           <FILE id="daWKRA" name="PinchPopup.h" compile="0" resource="0" file="Source/PinchPopup.h"/>
           <FILE id="zF8dd2" name="PopupTool.h" compile="0" resource="0" file="Source/PopupTool.h"/>
           <FILE id="MdAhEP" name="RotatePopup.h" compile="0" resource="0" file="Source/RotatePopup.h"/>
+          <FILE id="UTm9qY" name="SaturationPopup.h" compile="0" resource="0"
+                file="Source/SaturationPopup.h"/>
           <FILE id="SbIKdp" name="ScalePopup.h" compile="0" resource="0" file="Source/ScalePopup.h"/>
           <FILE id="dLKYqi" name="ShearPopup.h" compile="0" resource="0" file="Source/ShearPopup.h"/>
           <FILE id="E38Kl9" name="SpherePopup.h" compile="0" resource="0" file="Source/SpherePopup.h"/>
