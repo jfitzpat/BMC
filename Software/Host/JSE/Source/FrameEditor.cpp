@@ -1751,8 +1751,8 @@ bool FrameEditor::gradientIldaSelected (const Colour& color1,
     {
         Frame::XYPoint& point = points.getReference (n);
 
-        int x = Frame::getCompXInt (point);
-        int y = Frame::getCompYInt (point);
+        int x = Frame::getCompXInt (point, activeView);
+        int y = Frame::getCompYInt (point, activeView);
                 
         float proportion = 0.0;
         
@@ -1762,10 +1762,9 @@ bool FrameEditor::gradientIldaSelected (const Colour& color1,
             proportion = flength / l.getLength();
         }
         else
-        {
             proportion = line.findNearestProportionalPositionTo (Point<float> ((float)x, (float)y));
-        }
-        if (proportion < 0)
+
+        if (proportion < 0.0f)
             proportion = 0.0f;
         else if (proportion > 1.0f)
             proportion = 1.0f;
