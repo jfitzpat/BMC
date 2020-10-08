@@ -1718,9 +1718,9 @@ bool FrameEditor::gradientIldaSelected (const Colour& color1,
     if (centerOnSelection)
         getComponentCenterOfIldaSelection (xOffset, yOffset);
 
-    Point<float> center = Point<float> (xOffset, yOffset);
+    Point<float> center = Point<float> ((float)xOffset, (float)yOffset);
     
-    float flength = length * 32768.0 / 100.0f;
+    float flength = length * 32768.0f / 100.0f;
     double rot = angle < 0 ? 360.0 + angle : angle;
     
     // Clip rotation
