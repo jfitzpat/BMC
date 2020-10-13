@@ -62,14 +62,14 @@ bool IldaExporter::save (ReferenceCountedArray<Frame>& frameArray, File& file)
         // Write Header
         output.write (&header, sizeof(header));
         
-        Frame::XYPoint point;
+        Frame::IPoint point;
         
         // Now records
         if (frameArray[n]->getPointCount())
         {
             for (uint16 i = 0; i < frameArray[n]->getPointCount(); ++i)
             {
-                Frame::XYPoint in;
+                Frame::IPoint in;
                 
                 frameArray[n]->getPoint (i, in);
                 

@@ -29,11 +29,11 @@ void ThumbBuilder::build (Frame* frame, Image& thumb, int width, int height, flo
     
     for (uint16 n = 0; n < frame->getPointCount(); ++n)
     {
-        Frame::XYPoint point;
+        Frame::IPoint point;
         
         if (frame->getPoint (n, point))
         {
-            Frame::XYPoint nextPoint;
+            Frame::IPoint nextPoint;
             bool b;
             
             if (n < (frame->getPointCount() - 1))

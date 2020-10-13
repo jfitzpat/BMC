@@ -473,7 +473,7 @@ private:
 class UndoableInsertPoint : public UndoableAction
 {
 public:
-    UndoableInsertPoint (FrameEditor* editor, uint16 index, const Frame::XYPoint& point)
+    UndoableInsertPoint (FrameEditor* editor, uint16 index, const Frame::IPoint& point)
     : pointIndex (index), newPoint (point), frameEditor (editor) {;}
     
     bool perform() override
@@ -492,7 +492,7 @@ public:
     
 private:
     uint16 pointIndex;
-    Frame::XYPoint newPoint;
+    Frame::IPoint newPoint;
     FrameEditor* frameEditor;
 };
 
@@ -535,7 +535,7 @@ class UndoableDeletePoints : public UndoableAction
         
     private:
         SparseSet<uint16> selection;
-        Array<Frame::XYPoint> oldPoints;
+        Array<Frame::IPoint> oldPoints;
         FrameEditor* frameEditor;
 };
 
@@ -699,7 +699,7 @@ class UndoableSetIldaPoints : public UndoableAction
     public:
         UndoableSetIldaPoints (FrameEditor* editor,
                                const SparseSet<uint16>& select,
-                               const Array<Frame::XYPoint> points)
+                               const Array<Frame::IPoint> points)
         : selection (select), newPoints (points), frameEditor (editor) {;}
         
         bool perform() override
@@ -719,7 +719,7 @@ class UndoableSetIldaPoints : public UndoableAction
         
     private:
         SparseSet<uint16> selection;
-        Array<Frame::XYPoint> oldPoints;
-        Array<Frame::XYPoint> newPoints;
+        Array<Frame::IPoint> oldPoints;
+        Array<Frame::IPoint> newPoints;
         FrameEditor* frameEditor;
 };

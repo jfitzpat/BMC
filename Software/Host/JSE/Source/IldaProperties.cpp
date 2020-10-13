@@ -911,7 +911,7 @@ void IldaProperties::updateSelection()
             bool mz = false;    bool mr = false;
             bool mg = false;    bool mb = false;
             
-            Frame::XYPoint lastPoint;
+            Frame::IPoint lastPoint;
             zerostruct(lastPoint);  // Clear stupid VS warning
 
             for (auto n = 0; n < s.getNumRanges(); ++n)
@@ -932,7 +932,7 @@ void IldaProperties::updateSelection()
                 if (n == 0)
                     frameEditor->getPoint (r.getStart(), lastPoint);
                 
-                Frame::XYPoint newPoint;
+                Frame::IPoint newPoint;
                 
                 for (uint16 i = 0; i < r.getLength(); ++i)
                 {

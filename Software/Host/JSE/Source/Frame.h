@@ -46,7 +46,7 @@ public:
     float getImageYoffset()             { return imageYoffset; }
     void setImageYoffset (float off)    { imageYoffset = off; }
 
-    typedef ILDA_FORMAT_4 XYPoint;
+    typedef ILDA_FORMAT_4 IPoint;
     typedef enum {
         BlankedPoint = 0x40,
         LastPoint = 0x80
@@ -54,12 +54,12 @@ public:
     
     uint16 getPointCount() { return (uint16)framePoints.size(); }
     
-    bool getPoint (uint16 index, XYPoint& point);
-    XYPoint getPoint (uint16 index) { return framePoints[index]; }
+    bool getPoint (uint16 index, IPoint& point);
+    IPoint getPoint (uint16 index) { return framePoints[index]; }
     
-    void addPoint (XYPoint& point);
-    void replacePoint (uint16 index, const XYPoint& newPoint);
-    void insertPoint (uint16 index, const XYPoint& newPoint);
+    void addPoint (IPoint& point);
+    void replacePoint (uint16 index, const IPoint& newPoint);
+    void insertPoint (uint16 index, const IPoint& newPoint);
     void removePoint (uint16 index);
     
     void buildThumbNail (int width = 150, int height = 150, float lineSize = 1.0);
@@ -75,28 +75,28 @@ public:
         left = 2
     } ViewAngle;
     
-    static float getCompX (const XYPoint& point, ViewAngle view = front)
+    static float getCompX (const IPoint& point, ViewAngle view = front)
     {
         if (view == left)
             return (float)((float)point.z.w + 32768.0f);
         else
             return (float)((float)point.x.w + 32768.0f);
     }
-    static float getCompY (const XYPoint& point, ViewAngle view = front)
+    static float getCompY (const IPoint& point, ViewAngle view = front)
     {
         if (view == bottom)
             return (float)(32767.0f - (float)point.z.w);
         else
             return (float)(32767.0f - (float)point.y.w);
     }
-    static int getCompXInt (const XYPoint& point, ViewAngle view = front)
+    static int getCompXInt (const IPoint& point, ViewAngle view = front)
     {
         if (view == left)
             return (int)((int)point.z.w + 32768);
         else
             return (int)((int)point.x.w + 32768);
     }
-    static int getCompYInt (const XYPoint& point, ViewAngle view = front)
+    static int getCompYInt (const IPoint& point, ViewAngle view = front)
     {
         if (view == bottom)
             return (int)(32767 - (int)point.z.w);
@@ -111,7 +111,7 @@ public:
     {
         return Rectangle<int> (getIldaX(r), getIldaY(r), r.getWidth(), r.getHeight());
     }
-    static Point<int> getCompPoint (const XYPoint& point, ViewAngle view = front)
+    static Point<int> getCompPoint (const IPoint& point, ViewAngle view = front)
     {
         return Point<int>(getCompXInt (point, view), getCompYInt (point, view));
     }
@@ -119,7 +119,7 @@ public:
     static int toIldaY (int y) { return 32767 - y; }
     static int toCompX (int x) { return x + 32768; }
     static int toCompY (int y) { return 32767 - y; }
-    static void blankPoint (XYPoint& point)
+    static void blankPoint (IPoint& point)
     {
         point.status = Frame::BlankedPoint;
         point.red = point.green = point.blue = 0;
@@ -150,7 +150,7 @@ private:
     float imageXoffset;
     float imageYoffset;
     
-    Array<XYPoint> framePoints;
+    Array<IPoint> framePoints;
     
     Image thumbNail;
 };

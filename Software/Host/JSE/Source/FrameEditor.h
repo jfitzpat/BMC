@@ -21,6 +21,7 @@
 
 #include <JuceHeader.h>
 #include "Frame.h"
+#include "IPath.h"
 
 #define MIN_ZOOM (1.0f)
 #define MAX_ZOOM (16.0f)
@@ -148,7 +149,7 @@ public:
     Frame::Ptr getFrame () { return getFrame (getFrameIndex()); }
     
     uint16 getPointCount() { return currentFrame->getPointCount(); }
-    bool getPoint (uint16 index, Frame::XYPoint& point)
+    bool getPoint (uint16 index, Frame::IPoint& point)
     {
         return currentFrame->getPoint (index, point);
     }
@@ -160,11 +161,14 @@ public:
     const Point<int> getComponentCenterOfIldaSelection();
     void getComponentCenterOfIldaSelection (int&x, int&y);
     
-    void getIldaSelectedPoints (Array<Frame::XYPoint>& points);
-    void getIldaPoints (const SparseSet<uint16>& selection, Array<Frame::XYPoint>& points);
+    void getIldaSelectedPoints (Array<Frame::IPoint>& points);
+    void getIldaPoints (const SparseSet<uint16>& selection, Array<Frame::IPoint>& points);
 
     const Image& getCurrentThumbNail() { return currentFrame->getThumbNail(); }
     const Image& getThumbNail (uint16 index) { return Frames[index]->getThumbNail(); }
+    
+    int getIPathCount() { return IPaths.size(); }
+    IPath::Ptr getIPath (int index) { return IPaths[index]; }
     
     // Undoable Commands
     // Transform operaitons must be proceeded with startTransform
@@ -239,7 +243,7 @@ public:
     void setIldaSelectedB (uint8 newR);
     void setIldaSelectedRGB (const Colour newColor);
     
-    void insertPoint (const Frame::XYPoint& point);
+    void insertPoint (const Frame::IPoint& point);
     void deletePoints();
     
     // Destructive Version (invoked by UndoManager)
@@ -254,7 +258,7 @@ public:
     void _setActiveIldaTool (IldaTool tool);
     void _setPointToolColor (const Colour& color);
 
-    void _insertPoint (uint16 index, const Frame::XYPoint& point);
+    void _insertPoint (uint16 index, const Frame::IPoint& point);
     void _deletePoint (uint16 index);
     
     bool _setImageData (const MemoryBlock& file);
@@ -278,7 +282,7 @@ public:
     void _setIldaSelection (const SparseSet<uint16>& selection);
 
     void _setIldaPoints (const SparseSet<uint16>& selection,
-                         const Array<Frame::XYPoint>& points);
+                         const Array<Frame::IPoint>& points);
 
 private:
     File loadedFile;
@@ -306,11 +310,13 @@ private:
     
     bool tranformInProgress;
     bool transformUsed;
-    Array<Frame::XYPoint> transformPoints;
+    Array<Frame::IPoint> transformPoints;
     int16 transformCenterX;
     int16 transformCenterY;
     int16 transformCenterZ;
     String transformName;
+    
+    ReferenceCountedArray<IPath> IPaths;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
 

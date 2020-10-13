@@ -57,7 +57,7 @@ void Frame::setImageData (const MemoryBlock& data)
 }
 
 //==============================================================================
-bool Frame::getPoint (uint16 index, XYPoint& point)
+bool Frame::getPoint (uint16 index, IPoint& point)
 {
     if (index >= framePoints.size())
         return false;
@@ -66,12 +66,12 @@ bool Frame::getPoint (uint16 index, XYPoint& point)
     return true;
 }
 
-void Frame::addPoint (XYPoint& point)
+void Frame::addPoint (IPoint& point)
 {
     framePoints.add (point);
 }
 
-void Frame::replacePoint (uint16 index, const XYPoint& newPoint)
+void Frame::replacePoint (uint16 index, const IPoint& newPoint)
 {
     if (index >= framePoints.size())
         return;
@@ -80,7 +80,7 @@ void Frame::replacePoint (uint16 index, const XYPoint& newPoint)
     framePoints.insert (index, newPoint);
 }
 
-void Frame::insertPoint (uint16 index, const XYPoint& newPoint)
+void Frame::insertPoint (uint16 index, const IPoint& newPoint)
 {
     if (index > framePoints.size())
         return;

@@ -3,7 +3,7 @@
 <JUCERPROJECT id="qW4wAR" name="JSE" projectType="guiapp" useAppConfig="0"
               addUsingNamespaceToJuceHeader="1" jucerFormatVersion="1" companyName="ScrootchMe"
               companyCopyright="Copyright 2020 Scrootch.Me!" companyWebsite="http://scrootch.me/bmc"
-              version="0.1.3">
+              version="0.1.4">
   <MAINGROUP id="dkE1Q5" name="JSE">
     <GROUP id="{93E320CB-EECF-9379-FF9B-BDECFBE3DFD4}" name="Source">
       <GROUP id="{419AAC25-6FF2-599E-C3D9-334E04C580EF}" name="Binary Resources">
@@ -84,6 +84,8 @@
           <FILE id="GgNRij" name="SketchProperties.h" compile="0" resource="0"
                 file="Source/SketchProperties.h"/>
         </GROUP>
+        <FILE id="LxU0wr" name="Anchor.cpp" compile="1" resource="0" file="Source/Anchor.cpp"/>
+        <FILE id="DWVeqZ" name="Anchor.h" compile="0" resource="0" file="Source/Anchor.h"/>
         <FILE id="CpF1YK" name="EditProperties.cpp" compile="1" resource="0"
               file="Source/EditProperties.cpp"/>
         <FILE id="g32aaP" name="EditProperties.h" compile="0" resource="0"
@@ -96,6 +98,8 @@
         <FILE id="JFWu8F" name="FrameList.h" compile="0" resource="0" file="Source/FrameList.h"/>
         <FILE id="URe2fI" name="FrameUndo.h" compile="0" resource="0" file="Source/FrameUndo.h"/>
         <FILE id="dLhyf2" name="ILDA.h" compile="0" resource="0" file="Source/ILDA.h"/>
+        <FILE id="jFzMVD" name="IPath.cpp" compile="1" resource="0" file="Source/IPath.cpp"/>
+        <FILE id="ASyXhK" name="IPath.h" compile="0" resource="0" file="Source/IPath.h"/>
         <FILE id="pfwhIW" name="LaserControls.cpp" compile="1" resource="0"
               file="Source/LaserControls.cpp"/>
         <FILE id="rtHiO9" name="LaserControls.h" compile="0" resource="0" file="Source/LaserControls.h"/>

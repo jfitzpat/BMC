@@ -54,7 +54,7 @@ void WorkingArea::killMarkers()
 
 void WorkingArea::insertAnchor (uint16 index, Colour c)
 {
-    Frame::XYPoint point;
+    Frame::IPoint point;
     frameEditor->getPoint (index, point);
     point.red = c.getRed();
     point.green = c.getGreen();
@@ -107,12 +107,12 @@ void WorkingArea::mouseDownIldaPoint (const MouseEvent& event)
     }
     else if (drawDot)
     {
-        Frame::XYPoint fromPoint;
+        Frame::IPoint fromPoint;
         zerostruct (fromPoint);
         if (dotFrom >= 0)
             frameEditor->getPoint ((uint16)dotFrom, fromPoint);
         
-        Frame::XYPoint point;
+        Frame::IPoint point;
         zerostruct (point);
     
         FrameEditor::View view = frameEditor->getActiveView();
@@ -249,7 +249,7 @@ void WorkingArea::mouseUp (const MouseEvent& event)
         // Loop through all the points
         for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
         {
-            Frame::XYPoint point;
+            Frame::IPoint point;
             frameEditor->getPoint (n, point);
 
             int tx = view == Frame::left ? point.z.w : point.x.w;
@@ -318,7 +318,7 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
             int nearest = findCloseMouseMatch (event);
             if (nearest >= 0)
             {
-                Frame::XYPoint point;
+                Frame::IPoint point;
                 frameEditor->getPoint ((uint16)nearest, point);
                 x = Frame::getCompXInt (point, view);
                 y = Frame::getCompYInt (point, view);
@@ -329,7 +329,7 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
             // Since 45 dgrees is tan 1, could probably
             // do this more efficiently with two distances and ratio
             // but this is easy...
-            Frame::XYPoint point;
+            Frame::IPoint point;
             frameEditor->getPoint ((uint16)dotFrom, point);
             Point<int> p = Frame::getCompPoint (point, view);
             float angle = p.getAngleToPoint (Point<int>(x, y));
@@ -363,7 +363,7 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
         // Figure out the rectangle that encompasses all points
         // and repaint it
         Path p;
-        Frame::XYPoint point;
+        Frame::IPoint point;
         frameEditor->getPoint ((uint16)dotFrom, point);
         p.startNewSubPath (Frame::getCompX (point, view),
                            Frame::getCompY (point, view) );
@@ -389,7 +389,7 @@ void WorkingArea::findAllSameColor (Colour color, SparseSet<uint16>& set)
     // Loop through the points and look for matches
     for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
     {
-        Frame::XYPoint point;
+        Frame::IPoint point;
         frameEditor->getPoint (n, point);
    
         Colour c;
@@ -407,7 +407,7 @@ void WorkingArea::findAllSameColor (uint16 index, SparseSet<uint16>& set)
 {
     set.clear();
     
-    Frame::XYPoint point;
+    Frame::IPoint point;
     if (frameEditor->getPoint (index, point))
         findAllSameColor (Colour (point.red, point.green, point.blue), set);
 }
@@ -419,7 +419,7 @@ void WorkingArea::findAllSameVisibility (bool blanked, SparseSet<uint16>& set)
      // Loop through the points and look for matches
      for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
      {
-         Frame::XYPoint point;
+         Frame::IPoint point;
          frameEditor->getPoint (n, point);
     
          if ((bool)(point.status & Frame::BlankedPoint) == blanked)
@@ -431,7 +431,7 @@ void WorkingArea::findAllSameVisibility (uint16 index, SparseSet<uint16>& set)
 {
     set.clear();
     
-    Frame::XYPoint point;
+    Frame::IPoint point;
     if (frameEditor->getPoint (index, point))
         findAllSameVisibility ((bool)(point.status & Frame::BlankedPoint), set);
 }
@@ -440,7 +440,7 @@ void WorkingArea::findAllCloseSiblings (uint16 index, SparseSet<uint16>& set)
 {
     set.clear();
     
-    Frame::XYPoint point;
+    Frame::IPoint point;
     if (! frameEditor->getPoint (index, point))
         return;
 
@@ -480,7 +480,7 @@ int WorkingArea::findCloseMouseMatch (const MouseEvent& event)
     uint16 n;
     for (n = 0; n < frameEditor->getPointCount(); ++n)
     {
-        Frame::XYPoint point;
+        Frame::IPoint point;
         frameEditor->getPoint (n, point);
         
         uint16 tx = view == Frame::left ? point.z.w : point.x.w;
@@ -629,14 +629,14 @@ void WorkingArea::paint (juce::Graphics& g)
         
         for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
         {
-            Frame::XYPoint point;
+            Frame::IPoint point;
             
             if (frameEditor->getPoint (n, point))
             {
                 // Draw lines
                 if (frameEditor->getIldaDrawLines())
                 {
-                    Frame::XYPoint nextPoint;
+                    Frame::IPoint nextPoint;
                     bool b;
                     
                     if (n < (frameEditor->getPointCount() - 1))
@@ -736,7 +736,7 @@ void WorkingArea::paint (juce::Graphics& g)
             // draw lines
             if (dotFrom != -1)
             {
-                Frame::XYPoint point;
+                Frame::IPoint point;
                 frameEditor->getPoint ((uint16)dotFrom, point);
                 
                 if (point.status & Frame::BlankedPoint)
@@ -761,7 +761,7 @@ void WorkingArea::paint (juce::Graphics& g)
 
             if (dotTo != -1)
             {
-                Frame::XYPoint point;
+                Frame::IPoint point;
                 frameEditor->getPoint ((uint16)dotTo, point);
                 
                 if (c == Colours::black)
@@ -799,6 +799,18 @@ void WorkingArea::paint (juce::Graphics& g)
                               (float)dotAt.getY() - halfSelectSize,
                               selectSize, selectSize);
             }
+        }
+    }
+    
+    // Sketch Layer
+    if (frameEditor->getSketchVisible() && (frameEditor->getActiveView() == Frame::front))
+    {
+        for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
+        {
+            IPath::Ptr path = frameEditor->getIPath (n);
+            
+            g.setColour (path->getColor());
+            g.strokePath (path->getPath(), PathStrokeType (activeInvScale));
         }
     }
 }
@@ -882,7 +894,10 @@ void WorkingArea::actionListenerCallback (const String& message)
         updateCursor();
     }
     else if (message == EditorActions::framesChanged)
+    {
         killMarkers();
+        repaint();
+    }
     else if (message == EditorActions::deleteRequest)
     {
         if (drawDot)

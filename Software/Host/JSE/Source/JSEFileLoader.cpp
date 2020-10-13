@@ -77,7 +77,7 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
         {
             for (auto i = 0; i < points.getArray()->size(); ++i)
             {
-                Frame::XYPoint point;
+                Frame::IPoint point;
                 DynamicObject* pointData = points[i].getDynamicObject();
                 if (pointData == nullptr)
                     return false;

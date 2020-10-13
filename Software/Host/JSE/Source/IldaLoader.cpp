@@ -55,7 +55,7 @@ bool IldaLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
         if (!rCount) break;
 
         int n;
-        Frame::XYPoint newPoint;
+        Frame::IPoint newPoint;
         zerostruct(newPoint);   // Clear stupid Visual Studio warning
 
         for (n = 0; n < rCount; ++n)

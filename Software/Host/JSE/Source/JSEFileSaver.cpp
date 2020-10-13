@@ -82,7 +82,7 @@ var JSEFileSaver::frameToObj (uint16 frameIndex)
 
 var JSEFileSaver::pointToObj (uint16 frameIndex, uint16 pointIndex)
 {
-    Frame::XYPoint point;
+    Frame::IPoint point;
     
     frameEditor->getFrames()[frameIndex]->getPoint(pointIndex, point);
     

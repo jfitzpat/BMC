@@ -47,7 +47,18 @@ FrameEditor::FrameEditor()
       tranformInProgress (false)
 {
     Frames.add (new Frame());
-    currentFrame = Frames[frameIndex];    
+    currentFrame = Frames[frameIndex];
+    
+    // !!!!
+    IPath::Ptr p = new IPath;
+    
+    p->addAnchor (Anchor (10000, 50000, 3000, 3000, 3000, -3000));
+    p->addAnchor (Anchor (50000, 50000, -3000, -3000, 3000, -3000));
+    p->addAnchor (Anchor (50000, 10000, 3000, 3000, -3000, -3000));
+    p->addAnchor (Anchor (10000, 10000));
+    p->addAnchor (Anchor (10000, 50000));
+
+    IPaths.add (p.get());
 }
 
 FrameEditor::~FrameEditor()
@@ -203,7 +214,7 @@ void FrameEditor::getCenterOfIldaSelection (int16& x, int16& y, int16& z)
         Range<uint16> r = ildaSelection.getRange (n);
         for (auto i=0; i < r.getLength(); ++i)
         {
-            Frame::XYPoint point;
+            Frame::IPoint point;
             currentFrame->getPoint (r.getStart() + (uint16)i, point);
             
             if (first)
@@ -258,7 +269,7 @@ void FrameEditor::getComponentCenterOfIldaSelection (int&x, int&y)
     y = Frame::toCompY (activeView == Frame::bottom ? cz : cy);
 }
 
-void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
+void FrameEditor::getIldaSelectedPoints (Array<Frame::IPoint>& points)
 {
     points.clear();
     
@@ -268,7 +279,7 @@ void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
         
         for (uint16 i = 0; i < r.getLength(); ++i)
         {
-            Frame::XYPoint point;
+            Frame::IPoint point;
             
             getPoint (r.getStart() + i, point);
             points.add (point);
@@ -277,7 +288,7 @@ void FrameEditor::getIldaSelectedPoints (Array<Frame::XYPoint>& points)
 }
 
 void FrameEditor::getIldaPoints (const SparseSet<uint16>& selection,
-                                 Array<Frame::XYPoint>& points)
+                                 Array<Frame::IPoint>& points)
 {
     points.clear();
     
@@ -287,7 +298,7 @@ void FrameEditor::getIldaPoints (const SparseSet<uint16>& selection,
         
         for (uint16 i = 0; i < r.getLength(); ++i)
         {
-            Frame::XYPoint point;
+            Frame::IPoint point;
             
             getPoint (r.getStart() + i, point);
             points.add (point);
@@ -403,7 +414,7 @@ void FrameEditor::selectAll()
                 // Walk all the points and find ranges of visible
                 for (uint16 n = 0; n < getPointCount(); ++n)
                 {
-                    Frame::XYPoint point;
+                    Frame::IPoint point;
                     currentFrame->getPoint (n, point);
                     if (! (point.status & Frame::BlankedPoint))
                     {
@@ -688,6 +699,7 @@ void FrameEditor::deleteFrame ()
         beginNewTransaction ("Delete Frame");
         if (index == (Frames.size() - 1))
             perform (new UndoableSetFrameIndex (this, index - 1));
+        
         perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform (new UndoableDeleteFrame (this, index));
     }
@@ -740,7 +752,7 @@ void FrameEditor::moveFrameDown()
     }
 }
 
-void FrameEditor::insertPoint (const Frame::XYPoint& point)
+void FrameEditor::insertPoint (const Frame::IPoint& point)
 {
     uint16 index;
     
@@ -833,7 +845,7 @@ void FrameEditor::adjustIldaSelection (int offset)
 
 bool FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool constrain)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return false;
@@ -842,7 +854,7 @@ bool FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool 
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         int x = point.x.w;
         x += xOffset;
@@ -885,7 +897,7 @@ bool FrameEditor::moveIldaSelected (int xOffset, int yOffset, int zOffset, bool 
 
 bool FrameEditor::centerIldaSelected (bool doX, bool doY, bool doZ, bool constrain)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return false;
@@ -900,7 +912,7 @@ bool FrameEditor::centerIldaSelected (bool doX, bool doY, bool doZ, bool constra
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
         
         int x = point.x.w;
         if (doX)
@@ -953,7 +965,7 @@ bool FrameEditor::centerIldaSelected (bool doX, bool doY, bool doZ, bool constra
 
 void FrameEditor::duplicateIldaSelected()
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -991,14 +1003,14 @@ void FrameEditor::duplicateIldaSelected()
 
 void FrameEditor::anchorIldaSelected()
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
     
     int pIndex = points.size() - 1;
     
-    Frame::XYPoint point;
+    Frame::IPoint point;
     zerostruct (point);
     point.status = Frame::BlankedPoint;
     
@@ -1053,7 +1065,7 @@ bool FrameEditor::scaleIldaSelected (float xScale,
                                      bool centerOnSelection,
                                      bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
   
@@ -1072,7 +1084,7 @@ bool FrameEditor::scaleIldaSelected (float xScale,
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         int x = point.x.w;
         x -= xOffset;
@@ -1137,7 +1149,7 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
                                       bool centerOnSelection,
                                       bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
   
@@ -1217,7 +1229,7 @@ bool FrameEditor::rotateIldaSelected (float xAngle,
         double d;
         double dx, dy, dz;
         
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         dx = point.x.w - xOffset;
         dy = point.y.w - yOffset;
@@ -1267,7 +1279,7 @@ bool FrameEditor::shearIldaSelected (float xShear,
                                      bool centerOnSelection,
                                      bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
   
@@ -1285,7 +1297,7 @@ bool FrameEditor::shearIldaSelected (float xShear,
 
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         int x = activeView == Frame::left ? point.z.w : point.x.w;
         x -= xOffset;
@@ -1331,7 +1343,7 @@ bool FrameEditor::translateIldaSelected (int xOffset,
                                          int zOffset,
                                          bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
 
@@ -1339,7 +1351,7 @@ bool FrameEditor::translateIldaSelected (int xOffset,
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         int x = point.x.w;
         x += xOffset;
@@ -1383,7 +1395,7 @@ bool FrameEditor::barberPoleIldaSelected (float radius,
                                           bool centerOnSelection,
                                           bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
 
@@ -1424,7 +1436,7 @@ bool FrameEditor::barberPoleIldaSelected (float radius,
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         // fetch next point
         int x = point.x.w;
@@ -1485,7 +1497,7 @@ bool FrameEditor::bulgeIldaSelected (float radius,
                                      bool centerOnSelection,
                                      bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
 
@@ -1504,7 +1516,7 @@ bool FrameEditor::bulgeIldaSelected (float radius,
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         // fetch next point
         int x = point.x.w;
@@ -1560,7 +1572,7 @@ bool FrameEditor::spiralIldaSelected (float angle,
                                       bool centerOnSelection,
                                       bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
 
@@ -1581,7 +1593,7 @@ bool FrameEditor::spiralIldaSelected (float angle,
     
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
         double dx = point.x.w - xOffset;
         double dy = point.y.w - yOffset;
         double dist = (dx * dx + dy * dy) / b;
@@ -1633,7 +1645,7 @@ bool FrameEditor::sphereIldaSelected (double xScale,
                                       bool centerOnSelection,
                                       bool constrain)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
 
@@ -1656,7 +1668,7 @@ bool FrameEditor::sphereIldaSelected (double xScale,
 
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
         double dx = point.x.w - xOffset;
         double dy = point.y.w - yOffset;
         double d;
@@ -1707,7 +1719,7 @@ bool FrameEditor::gradientIldaSelected (const Colour& color1,
                                         bool centerOnSelection,
                                         const Colour& color3)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
 
@@ -1749,7 +1761,7 @@ bool FrameEditor::gradientIldaSelected (const Colour& color1,
     // Walk the selected points
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         int x = Frame::getCompXInt (point, activeView);
         int y = Frame::getCompYInt (point, activeView);
@@ -1789,13 +1801,13 @@ bool FrameEditor::adjustHueIldaSelected (float hshift,
                                          float saturation,
                                          float brightness)
 {
-    Array<Frame::XYPoint> points = transformPoints;
+    Array<Frame::IPoint> points = transformPoints;
     if (! points.size())
         return false;
 
     for (auto n = 0; n < points.size(); ++n)
     {
-        Frame::XYPoint& point = points.getReference (n);
+        Frame::IPoint& point = points.getReference (n);
 
         Colour c = Colour (point.red, point.green, point.blue).withRotatedHue (hshift);
         float sat = c.getSaturation() + saturation;
@@ -1830,7 +1842,7 @@ bool FrameEditor::adjustHueIldaSelected (float hshift,
 void FrameEditor::endTransform()
 {
     // Already Transformed! So grab!
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints(points);
 
     // Restore original
@@ -1853,7 +1865,7 @@ void FrameEditor::endTransform()
 
 void FrameEditor::setIldaSelectedX (int16 newX)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -1867,7 +1879,7 @@ void FrameEditor::setIldaSelectedX (int16 newX)
 
 void FrameEditor::setIldaSelectedY (int16 newY)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -1881,7 +1893,7 @@ void FrameEditor::setIldaSelectedY (int16 newY)
 
 void FrameEditor::setIldaSelectedZ (int16 newZ)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -1895,7 +1907,7 @@ void FrameEditor::setIldaSelectedZ (int16 newZ)
 
 void FrameEditor::setIldaSelectedR (uint8 newR)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -1915,7 +1927,7 @@ void FrameEditor::setIldaSelectedR (uint8 newR)
 
 void FrameEditor::setIldaSelectedG (uint8 newG)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -1935,7 +1947,7 @@ void FrameEditor::setIldaSelectedG (uint8 newG)
 
 void FrameEditor::setIldaSelectedB (uint8 newB)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -1955,7 +1967,7 @@ void FrameEditor::setIldaSelectedB (uint8 newB)
 
 void FrameEditor::setIldaSelectedRGB (const Colour newColor)
 {
-    Array<Frame::XYPoint> points;
+    Array<Frame::IPoint> points;
     getIldaSelectedPoints (points);
     if (! points.size())
         return;
@@ -2158,6 +2170,7 @@ void FrameEditor::_deleteFrame (uint16 index)
     if ((Frames.size() > 1) && (index < Frames.size()))
     {
         Frames.remove (index);
+        currentFrame = Frames[frameIndex];
         sendActionMessage (EditorActions::framesChanged);
     }
 }
@@ -2167,6 +2180,7 @@ void FrameEditor::_insertFrame (uint16 index, Frame::Ptr frame)
     if (index <= Frames.size())
     {
         Frames.insert(index, frame);
+        currentFrame = Frames[frameIndex];
         sendActionMessage (EditorActions::framesChanged);
     }
 }
@@ -2241,7 +2255,7 @@ void FrameEditor::_setIldaSelection (const SparseSet<uint16>& selection)
 }
 
 void FrameEditor::_setIldaPoints (const SparseSet<uint16>& selection,
-                                  const Array<Frame::XYPoint>& points)
+                                  const Array<Frame::IPoint>& points)
 {
     auto pindex = 0;
     
@@ -2259,7 +2273,7 @@ void FrameEditor::_setIldaPoints (const SparseSet<uint16>& selection,
     sendActionMessage (EditorActions::ildaPointsChanged);
 }
 
-void FrameEditor::_insertPoint (uint16 index, const Frame::XYPoint& point)
+void FrameEditor::_insertPoint (uint16 index, const Frame::IPoint& point)
 {
     if (index <= currentFrame->getPointCount())
     {
