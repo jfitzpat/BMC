@@ -20,6 +20,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "IPath.h"
 #include "ILDA.h"
 
 // Reference Counted so we can keep frames around for undo and just have them
@@ -61,6 +62,11 @@ public:
     void replacePoint (uint16 index, const IPoint& newPoint);
     void insertPoint (uint16 index, const IPoint& newPoint);
     void removePoint (uint16 index);
+  
+    int getIPathCount() { return iPaths.size(); }
+    IPath::Ptr getIPath (int index) { return iPaths[index]; }
+    void addPath (IPath* p) { iPaths.add (p); }
+    
     
     void buildThumbNail (int width = 150, int height = 150, float lineSize = 1.0);
     const Image& getThumbNail() { return thumbNail; }
@@ -151,6 +157,7 @@ private:
     float imageYoffset;
     
     Array<IPoint> framePoints;
-    
+    ReferenceCountedArray<IPath> iPaths;
+
     Image thumbNail;
 };

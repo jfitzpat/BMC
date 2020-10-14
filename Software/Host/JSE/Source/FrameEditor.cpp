@@ -36,6 +36,9 @@ FrameEditor::FrameEditor()
       activeIldaTool (selectTool),
       pointToolColor (Colours::white),
       lastVisiblePointToolColor (Colours::white),
+      activeSketchTool (sketchPenTool),
+      sketchToolColor (Colours::white),
+      lastVisibleSketchToolColor (Colours::white),
       sketchVisible (true),
       ildaVisible (true),
       ildaShowBlanked (true),
@@ -44,7 +47,9 @@ FrameEditor::FrameEditor()
       refDrawGrid (true),
       refOpacity (1.0),
       frameIndex (0),
-      tranformInProgress (false)
+      tranformInProgress (false),
+      activePath (-1),
+      selectedAnchor (-1)
 {
     Frames.add (new Frame());
     currentFrame = Frames[frameIndex];
@@ -58,7 +63,10 @@ FrameEditor::FrameEditor()
     p->addAnchor (Anchor (10000, 10000));
     p->addAnchor (Anchor (10000, 50000));
 
-    IPaths.add (p.get());
+    currentFrame->addPath (p.get());
+    
+    //selectedAnchor = 1;
+    //iPathSelection.addRange (Range<uint16> (0, 1));
 }
 
 FrameEditor::~FrameEditor()
@@ -185,14 +193,18 @@ bool FrameEditor::hasMovableSelection()
 
 void FrameEditor::toggleBlanking()
 {
-    if ((activeLayer == ilda) && (activeIldaTool == pointTool))
+    if (activeLayer == ilda)
         togglePointToolBlank();
+    else if (activeLayer == sketch)
+        toggleSketchToolBlank();
 }
 
 void FrameEditor::cycleColors()
 {
-    if ((activeLayer == ilda) && (activeIldaTool == pointTool))
+    if (activeLayer == ilda)
         cyclePointToolColors();
+    else if (activeLayer == sketch)
+        cycleSketchToolColors();
 }
 
 //==============================================================================
@@ -371,12 +383,58 @@ void FrameEditor::cyclePointToolColors()
         setPointToolColor (Colours::white);
 }
 
+void FrameEditor::setActiveSketchTool (SketchTool tool)
+{
+    if (activeSketchTool != tool)
+    {
+        beginNewTransaction ("Tool Change");
+        perform (new UndoableSetSketchTool (this, tool));
+    }
+}
+
+void FrameEditor::setSketchToolColor (const Colour& color)
+{
+    if (sketchToolColor != color)
+    {
+        beginNewTransaction ("Sketch Tool Color");
+        perform (new UndoableSetSketchToolColor (this, color));
+    }
+}
+
+void FrameEditor::toggleSketchToolBlank()
+{
+    if (sketchToolColor == Colours::black)
+        setSketchToolColor (lastVisibleSketchToolColor);
+    else
+        setSketchToolColor (Colours::black);
+}
+
+void FrameEditor::cycleSketchToolColors()
+{
+    if (sketchToolColor == Colours::white)
+        setSketchToolColor (Colours::red);
+    else if (sketchToolColor == Colours::red)
+        setSketchToolColor (Colour (0, 255, 0));
+    else if (sketchToolColor == Colour (0, 255, 0))
+        setSketchToolColor (Colours::blue);
+    else if (sketchToolColor == Colours::blue)
+        setSketchToolColor (Colours::yellow);
+    else if (sketchToolColor == Colours::yellow)
+        setSketchToolColor (Colours::cyan);
+    else if (sketchToolColor == Colours::cyan)
+        setSketchToolColor (Colours::magenta);
+    else if (sketchToolColor == Colours::magenta)
+        setSketchToolColor (Colours::black);
+    else
+        setSketchToolColor (Colours::white);
+}
+
 void FrameEditor::setSketchVisible (bool visible)
 {
     if (visible != sketchVisible)
     {
-        sketchVisible = visible;
-        sendActionMessage (EditorActions::sketchVisibilityChanged);
+        beginNewTransaction ("Sketch Visible Change");
+        perform (new UndoableSetSketchVisibility (this, visible));
     }
 }
 
@@ -435,12 +493,23 @@ void FrameEditor::selectAll()
             setIldaSelection (s);
         }
     }
+    else if (getActiveLayer() == sketch)
+    {
+        if (getIPathCount())
+        {
+            SparseSet<uint16> s;
+            s.addRange (Range<uint16> (0, getIPathCount()));
+            setIPathSelection (s);
+        }
+    }
 }
 
 void FrameEditor::clearSelection()
 {
     if (getActiveLayer() == ilda)
         setIldaSelection (SparseSet<uint16>());
+    else if (getActiveLayer() == sketch)
+        setIPathSelection (SparseSet<uint16>());
 }
 
 void FrameEditor::selectImage()
@@ -1047,6 +1116,21 @@ void FrameEditor::anchorIldaSelected()
     }
 
     perform (new UndoableSetIldaSelection (this, newSelection));
+}
+
+void FrameEditor::setIPathSelection (const SparseSet<uint16>& selection)
+{
+    if (selection.getTotalRange().getEnd() > getIPathCount())
+        return;
+    
+    if (! getSketchVisible())
+        return;
+    
+    if (selection != iPathSelection)
+    {
+        beginNewTransaction ("Selection Change");
+        perform (new UndoableSetIPathSelection (this, selection));
+    }
 }
 
 void FrameEditor::startTransform (const String& name)
@@ -2044,6 +2128,28 @@ void FrameEditor::_setPointToolColor (const Colour& color)
     }
 }
 
+void FrameEditor::_setActiveSketchTool (SketchTool tool)
+{
+    if (activeSketchTool != tool)
+    {
+        activeSketchTool = tool;
+        sendActionMessage (EditorActions::sketchToolChanged);
+
+        refreshThumb();
+    }
+}
+
+void FrameEditor::_setSketchToolColor (const Colour& color)
+{
+    if (color != sketchToolColor)
+    {
+        sketchToolColor = color;
+        if (color != Colours::black)
+            lastVisibleSketchToolColor = color;
+        sendActionMessage (EditorActions::sketchToolColorChanged);
+    }
+}
+
 void FrameEditor::_setSketchVisible (bool visible)
 {
     if (visible != sketchVisible)
@@ -2291,3 +2397,17 @@ void FrameEditor::_deletePoint (uint16 index)
     }
 }
 
+void FrameEditor::_setIPathSelection (const SparseSet<uint16>& selection)
+{
+    if (selection.getTotalRange().getEnd() > getIPathCount())
+        return;
+    
+    if (! getSketchVisible())
+        return;
+    
+    if (selection != iPathSelection)
+    {
+        iPathSelection = selection;
+        sendActionMessage (EditorActions::iPathSelectionChanged);
+    }
+}

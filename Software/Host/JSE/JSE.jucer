@@ -19,10 +19,12 @@
         <FILE id="OVPQcf" name="down-white.png" compile="0" resource="1" file="Graphics/down-white.png"/>
         <FILE id="NfqRkZ" name="duplicate-white.png" compile="0" resource="1"
               file="Graphics/duplicate-white.png"/>
+        <FILE id="VNWAGa" name="ellipse.png" compile="0" resource="1" file="Graphics/ellipse.png"/>
         <FILE id="bY1Kdi" name="gradient.png" compile="0" resource="1" file="Graphics/gradient.png"/>
         <FILE id="jNaIci" name="gradient3.png" compile="0" resource="1" file="Graphics/gradient3.png"/>
         <FILE id="VuLuq9" name="jse2.png" compile="0" resource="0" file="Graphics/jse2.png"/>
         <FILE id="iWP9Vt" name="move.png" compile="0" resource="1" file="Graphics/move.png"/>
+        <FILE id="gFKBmd" name="pen.png" compile="0" resource="1" file="Graphics/pen.png"/>
         <FILE id="Enw2eq" name="pinch.png" compile="0" resource="1" file="Graphics/pinch.png"/>
         <FILE id="MatEZ4" name="pointinghand.png" compile="0" resource="1"
               file="Graphics/pointinghand.png"/>

@@ -31,6 +31,7 @@ WorkingArea::WorkingArea (FrameEditor* frame)
     drawMark = false;
     drawRect = false;
     drawDot = false;
+    drawSDot = false;
 }
 
 WorkingArea::~WorkingArea()
@@ -49,6 +50,12 @@ void WorkingArea::killMarkers()
     {
         drawDot = false;
         repaint (lastDotRect);
+    }
+    
+    if (drawSDot)
+    {
+        drawSDot = false;
+        repaint (lastSDotRect);
     }
 }
 
@@ -617,14 +624,15 @@ void WorkingArea::paint (juce::Graphics& g)
             g.drawImageTransformed (*i, t);
         }
     }
-    
+
+    float dotSize = 3.0f * activeInvScale;
+    float halfDotSize = dotSize / 2.0f;
+    float selectSize = 6.0f * activeInvScale;
+    float halfSelectSize = selectSize / 2.0f;
+
     // ILDA points
     if (frameEditor->getIldaVisible())
     {
-        float dotSize = 3.0f * activeInvScale;
-        float halfDotSize = dotSize / 2.0f;
-        float selectSize = 6.0f * activeInvScale;
-        float halfSelectSize = selectSize / 2.0f;
         FrameEditor::View view = frameEditor->getActiveView();
         
         for (uint16 n = 0; n < frameEditor->getPointCount(); ++n)
@@ -808,9 +816,50 @@ void WorkingArea::paint (juce::Graphics& g)
         for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
         {
             IPath::Ptr path = frameEditor->getIPath (n);
+            bool selected = frameEditor->getIPathSelection().contains (n);
             
-            g.setColour (path->getColor());
-            g.strokePath (path->getPath(), PathStrokeType (activeInvScale));
+            Colour c = path->getColor();
+            if (c == Colours::black)
+                c = Colours::darkgrey;
+            
+            g.setColour (c);
+            g.strokePath (path->getPath(), PathStrokeType (selected ? 2 * activeInvScale : activeInvScale));
+            
+            for (auto i = 0; i < path->getAnchorCount(); ++i)
+            {
+                Anchor a = path->getAnchor (i);
+                
+                if (i == frameEditor->getSelectedAnchor() || selected)
+                {
+                    g.drawRect (a.getX() - halfSelectSize, a.getY() - halfSelectSize,
+                                selectSize, selectSize, activeInvScale);
+                }
+                
+                if (i == frameEditor->getSelectedAnchor())
+                {
+
+                    g.setColour (Colours::grey);
+                    if (a.getExitXDelta() != 0 || a.getExitYDelta() != 0)
+                    {
+                        int x, y;
+                        a.getExitPosition (x, y);
+                        g.drawLine(x, y, a.getX(), a.getY(), activeInvScale);
+                        g.fillEllipse (x - halfDotSize, y - halfDotSize, dotSize, dotSize);
+                    }
+                    if (a.getEntryXDelta() != 0 || a.getEntryYDelta() != 0)
+                    {
+                        int x, y;
+                        a.getEntryPosition (x, y);
+                        g.drawLine(x, y, a.getX(), a.getY(), activeInvScale);
+                        g.fillEllipse (x - halfDotSize, y - halfDotSize, dotSize, dotSize);
+                    }
+                    g.setColour (c);
+                }
+                
+                g.fillRect (a.getX() - halfDotSize, a.getY() - halfDotSize,
+                            dotSize, dotSize);
+
+            }
         }
     }
 }
@@ -834,6 +883,28 @@ void WorkingArea::updateCursor()
                 break;
 
             case FrameEditor::moveTool:
+                setMouseCursor (MouseCursor::UpDownLeftRightResizeCursor);
+                break;
+
+            default:
+                setMouseCursor (MouseCursor::NormalCursor);
+                break;
+        }
+    }
+    else if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+    {
+        switch (frameEditor->getActiveSketchTool())
+        {
+            case FrameEditor::sketchSelectTool:
+                setMouseCursor (MouseCursor::PointingHandCursor);
+                break;
+                
+            case FrameEditor::sketchPenTool:
+            case FrameEditor::sketchEllipseTool:
+                setMouseCursor (MouseCursor::CrosshairCursor);
+                break;
+
+            case FrameEditor::sketchMoveTool:
                 setMouseCursor (MouseCursor::UpDownLeftRightResizeCursor);
                 break;
 
@@ -884,11 +955,23 @@ void WorkingArea::actionListenerCallback (const String& message)
         killMarkers();
         repaint();
     }
+    else if (message == EditorActions::iPathSelectionChanged)
+    {
+        killMarkers();
+        repaint();
+    }
     else if (message == EditorActions::ildaPointsChanged)
         repaint();
     else if (message == EditorActions::ildaPointToolColorChanged)
         repaint();
+    else if (message == EditorActions::sketchToolColorChanged)
+        repaint();
     else if (message == EditorActions::ildaToolChanged)
+    {
+        killMarkers();
+        updateCursor();
+    }
+    else if (message == EditorActions::sketchToolChanged)
     {
         killMarkers();
         updateCursor();

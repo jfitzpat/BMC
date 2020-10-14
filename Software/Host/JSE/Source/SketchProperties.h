@@ -20,25 +20,50 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "ColourButton.h"
 #include "FrameEditor.h"
 
 //==============================================================================
 /*
 */
 class SketchProperties  : public Component,
-                          public ActionListener
+                          public ActionListener,
+                          public Button::Listener,
+                          public ChangeListener
 {
 public:
     SketchProperties (FrameEditor* editor);
     ~SketchProperties() override;
 
+    //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    //==============================================================================
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+
+    //==============================================================================
+    void changeListenerCallback (ChangeBroadcaster* source) override;
+
+    //==============================================================================
     void actionListenerCallback (const String& message) override;
 
 private:
+    void refresh();
+    void updateTools();
+    
     FrameEditor* frameEditor;
+
+    std::unique_ptr<ToggleButton> layerVisible;
+    std::unique_ptr<Drawable> selectIcon;
+    std::unique_ptr<DrawableButton> selectToolButton;
+    std::unique_ptr<Drawable> moveIcon;
+    std::unique_ptr<DrawableButton> moveToolButton;
+    std::unique_ptr <Drawable> ellipseIcon;
+    std::unique_ptr<DrawableButton> ellipseToolButton;
+    std::unique_ptr <Drawable> penIcon;
+    std::unique_ptr<DrawableButton> penToolButton;
+    std::unique_ptr<ColourButton> toolColorButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SketchProperties)
 };

@@ -122,6 +122,56 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableSetSketchTool : public UndoableAction
+{
+public:
+    UndoableSetSketchTool (FrameEditor* editor, FrameEditor::SketchTool tool)
+    : newTool (tool), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldTool = frameEditor->getActiveSketchTool();
+        frameEditor->_setActiveSketchTool (newTool);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setActiveSketchTool (oldTool);
+        return true;
+    }
+    
+private:
+    FrameEditor::SketchTool oldTool;
+    FrameEditor::SketchTool newTool;
+    FrameEditor* frameEditor;
+};
+
+class UndoableSetSketchToolColor : public UndoableAction
+{
+public:
+    UndoableSetSketchToolColor (FrameEditor* editor, const Colour& color)
+    : newColor (color), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldColor = frameEditor->getSketchToolColor();
+        frameEditor->_setSketchToolColor (newColor);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setSketchToolColor (oldColor);
+        return true;
+    }
+    
+private:
+    Colour oldColor;
+    Colour newColor;
+    FrameEditor* frameEditor;
+};
+
 class UndoableSetSketchVisibility : public UndoableAction
 {
 public:
@@ -722,4 +772,29 @@ class UndoableSetIldaPoints : public UndoableAction
         Array<Frame::IPoint> oldPoints;
         Array<Frame::IPoint> newPoints;
         FrameEditor* frameEditor;
+};
+
+class UndoableSetIPathSelection : public UndoableAction
+{
+public:
+    UndoableSetIPathSelection (FrameEditor* editor, const SparseSet<uint16>& select)
+    : newSelect (select), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        oldSelect = frameEditor->getIPathSelection();
+        frameEditor->_setIPathSelection (newSelect);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setIPathSelection (oldSelect);
+        return true;
+    }
+    
+private:
+    SparseSet<uint16> oldSelect;
+    SparseSet<uint16> newSelect;
+    FrameEditor* frameEditor;
 };

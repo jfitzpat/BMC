@@ -50,6 +50,9 @@ namespace EditorActions
     const String ildaPointsChanged          ("IPC");
     const String ildaToolChanged            ("ITC");
     const String ildaPointToolColorChanged  ("PTC");
+    const String sketchToolChanged          ("STC");
+    const String sketchToolColorChanged     ("SCC");
+    const String iPathSelectionChanged      ("PSC");
     const String cancelRequest              ("CR");
     const String deleteRequest              ("DR");
     const String upRequest                  ("UPR");
@@ -85,6 +88,13 @@ public:
         moveTool,
         pointTool
     } IldaTool;
+    
+    typedef enum {
+        sketchSelectTool = 0,
+        sketchMoveTool,
+        sketchEllipseTool,
+        sketchPenTool
+    } SketchTool;
     
     // Dirty/Clean mechanism
     uint32 getDirtyCounter() { return dirtyCounter; }
@@ -131,6 +141,8 @@ public:
     
     IldaTool getActiveIldaTool() { return activeIldaTool; }
     Colour getPointToolColor() { return pointToolColor; }
+    SketchTool getActiveSketchTool() { return activeSketchTool; }
+    Colour getSketchToolColor() { return sketchToolColor; }
     
     const MemoryBlock& getImageData() {return currentFrame->getImageData(); }
     
@@ -167,8 +179,10 @@ public:
     const Image& getCurrentThumbNail() { return currentFrame->getThumbNail(); }
     const Image& getThumbNail (uint16 index) { return Frames[index]->getThumbNail(); }
     
-    int getIPathCount() { return IPaths.size(); }
-    IPath::Ptr getIPath (int index) { return IPaths[index]; }
+    int getIPathCount() { return currentFrame->getIPathCount(); }
+    IPath::Ptr getIPath (int index) { return currentFrame->getIPath (index); }
+    int getSelectedAnchor() { return selectedAnchor; }
+    const SparseSet<uint16>& getIPathSelection() { return iPathSelection; }
     
     // Undoable Commands
     // Transform operaitons must be proceeded with startTransform
@@ -198,6 +212,11 @@ public:
     void setPointToolColor (const Colour& color);
     void togglePointToolBlank();
     void cyclePointToolColors();
+
+    void setActiveSketchTool (SketchTool tool);
+    void setSketchToolColor (const Colour& color);
+    void toggleSketchToolBlank();
+    void cycleSketchToolColors();
 
     void selectImage();
     void clearImage();
@@ -245,7 +264,9 @@ public:
     
     void insertPoint (const Frame::IPoint& point);
     void deletePoints();
-    
+
+    void setIPathSelection (const SparseSet<uint16>& selection);
+
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }
     void _setZoomFactor (float zoom);
@@ -257,6 +278,9 @@ public:
 
     void _setActiveIldaTool (IldaTool tool);
     void _setPointToolColor (const Colour& color);
+
+    void _setActiveSketchTool (SketchTool tool);
+    void _setSketchToolColor (const Colour& color);
 
     void _insertPoint (uint16 index, const Frame::IPoint& point);
     void _deletePoint (uint16 index);
@@ -284,6 +308,8 @@ public:
     void _setIldaPoints (const SparseSet<uint16>& selection,
                          const Array<Frame::IPoint>& points);
 
+    void _setIPathSelection (const SparseSet<uint16>& selection);
+    
 private:
     File loadedFile;
     uint32 dirtyCounter;
@@ -294,6 +320,9 @@ private:
     IldaTool activeIldaTool;
     Colour pointToolColor;
     Colour lastVisiblePointToolColor;
+    SketchTool activeSketchTool;
+    Colour sketchToolColor;
+    Colour lastVisibleSketchToolColor;
     bool sketchVisible;
     bool ildaVisible;
     bool ildaShowBlanked;
@@ -316,7 +345,10 @@ private:
     int16 transformCenterZ;
     String transformName;
     
-    ReferenceCountedArray<IPath> IPaths;
+    SparseSet<uint16> iPathSelection;
+    int activePath;
+    int selectedAnchor;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
 

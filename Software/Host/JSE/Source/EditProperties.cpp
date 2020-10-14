@@ -79,8 +79,7 @@ EditProperties::EditProperties (FrameEditor* frame)
     layerTabs->addTab("Background",
                       tabColor,
                       new RefProperties (frame), true);
-    
-    frameEditor->setActiveLayer (FrameEditor::ilda);
+        
     updateZoomButtons();
     updateViewButton();
 }

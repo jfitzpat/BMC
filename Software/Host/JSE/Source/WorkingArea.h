@@ -87,7 +87,13 @@ private:
     int dotFrom;
     int dotTo;
     Rectangle<int> lastDotRect;
-    
+
+    bool drawSDot;
+    Point<int> sDotAt;
+    int sDotFrom;
+    int sDotTo;
+    Rectangle<int> lastSDotRect;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WorkingArea)
 };
 
