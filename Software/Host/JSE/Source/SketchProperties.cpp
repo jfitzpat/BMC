@@ -146,6 +146,13 @@ void SketchProperties::actionListenerCallback (const String& message)
         updateTools();
     else if (message == EditorActions::sketchToolColorChanged)
         updateTools();
+    else if (message == EditorActions::viewChanged)
+        updateTools();
+    else if (message == EditorActions::deleteRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->deletePaths();
+    }
 }
 
 //==============================================================================
@@ -157,6 +164,23 @@ void SketchProperties::refresh()
 
 void SketchProperties::updateTools()
 {
+    if (frameEditor->getActiveView() != Frame::front)
+    {
+        selectToolButton->setEnabled (false);
+        moveToolButton->setEnabled (false);
+        ellipseToolButton->setEnabled (false);
+        penToolButton->setEnabled (false);
+        toolColorButton->setEnabled (false);
+    }
+    else
+    {
+        selectToolButton->setEnabled (true);
+        moveToolButton->setEnabled (true);
+        ellipseToolButton->setEnabled (true);
+        penToolButton->setEnabled (true);
+        toolColorButton->setEnabled (true);
+    }
+
     if (frameEditor->getActiveSketchTool() == FrameEditor::sketchSelectTool)
     {
         selectToolButton->setToggleState (true, dontSendNotification);

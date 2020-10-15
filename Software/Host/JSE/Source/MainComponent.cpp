@@ -157,11 +157,14 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::editSelectAll);
         menu.addCommandItem (&commandManager, CommandIDs::editClearSelection);
         menu.addCommandItem (&commandManager, CommandIDs::deleteSelection);
-        if (frameEditor->getActiveLayer() == FrameEditor::ilda ||
-            frameEditor->getActiveLayer() == FrameEditor::sketch)
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
             menu.addCommandItem (&commandManager, CommandIDs::selectionDownRequest);
             menu.addCommandItem (&commandManager, CommandIDs::selectionUpRequest);
+        }
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda ||
+            frameEditor->getActiveLayer() == FrameEditor::sketch)
+        {
             menu.addSeparator();
             menu.addCommandItem (&commandManager, CommandIDs::blankingToggleRequest);
             menu.addCommandItem (&commandManager, CommandIDs::cycleColorsRequest);

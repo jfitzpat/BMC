@@ -546,6 +546,58 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableDeletePaths : public UndoableAction
+{
+public:
+    UndoableDeletePaths (FrameEditor* editor,
+                         const SparseSet<uint16>& select)
+    : selection (select), frameEditor (editor) {;}
+
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+
+        // Collect the selected paths
+        paths.clear();
+        for (auto n = 0; n < selection.getNumRanges(); ++n)
+        {
+            Range<uint16> r = selection.getRange (n);
+            for (auto i = r.getStart(); i < r.getEnd(); ++i)
+                paths.add (frameEditor->getIPath (i));
+        }
+
+        // Loop backwards through selection to delete
+        for (auto n = selection.getNumRanges() - 1; n >= 0; --n)
+        {
+            Range<uint16> r = selection.getRange (n);
+            for (auto i = r.getEnd() - 1; i >= r.getStart(); --i)
+                frameEditor->_deletePath (i);
+        }
+        return true;
+    }
+    
+    bool undo() override
+    {
+        int pindex = 0;
+        
+        // Loop forwards to insert
+        for (auto n = 0; n < selection.getNumRanges(); ++n)
+        {
+            Range<uint16> r = selection.getRange (n);
+            for (auto i = r.getStart(); i < r.getEnd(); ++i)
+                frameEditor->_insertPath (i, paths.getObjectPointer(pindex++));
+        }
+
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    ReferenceCountedArray<IPath> paths;
+    SparseSet<uint16> selection;
+    FrameEditor* frameEditor;
+};
+
 class UndoableDeletePoints : public UndoableAction
 {
     public:

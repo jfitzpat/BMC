@@ -52,6 +52,7 @@ namespace EditorActions
     const String ildaPointToolColorChanged  ("PTC");
     const String sketchToolChanged          ("STC");
     const String sketchToolColorChanged     ("SCC");
+    const String iPathsChanged              ("PAC");
     const String iPathSelectionChanged      ("PSC");
     const String cancelRequest              ("CR");
     const String deleteRequest              ("DR");
@@ -266,6 +267,7 @@ public:
     void deletePoints();
 
     void setIPathSelection (const SparseSet<uint16>& selection);
+    void deletePaths();
 
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }
@@ -309,6 +311,8 @@ public:
                          const Array<Frame::IPoint>& points);
 
     void _setIPathSelection (const SparseSet<uint16>& selection);
+    void _deletePath (int index);
+    void _insertPath (int index, IPath* path);
     
 private:
     File loadedFile;

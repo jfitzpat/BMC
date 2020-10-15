@@ -26,7 +26,8 @@ class IPath : public ReferenceCountedObject
 {
 public:
     IPath (Colour c = Colours::white)
-        : color (c) {;}
+        : color (c), pointDensity (1200), extraPointsPerAnchor(0),
+          blankedPointsBeforeStart (1), blankedPointsAfterEnd (1) {;}
     ~IPath() {;}
     
     int getAnchorCount() { return anchors.size(); }
@@ -40,6 +41,15 @@ public:
     const Colour& getColor() { return color; }
     void setColor (Colour c) { color = c; }
     
+    uint16 getPointDensity() { return pointDensity; }
+    void setPointDensity (uint16 d) { pointDensity = d ? d : 1; }
+    uint16 getExtraPointsPerAnchor() { return extraPointsPerAnchor; }
+    void setExtraPointsPerAnchor (uint16 p) { extraPointsPerAnchor = p; }
+    uint16 getBlankedPointsBeforeStart() { return blankedPointsBeforeStart; }
+    void setBlankedPointsBeforeStart (uint16 p) { blankedPointsBeforeStart = p ? p : 1; }
+    uint16 getBlankedPointsAfterEnd() { return blankedPointsAfterEnd; }
+    void setBlankedPointsAfterEnd (uint16 p) { blankedPointsAfterEnd = p ? p : 1; }
+
     const Path& getPath() { return path; }
 
     // Make a counting pointer of our type
@@ -50,5 +60,10 @@ private:
     
     Array<Anchor> anchors;
     Colour color;
+    uint16 pointDensity;
+    uint16 extraPointsPerAnchor;
+    uint16 blankedPointsBeforeStart;
+    uint16 blankedPointsAfterEnd;
+    
     Path path;
 };

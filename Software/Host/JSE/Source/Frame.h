@@ -66,6 +66,8 @@ public:
     int getIPathCount() { return iPaths.size(); }
     IPath::Ptr getIPath (int index) { return iPaths[index]; }
     void addPath (IPath* p) { iPaths.add (p); }
+    void deletePath (int index) { iPaths.remove (index); }
+    void insertPath (int index, IPath* p) { iPaths.insert (index, p); }
     
     
     void buildThumbNail (int width = 150, int height = 150, float lineSize = 1.0);

@@ -86,7 +86,6 @@
           <FILE id="GgNRij" name="SketchProperties.h" compile="0" resource="0"
                 file="Source/SketchProperties.h"/>
         </GROUP>
-        <FILE id="LxU0wr" name="Anchor.cpp" compile="1" resource="0" file="Source/Anchor.cpp"/>
         <FILE id="DWVeqZ" name="Anchor.h" compile="0" resource="0" file="Source/Anchor.h"/>
         <FILE id="CpF1YK" name="EditProperties.cpp" compile="1" resource="0"
               file="Source/EditProperties.cpp"/>

@@ -67,9 +67,13 @@ private:
     void mouseDownIldaSelect (const MouseEvent& event);
     void mouseDownIldaMove (const MouseEvent& event);
     void mouseDownIldaPoint (const MouseEvent& event);
+    void mouseDownSketchSelect (const MouseEvent& event);
+    void mouseUpIlda (const MouseEvent& event);
+    void mouseUpSketch (const MouseEvent& event);
     void mouseMoveIldaSelect (const MouseEvent& event);
     void mouseMoveIldaMove (const MouseEvent& event);
     void mouseMoveIldaPoint (const MouseEvent& event);
+    void mouseMoveSketchSelect (const MouseEvent& event);
 
     FrameEditor* frameEditor;
     float activeScale;
@@ -88,6 +92,10 @@ private:
     int dotTo;
     Rectangle<int> lastDotRect;
 
+    bool drawSMark;
+    int sMarkIndex;
+    Rectangle<int> lastSMarkRect;
+    
     bool drawSDot;
     Point<int> sDotAt;
     int sDotFrom;

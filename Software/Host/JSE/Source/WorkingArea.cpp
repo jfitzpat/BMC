@@ -31,6 +31,7 @@ WorkingArea::WorkingArea (FrameEditor* frame)
     drawMark = false;
     drawRect = false;
     drawDot = false;
+    drawSMark = false;
     drawSDot = false;
 }
 
@@ -50,6 +51,12 @@ void WorkingArea::killMarkers()
     {
         drawDot = false;
         repaint (lastDotRect);
+    }
+    
+    if (drawSMark)
+    {
+        drawSMark = false;
+        repaint (lastSMarkRect);
     }
     
     if (drawSDot)
@@ -184,18 +191,16 @@ void WorkingArea::rightClickIldaSelect (const MouseEvent& /*event*/)
 
 void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
 {
-    // Left mouse only for now
     if (event.mods.isRightButtonDown())
     {
         rightClickIldaSelect (event);
         return;
     }
     
-    
+    // Left button?
     if (! event.mods.isLeftButtonDown())
         return;
     
-
     // Has user highlighted a point?
     if (drawMark)
     {
@@ -219,22 +224,108 @@ void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
     }
 }
 
-void WorkingArea::mouseDown (const MouseEvent& event)
+void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
 {
-    // Only dealing with ILDA layer
-    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
-        frameEditor->getIldaVisible() == false)
+    // Front View?
+    if (frameEditor->getActiveView() != Frame::front)
         return;
     
-    if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
-        mouseDownIldaSelect (event);
-    else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
-        mouseDownIldaPoint (event);
-    else if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
-        mouseDownIldaMove (event);
+    // Left button?
+    if (! event.mods.isLeftButtonDown())
+        return;
+    
+    // Has user highlighted a point?
+    if (drawSMark)
+    {
+        SparseSet<uint16> selection;
+        
+        if (event.mods.isCommandDown() || event.mods.isAltDown())
+            selection = frameEditor->getIPathSelection();
+        
+        if (selection.contains (sMarkIndex) || event.mods.isAltDown())
+            selection.removeRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
+        else
+            selection.addRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
+        
+        drawSMark = false;
+        frameEditor->setIPathSelection (selection);
+    }
+    else
+    {
+        drawRect = true;
+        lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
+    }
+}
+
+void WorkingArea::mouseDown (const MouseEvent& event)
+{
+    if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+    {
+        if (frameEditor->getIldaVisible() == false)
+            return;
+        else if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+            mouseDownIldaSelect (event);
+        else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+            mouseDownIldaPoint (event);
+        else if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
+            mouseDownIldaMove (event);
+    }
+    else if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+    {
+        if (frameEditor->getSketchVisible() == false)
+            return;
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchSelectTool)
+            mouseDownSketchSelect (event);
+    }
 }
 
 void WorkingArea::mouseUp (const MouseEvent& event)
+{
+    if (frameEditor->getActiveLayer() == FrameEditor::ilda)
+        mouseUpIlda (event);
+    else if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+        mouseUpSketch (event);
+}
+
+void WorkingArea::mouseUpSketch (const MouseEvent& event)
+{
+    if (drawRect)
+    {
+        drawRect = false;
+        int expansion = (int)(activeInvScale * 3);
+        repaint (lastDrawRect.expanded (expansion, expansion));
+        
+        // Should we be using existing selection?
+        SparseSet<uint16> selection;
+        if (event.mods.isAltDown() || event.mods.isCommandDown())
+            selection = frameEditor->getIPathSelection();
+        
+        for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
+        {
+            IPath::Ptr path = frameEditor->getIPath (n);
+
+            Rectangle<float> bounds = path->getPath().getBounds();
+            Rectangle<int> r (bounds.getX(), bounds.getY(),
+                              bounds.getWidth(), bounds.getHeight());
+            
+            if (lastDrawRect.contains (r))
+            {
+                if (event.mods.isAltDown())
+                    selection.removeRange (Range<uint16>(n, n + 1));
+                else
+                    selection.addRange (Range<uint16>(n, n + 1));
+            }
+        }
+
+        // Make the selection
+        frameEditor->setIPathSelection (selection);
+        
+        // Discard the rect
+        lastDrawRect = Rectangle<int>();
+    }
+}
+
+void WorkingArea::mouseUpIlda (const MouseEvent& event)
 {
     if (drawRect)
     {
@@ -286,6 +377,55 @@ void WorkingArea::mouseUp (const MouseEvent& event)
     {
         if (frameEditor->isTransforming())
             frameEditor->endTransform();
+    }
+}
+
+void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
+{
+    if (frameEditor->getActiveView() != Frame::front)
+    {
+        if (drawSMark)
+        {
+            drawSMark = false;
+            repaint (lastSMarkRect);
+        }
+        return;
+    }
+    
+    Point<float> pos ((float)event.x, (float)event.y);
+    
+    int n;
+    for (n = 0; n < frameEditor->getIPathCount(); ++n)
+    {
+        IPath::Ptr path;
+        Point<float> nearest;
+        
+        path = frameEditor->getIPath (n);
+        path->getPath().getNearestPoint (pos, nearest);
+        float distance = pos.getDistanceFrom(nearest);
+        if (abs(distance) <= (3 * activeInvScale))
+        {
+            if (drawSMark)
+                repaint (lastSMarkRect);
+            
+            Rectangle<float> r = path->getPath().getBounds();
+            r.expand (7 * activeInvScale, 7 * activeInvScale);
+            lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+            
+            sMarkIndex = n;
+            drawSMark = true;
+            repaint (lastSMarkRect);
+            break;
+        }
+    }
+    
+    if (n == frameEditor->getIPathCount())
+    {
+        if (drawSMark)
+        {
+            drawSMark = false;
+            repaint (lastSMarkRect);
+        }
     }
 }
 
@@ -532,21 +672,30 @@ void WorkingArea::mouseMoveIldaSelect (const MouseEvent& event)
 
 void WorkingArea::mouseMove (const MouseEvent& event)
 {
-    // If we aren't the ILDA layer case, clear all hover marks
-    // and bail
-    if (frameEditor->getActiveLayer() != FrameEditor::ilda ||
-        frameEditor->getIldaVisible() == false)
+    if (frameEditor->getActiveLayer() == FrameEditor::ilda)
     {
-        killMarkers();
-        return;
+        if (frameEditor->getIldaVisible() == false)
+        {
+            killMarkers();
+            return;
+        }
+        else if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
+            mouseMoveIldaSelect (event);
+        else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
+            mouseMoveIldaPoint (event);
+        else if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
+            mouseMoveIldaMove (event);
     }
-    
-    if (frameEditor->getActiveIldaTool() == FrameEditor::selectTool)
-        mouseMoveIldaSelect (event);
-    else if (frameEditor->getActiveIldaTool() == FrameEditor::pointTool)
-        mouseMoveIldaPoint (event);
-    else if (frameEditor->getActiveIldaTool() == FrameEditor::moveTool)
-        mouseMoveIldaMove (event);
+    else if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+    {
+        if (frameEditor->getSketchVisible() == false)
+        {
+            killMarkers();
+            return;
+        }
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchSelectTool)
+            mouseMoveSketchSelect (event);
+    }
 }
 
 void WorkingArea::mouseDrag (const MouseEvent& event)
@@ -731,12 +880,6 @@ void WorkingArea::paint (juce::Graphics& g)
             }
         }
         
-        if (frameEditor->getActiveLayer() == FrameEditor::ilda && drawRect)
-        {
-            g.setColour (Colours::grey);
-            g.drawRect (lastDrawRect, (int)activeInvScale >> 1);
-        }
-
         if (frameEditor->getActiveLayer() == FrameEditor::ilda && drawDot)
         {
             Colour c = frameEditor->getPointToolColor();
@@ -817,13 +960,14 @@ void WorkingArea::paint (juce::Graphics& g)
         {
             IPath::Ptr path = frameEditor->getIPath (n);
             bool selected = frameEditor->getIPathSelection().contains (n);
+            bool doubleline = (selected || (drawSMark && (sMarkIndex == n)));
             
             Colour c = path->getColor();
             if (c == Colours::black)
                 c = Colours::darkgrey;
             
             g.setColour (c);
-            g.strokePath (path->getPath(), PathStrokeType (selected ? 2 * activeInvScale : activeInvScale));
+            g.strokePath (path->getPath(), PathStrokeType (doubleline ? 2 * activeInvScale : activeInvScale));
             
             for (auto i = 0; i < path->getAnchorCount(); ++i)
             {
@@ -862,6 +1006,14 @@ void WorkingArea::paint (juce::Graphics& g)
             }
         }
     }
+
+    // Rectangle
+    if (drawRect)
+    {
+        g.setColour (Colours::grey);
+        g.drawRect (lastDrawRect, (int)activeInvScale >> 1);
+    }
+
 }
 
 void WorkingArea::resized()
@@ -977,6 +1129,11 @@ void WorkingArea::actionListenerCallback (const String& message)
         updateCursor();
     }
     else if (message == EditorActions::framesChanged)
+    {
+        killMarkers();
+        repaint();
+    }
+    else if (message == EditorActions::iPathsChanged)
     {
         killMarkers();
         repaint();

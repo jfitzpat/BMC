@@ -36,7 +36,7 @@ FrameEditor::FrameEditor()
       activeIldaTool (selectTool),
       pointToolColor (Colours::white),
       lastVisiblePointToolColor (Colours::white),
-      activeSketchTool (sketchPenTool),
+      activeSketchTool (sketchSelectTool),
       sketchToolColor (Colours::white),
       lastVisibleSketchToolColor (Colours::white),
       sketchVisible (true),
@@ -62,6 +62,14 @@ FrameEditor::FrameEditor()
     p->addAnchor (Anchor (50000, 10000, 3000, 3000, -3000, -3000));
     p->addAnchor (Anchor (10000, 10000));
     p->addAnchor (Anchor (10000, 50000));
+
+    currentFrame->addPath (p.get());
+
+    p = new IPath;
+    p->addAnchor (Anchor (30000, 40000, 3000, 3000, 3000, -3000));
+    p->addAnchor (Anchor (40000, 40000, -3000, -3000, 3000, -3000));
+    p->addAnchor (Anchor (20000, 30000, 3000, 3000, -3000, -3000));
+    p->setColor (Colours::red);
 
     currentFrame->addPath (p.get());
     
@@ -181,6 +189,8 @@ void FrameEditor::fileIldaExport()
 bool FrameEditor::hasSelection()
 {
     if (activeLayer == ilda && (! ildaSelection.isEmpty()))
+        return true;
+    else if (activeLayer == sketch && (! iPathSelection.isEmpty()))
         return true;
         
     return false;
@@ -1116,6 +1126,17 @@ void FrameEditor::anchorIldaSelected()
     }
 
     perform (new UndoableSetIldaSelection (this, newSelection));
+}
+
+void FrameEditor::deletePaths()
+{
+    if (iPathSelection.isEmpty())
+        return;
+    
+    beginNewTransaction ("Delete Path(s)");
+    SparseSet<uint16> selection = iPathSelection;
+    perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
+    perform (new UndoableDeletePaths (this, selection));
 }
 
 void FrameEditor::setIPathSelection (const SparseSet<uint16>& selection)
@@ -2409,5 +2430,23 @@ void FrameEditor::_setIPathSelection (const SparseSet<uint16>& selection)
     {
         iPathSelection = selection;
         sendActionMessage (EditorActions::iPathSelectionChanged);
+    }
+}
+
+void FrameEditor::_deletePath (int index)
+{
+    if ((index >= 0) && (index < getIPathCount()))
+    {
+        currentFrame->deletePath (index);
+        sendActionMessage (EditorActions::iPathsChanged);
+    }
+}
+
+void FrameEditor::_insertPath (int index, IPath* path)
+{
+    if ((index >= 0) && (index <= getIPathCount()))
+    {
+        currentFrame->insertPath (index, path);
+        sendActionMessage (EditorActions::iPathsChanged);
     }
 }
