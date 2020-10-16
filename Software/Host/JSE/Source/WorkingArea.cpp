@@ -226,10 +226,6 @@ void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
 
 void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
 {
-    // Front View?
-    if (frameEditor->getActiveView() != Frame::front)
-        return;
-    
     // Left button?
     if (! event.mods.isLeftButtonDown())
         return;
@@ -382,16 +378,6 @@ void WorkingArea::mouseUpIlda (const MouseEvent& event)
 
 void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
 {
-    if (frameEditor->getActiveView() != Frame::front)
-    {
-        if (drawSMark)
-        {
-            drawSMark = false;
-            repaint (lastSMarkRect);
-        }
-        return;
-    }
-    
     Point<float> pos ((float)event.x, (float)event.y);
     
     int n;
@@ -954,7 +940,7 @@ void WorkingArea::paint (juce::Graphics& g)
     }
     
     // Sketch Layer
-    if (frameEditor->getSketchVisible() && (frameEditor->getActiveView() == Frame::front))
+    if (frameEditor->getSketchVisible())
     {
         for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
         {

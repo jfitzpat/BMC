@@ -156,6 +156,12 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::editSelectAll);
         menu.addCommandItem (&commandManager, CommandIDs::editClearSelection);
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+        {
+            menu.addCommandItem (&commandManager, CommandIDs::editCut);
+            menu.addCommandItem (&commandManager, CommandIDs::editCopy);
+            menu.addCommandItem (&commandManager, CommandIDs::editPaste);
+        }
         menu.addCommandItem (&commandManager, CommandIDs::deleteSelection);
         if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         {
@@ -273,6 +279,9 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::appExit,
                                 CommandIDs::editUndo,
                                 CommandIDs::editRedo,
+                                CommandIDs::editCut,
+                                CommandIDs::editCopy,
+                                CommandIDs::editPaste,
                                 CommandIDs::editSelectAll,
                                 CommandIDs::editClearSelection,
                                 CommandIDs::deleteFrame,
@@ -373,6 +382,21 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
                 result.setActive(false);
             }
             break;
+        case CommandIDs::editCut:
+            result.setInfo ("Cut", "Cut the current selection", "Menu", 0);
+            result.addDefaultKeypress('x', ModifierKeys::commandModifier);
+            result.setActive (frameEditor->canCopy());
+            break;
+        case CommandIDs::editCopy:
+            result.setInfo ("Copy", "Copy the current selection", "Menu", 0);
+            result.addDefaultKeypress('c', ModifierKeys::commandModifier);
+            result.setActive (frameEditor->canCopy());
+            break;
+        case CommandIDs::editPaste:
+            result.setInfo ("Paste", "Paste the current selection", "Menu", 0);
+            result.addDefaultKeypress('v', ModifierKeys::commandModifier);
+            result.setActive (frameEditor->canPaste());
+            break;
         case CommandIDs::deleteFrame:
             result.setInfo ("Delete Frame", "Delete the current frame", "Menu", 0);
             result.setActive (frameEditor->getFrameCount() > 1);
@@ -466,7 +490,7 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress (KeyPress::backspaceKey, 0);
             break;
         case CommandIDs::deleteSelection:
-            result.setInfo ("Delete Selection", "Delete the current selection", "Menu", 0);
+            result.setInfo ("Delete", "Delete the current selection", "Menu", 0);
             result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
             result.setActive (frameEditor->hasSelection());
             break;
@@ -540,6 +564,15 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::editRedo:
             frameEditor->redo();
+            break;
+        case CommandIDs::editCut:
+            frameEditor->cut();
+            break;
+        case CommandIDs::editCopy:
+            frameEditor->copy();
+            break;
+        case CommandIDs::editPaste:
+            frameEditor->paste();
             break;
         case CommandIDs::editSelectAll:
             frameEditor->selectAll();

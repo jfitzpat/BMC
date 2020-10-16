@@ -31,6 +31,7 @@
 namespace EditorActions
 {
     const String dirtyStatusChanged         ("DSC");
+    const String selectionCopied            ("SCP");
     const String layerChanged               ("LC");
     const String viewChanged                ("VC");
     const String zoomFactorChanged          ("ZFC");
@@ -109,6 +110,11 @@ public:
     void fileSaveAs();
     void fileIldaExport();
     
+    // Edit helpers
+    bool canCopy();
+    bool canPaste();
+    void copy();
+
     // Tool helpers
     void cancelRequest()
     {
@@ -217,6 +223,9 @@ public:
     void setPointToolColor (const Colour& color);
     void togglePointToolBlank();
     void cyclePointToolColors();
+
+    void cut();
+    void paste();
 
     void setActiveSketchTool (SketchTool tool);
     void setSketchToolColor (const Colour& color);
@@ -358,6 +367,7 @@ private:
     SparseSet<uint16> iPathSelection;
     int activePath;
     int selectedAnchor;
+    ReferenceCountedArray<IPath> iPathCopy;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };

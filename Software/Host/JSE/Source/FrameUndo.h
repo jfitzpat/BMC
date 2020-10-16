@@ -600,45 +600,45 @@ private:
 
 class UndoableDeletePoints : public UndoableAction
 {
-    public:
-        UndoableDeletePoints (FrameEditor* editor,
-                              const SparseSet<uint16>& select)
-        : selection (select), frameEditor (editor) {;}
+public:
+    UndoableDeletePoints (FrameEditor* editor,
+                          const SparseSet<uint16>& select)
+    : selection (select), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        frameEditor->getIldaPoints (selection, oldPoints);
         
-        bool perform() override
+        // Loop backwards through selection to delete
+        for (auto n = selection.getNumRanges() - 1; n >= 0; --n)
         {
-            frameEditor->incDirtyCounter();
-            frameEditor->getIldaPoints (selection, oldPoints);
-            
-            // Loop backwards through selection to delete
-            for (auto n = selection.getNumRanges() - 1; n >= 0; --n)
-            {
-                Range<uint16> r = selection.getRange (n);
-                for (auto i = r.getEnd() - 1; i >= r.getStart(); --i)
-                    frameEditor->_deletePoint ((uint16)i);
-            }
-            return true;
+            Range<uint16> r = selection.getRange (n);
+            for (auto i = r.getEnd() - 1; i >= r.getStart(); --i)
+                frameEditor->_deletePoint ((uint16)i);
         }
+        return true;
+    }
+    
+    bool undo() override
+    {
+        int pindex = 0;
         
-        bool undo() override
+        // Loop forwards to insert
+        for (auto n = 0; n < selection.getNumRanges(); ++n)
         {
-            int pindex = 0;
-            
-            // Loop forwards to insert
-            for (auto n = 0; n < selection.getNumRanges(); ++n)
-            {
-                Range<uint16> r = selection.getRange (n);
-                for (auto i = r.getStart(); i < r.getEnd(); ++i)
-                    frameEditor->_insertPoint (i, oldPoints[pindex++]);
-            }
-            frameEditor->decDirtyCounter();
-            return true;
+            Range<uint16> r = selection.getRange (n);
+            for (auto i = r.getStart(); i < r.getEnd(); ++i)
+                frameEditor->_insertPoint (i, oldPoints[pindex++]);
         }
-        
-    private:
-        SparseSet<uint16> selection;
-        Array<Frame::IPoint> oldPoints;
-        FrameEditor* frameEditor;
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    SparseSet<uint16> selection;
+    Array<Frame::IPoint> oldPoints;
+    FrameEditor* frameEditor;
 };
 
 class UndoableSetFrameIndex : public UndoableAction
@@ -668,107 +668,107 @@ private:
 
 class UndoableDeleteFrame : public UndoableAction
 {
-    public:
-        UndoableDeleteFrame (FrameEditor* editor, uint16 index)
-        : delIndex (index), frameEditor (editor) {;}
-        
-        bool perform() override
-        {
-            frameEditor->incDirtyCounter();
-            oldFrame = frameEditor->getFrame (delIndex);
-            frameEditor->_deleteFrame (delIndex);
-            return true;
-        }
-        
-        bool undo() override
-        {
-            frameEditor->_insertFrame (delIndex, oldFrame);
-            frameEditor->decDirtyCounter();
-            return true;
-        }
-        
-    private:
-        Frame::Ptr oldFrame;
-        uint16 delIndex;
-        FrameEditor* frameEditor;
+public:
+    UndoableDeleteFrame (FrameEditor* editor, uint16 index)
+    : delIndex (index), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        oldFrame = frameEditor->getFrame (delIndex);
+        frameEditor->_deleteFrame (delIndex);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_insertFrame (delIndex, oldFrame);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    Frame::Ptr oldFrame;
+    uint16 delIndex;
+    FrameEditor* frameEditor;
 };
 
 class UndoableNewFrame : public UndoableAction
 {
-    public:
-        UndoableNewFrame (FrameEditor* editor)
-        : frameEditor (editor) {;}
-        
-        bool perform() override
-        {
-            frameEditor->incDirtyCounter();
-            index = frameEditor->getFrameIndex() + 1;
-            frameEditor->_newFrame();
-            return true;
-        }
-        
-        bool undo() override
-        {
-            frameEditor->_deleteFrame (index);
-            frameEditor->decDirtyCounter();
-            return true;
-        }
-        
-    private:
-        uint16 index;
-        FrameEditor* frameEditor;
+public:
+    UndoableNewFrame (FrameEditor* editor)
+    : frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        index = frameEditor->getFrameIndex() + 1;
+        frameEditor->_newFrame();
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_deleteFrame (index);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    uint16 index;
+    FrameEditor* frameEditor;
 };
 
 class UndoableDupFrame : public UndoableAction
 {
-    public:
-        UndoableDupFrame (FrameEditor* editor)
-        : frameEditor (editor) {;}
-        
-        bool perform() override
-        {
-            frameEditor->incDirtyCounter();
-            index = frameEditor->getFrameIndex() + 1;
-            frameEditor->_dupFrame();
-            return true;
-        }
-        
-        bool undo() override
-        {
-            frameEditor->_deleteFrame (index);
-            frameEditor->decDirtyCounter();
-            return true;
-        }
-        
-    private:
-        uint16 index;
-        FrameEditor* frameEditor;
+public:
+    UndoableDupFrame (FrameEditor* editor)
+    : frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        index = frameEditor->getFrameIndex() + 1;
+        frameEditor->_dupFrame();
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_deleteFrame (index);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    uint16 index;
+    FrameEditor* frameEditor;
 };
 
 class UndoableSwapFrames : public UndoableAction
 {
-    public:
-        UndoableSwapFrames (FrameEditor* editor, uint16 _index1, uint16 _index2)
-        : index1 (_index1), index2 (_index2), frameEditor (editor)  {;}
-        
-        bool perform() override
-        {
-            frameEditor->incDirtyCounter();
-            frameEditor->_swapFrames(index1, index2);
-            return true;
-        }
-        
-        bool undo() override
-        {
-            frameEditor->_swapFrames(index1, index2);
-            frameEditor->decDirtyCounter();
-            return true;
-        }
-        
-    private:
-        uint16 index1;
-        uint16 index2;
-        FrameEditor* frameEditor;
+public:
+    UndoableSwapFrames (FrameEditor* editor, uint16 _index1, uint16 _index2)
+    : index1 (_index1), index2 (_index2), frameEditor (editor)  {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        frameEditor->_swapFrames(index1, index2);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_swapFrames(index1, index2);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    uint16 index1;
+    uint16 index2;
+    FrameEditor* frameEditor;
 };
 
 class UndoableSetIldaSelection : public UndoableAction
@@ -798,32 +798,32 @@ private:
 
 class UndoableSetIldaPoints : public UndoableAction
 {
-    public:
-        UndoableSetIldaPoints (FrameEditor* editor,
-                               const SparseSet<uint16>& select,
-                               const Array<Frame::IPoint> points)
-        : selection (select), newPoints (points), frameEditor (editor) {;}
-        
-        bool perform() override
-        {
-            frameEditor->incDirtyCounter();
-            frameEditor->getIldaPoints (selection, oldPoints);
-            frameEditor->_setIldaPoints (selection, newPoints);
-            return true;
-        }
-        
-        bool undo() override
-        {
-            frameEditor->_setIldaPoints (selection, oldPoints);
-            frameEditor->decDirtyCounter();
-            return true;
-        }
-        
-    private:
-        SparseSet<uint16> selection;
-        Array<Frame::IPoint> oldPoints;
-        Array<Frame::IPoint> newPoints;
-        FrameEditor* frameEditor;
+public:
+    UndoableSetIldaPoints (FrameEditor* editor,
+                           const SparseSet<uint16>& select,
+                           const Array<Frame::IPoint> points)
+    : selection (select), newPoints (points), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        frameEditor->getIldaPoints (selection, oldPoints);
+        frameEditor->_setIldaPoints (selection, newPoints);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setIldaPoints (selection, oldPoints);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    SparseSet<uint16> selection;
+    Array<Frame::IPoint> oldPoints;
+    Array<Frame::IPoint> newPoints;
+    FrameEditor* frameEditor;
 };
 
 class UndoableSetIPathSelection : public UndoableAction
@@ -853,30 +853,64 @@ private:
 
 class UndoableSetPaths : public UndoableAction
 {
-    public:
-        UndoableSetPaths (FrameEditor* editor,
-                          const SparseSet<uint16>& select,
-                          const ReferenceCountedArray<IPath>& paths)
-        : selection (select), newPaths (paths), frameEditor (editor) {;}
-        
-        bool perform() override
+public:
+    UndoableSetPaths (FrameEditor* editor,
+                      const SparseSet<uint16>& select,
+                      const ReferenceCountedArray<IPath>& paths)
+    : selection (select), newPaths (paths), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        frameEditor->getIPaths (selection, oldPaths);
+        frameEditor->_setPaths (selection, newPaths);
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setPaths (selection, oldPaths);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    SparseSet<uint16> selection;
+    ReferenceCountedArray<IPath> oldPaths;
+    ReferenceCountedArray<IPath> newPaths;
+    FrameEditor* frameEditor;
+};
+
+class UndoableAddPaths : public UndoableAction
+{
+public:
+    UndoableAddPaths (FrameEditor* editor,
+                      const ReferenceCountedArray<IPath>& paths)
+    : frameEditor (editor)
+    {
+        // We have to make copies, not just increment reference count
+        for (auto n = 0; n < paths.size(); ++n)
         {
-            frameEditor->incDirtyCounter();
-            frameEditor->getIPaths (selection, oldPaths);
-            frameEditor->_setPaths (selection, newPaths);
-            return true;
+            IPath::Ptr p = paths[n];
+            newPaths.add (new IPath (*p.get()));
         }
-        
-        bool undo() override
-        {
-            frameEditor->_setPaths (selection, oldPaths);
-            frameEditor->decDirtyCounter();
-            return true;
-        }
-        
-    private:
-        SparseSet<uint16> selection;
-        ReferenceCountedArray<IPath> oldPaths;
-        ReferenceCountedArray<IPath> newPaths;
-        FrameEditor* frameEditor;
+    }
+    
+    bool perform() override
+    {
+        int insertIndex = frameEditor->getIPathCount();
+        for (auto n = 0; n < newPaths.size(); ++n)
+            frameEditor->_insertPath (insertIndex++, newPaths.getObjectPointer(n));
+        return true;
+    }
+    
+    bool undo() override
+    {
+        for (auto n = 0; n <newPaths.size(); ++n)
+            frameEditor->_deletePath (frameEditor->getIPathCount() - 1);
+        return true;
+    }
+private:
+    ReferenceCountedArray<IPath> newPaths;
+    FrameEditor* frameEditor;
 };

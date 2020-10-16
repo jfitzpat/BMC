@@ -171,13 +171,13 @@ void MainEditor::setZoom (float zoom)
     frameEditor->_setZoomFactor (zoom);
     float zoomFactor = frameEditor->getZoomFactor();
     
-    int x;
-    int y;
+    int x = 32767;
+    int y = 32767;
 
     if (frameEditor->getActiveLayer() == FrameEditor::ilda)
         frameEditor->getComponentCenterOfIldaSelection (x, y);
-    else
-        frameEditor->getCenterOfIPathSelection (x, y);
+//    else
+//        frameEditor->getCenterOfIPathSelection (x, y);
     
     translateWorkingToMain (x, y);
     
@@ -203,12 +203,12 @@ void MainEditor::findZoomPoint (const MouseEvent& event, int& x, int& y)
         frameEditor->getComponentCenterOfIldaSelection (x, y);
         translateWorkingToMain (x, y);
     }
-    else if (frameEditor->getActiveLayer() == FrameEditor::sketch &&
-             (! frameEditor->getIPathSelection().isEmpty()))
-    {
-        frameEditor->getCenterOfIPathSelection (x, y);
-        translateWorkingToMain (x, y);
-    }
+//    else if (frameEditor->getActiveLayer() == FrameEditor::sketch &&
+//             (! frameEditor->getIPathSelection().isEmpty()))
+//    {
+//        frameEditor->getCenterOfIPathSelection (x, y);
+//        translateWorkingToMain (x, y);
+//    }
     else
     {
         x = event.getEventRelativeTo (workingArea.get()).x;

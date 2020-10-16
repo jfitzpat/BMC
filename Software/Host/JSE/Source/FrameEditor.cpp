@@ -72,9 +72,26 @@ FrameEditor::FrameEditor()
     p->setColor (Colours::red);
 
     currentFrame->addPath (p.get());
-    
+
+    p = new IPath;
+    p->addAnchor (Anchor (10000, 30000, 3000, 3000, 3000, -3000));
+    p->addAnchor (Anchor (30000, 30000, -3000, -3000, 3000, -3000));
+    p->addAnchor (Anchor (10000, 20000, 3000, 3000, -3000, -3000));
+    p->setColor (Colours::blue);
+
+    currentFrame->addPath (p.get());
+
+    p = new IPath;
+    p->addAnchor (Anchor (12000, 48000, 3000, 3000, 3000, -3000));
+    p->addAnchor (Anchor (46000, 46000, -3000, -3000, 3000, -3000));
+    p->addAnchor (Anchor (46000, 12000, 3000, 3000, -3000, -3000));
+    p->addAnchor (Anchor (17000, 13000));
+    p->addAnchor (Anchor (12000, 47000));
+    p->setColor (Colours::orange);
+
+    currentFrame->addPath (p.get());
+
     //selectedAnchor = 1;
-    //iPathSelection.addRange (Range<uint16> (0, 1));
 }
 
 FrameEditor::~FrameEditor()
@@ -186,6 +203,7 @@ void FrameEditor::fileIldaExport()
     }
 }
 
+//==========================================================================================
 bool FrameEditor::hasSelection()
 {
     if (activeLayer == ilda && (! ildaSelection.isEmpty()))
@@ -199,6 +217,26 @@ bool FrameEditor::hasSelection()
 bool FrameEditor::hasMovableSelection()
 {
     return hasSelection();
+}
+
+bool FrameEditor::canCopy()
+{
+    return activeLayer == sketch && (! iPathSelection.isEmpty());
+}
+
+bool FrameEditor::canPaste()
+{
+    return (activeLayer == sketch) && iPathCopy.size();
+}
+
+void FrameEditor::copy()
+{
+    if (! canCopy())
+        return;
+    
+    iPathCopy.clear();
+    getSelectedIPaths (iPathCopy);
+    sendActionMessage (EditorActions::selectionCopied);
 }
 
 void FrameEditor::toggleBlanking()
@@ -420,6 +458,29 @@ void FrameEditor::cyclePointToolColors()
         setPointToolColor (Colours::black);
     else
         setPointToolColor (Colours::white);
+}
+
+void FrameEditor::cut()
+{
+    if (! canCopy())
+        return;
+    
+    copy();
+    deletePaths();
+}
+
+void FrameEditor::paste()
+{
+    if (! canPaste())
+        return;
+    
+    beginNewTransaction ("Paste");
+    int rangeStart = getIPathCount();
+    int rangeEnd = rangeStart + iPathCopy.size();
+    perform (new UndoableAddPaths (this, iPathCopy));
+    SparseSet<uint16> selection;
+    selection.addRange (Range<uint16> ((uint16)rangeStart, (uint16)rangeEnd));
+    perform (new UndoableSetIPathSelection (this, selection));
 }
 
 void FrameEditor::setActiveSketchTool (SketchTool tool)
