@@ -22,7 +22,7 @@
 #include "Anchor.h"
 #include <JuceHeader.h>
 
-class IPath : public ReferenceCountedObject
+class IPath
 {
 public:
     IPath (Colour c = Colours::white)
@@ -52,9 +52,6 @@ public:
     void setBlankedPointsAfterEnd (uint16 p) { blankedPointsAfterEnd = p ? p : 1; }
 
     const Path& getPath() { return path; }
-
-    // Make a counting pointer of our type
-    using Ptr = ReferenceCountedObjectPtr<IPath>;
 
 private:
     void buildPath();

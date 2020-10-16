@@ -38,11 +38,9 @@ Frame::Frame (const Frame& frame)
     imageXoffset = frame.imageXoffset;
     imageYoffset = frame.imageYoffset;
     framePoints = frame.framePoints;
+    iPaths = frame.iPaths;
     thumbNail = frame.thumbNail;
     imageData = frame.imageData;
-
-    for (auto n = 0; n < frame.iPaths.size(); ++n)
-    iPaths.add (new IPath (*frame.iPaths.getObjectPointer (n)));
     
     Image i = ImageFileFormat::loadFrom(imageData.getData(), imageData.getSize());
     backgroundImage.reset (new Image(i));

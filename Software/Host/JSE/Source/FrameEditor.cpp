@@ -55,41 +55,41 @@ FrameEditor::FrameEditor()
     currentFrame = Frames[frameIndex];
     
     // !!!!
-    IPath::Ptr p = new IPath;
+    IPath p;
     
-    p->addAnchor (Anchor (10000, 50000, 3000, 3000, 3000, -3000));
-    p->addAnchor (Anchor (50000, 50000, -3000, -3000, 3000, -3000));
-    p->addAnchor (Anchor (50000, 10000, 3000, 3000, -3000, -3000));
-    p->addAnchor (Anchor (10000, 10000));
-    p->addAnchor (Anchor (10000, 50000));
+    p.addAnchor (Anchor (10000, 50000, 3000, 3000, 3000, -3000));
+    p.addAnchor (Anchor (50000, 50000, -3000, -3000, 3000, -3000));
+    p.addAnchor (Anchor (50000, 10000, 3000, 3000, -3000, -3000));
+    p.addAnchor (Anchor (10000, 10000));
+    p.addAnchor (Anchor (10000, 50000));
 
-    currentFrame->addPath (p.get());
+    currentFrame->addPath (p);
 
-    p = new IPath;
-    p->addAnchor (Anchor (30000, 40000, 3000, 3000, 3000, -3000));
-    p->addAnchor (Anchor (40000, 40000, -3000, -3000, 3000, -3000));
-    p->addAnchor (Anchor (20000, 30000, 3000, 3000, -3000, -3000));
-    p->setColor (Colours::red);
+    p.clearAllAnchors();
+    p.addAnchor (Anchor (30000, 40000, 3000, 3000, 3000, -3000));
+    p.addAnchor (Anchor (40000, 40000, -3000, -3000, 3000, -3000));
+    p.addAnchor (Anchor (20000, 30000, 3000, 3000, -3000, -3000));
+    p.setColor (Colours::red);
 
-    currentFrame->addPath (p.get());
+    currentFrame->addPath (p);
 
-    p = new IPath;
-    p->addAnchor (Anchor (10000, 30000, 3000, 3000, 3000, -3000));
-    p->addAnchor (Anchor (30000, 30000, -3000, -3000, 3000, -3000));
-    p->addAnchor (Anchor (10000, 20000, 3000, 3000, -3000, -3000));
-    p->setColor (Colours::blue);
+    p.clearAllAnchors();
+    p.addAnchor (Anchor (10000, 30000, 3000, 3000, 3000, -3000));
+    p.addAnchor (Anchor (30000, 30000, -3000, -3000, 3000, -3000));
+    p.addAnchor (Anchor (10000, 20000, 3000, 3000, -3000, -3000));
+    p.setColor (Colours::blue);
 
-    currentFrame->addPath (p.get());
+    currentFrame->addPath (p);
 
-    p = new IPath;
-    p->addAnchor (Anchor (12000, 48000, 3000, 3000, 3000, -3000));
-    p->addAnchor (Anchor (46000, 46000, -3000, -3000, 3000, -3000));
-    p->addAnchor (Anchor (46000, 12000, 3000, 3000, -3000, -3000));
-    p->addAnchor (Anchor (17000, 13000));
-    p->addAnchor (Anchor (12000, 47000));
-    p->setColor (Colours::orange);
+    p.clearAllAnchors();
+    p.addAnchor (Anchor (12000, 48000, 3000, 3000, 3000, -3000));
+    p.addAnchor (Anchor (46000, 46000, -3000, -3000, 3000, -3000));
+    p.addAnchor (Anchor (46000, 12000, 3000, 3000, -3000, -3000));
+    p.addAnchor (Anchor (17000, 13000));
+    p.addAnchor (Anchor (12000, 47000));
+    p.setColor (Colours::orange);
 
-    currentFrame->addPath (p.get());
+    currentFrame->addPath (p);
 
     //selectedAnchor = 1;
 }
@@ -379,14 +379,14 @@ void FrameEditor::getCenterOfIPathSelection (int& x, int& y)
             Range<uint16> r = iPathSelection.getRange (n);
             for (auto i=0; i < r.getLength(); ++i)
             {
-                IPath::Ptr p = getIPath (i);
+                IPath p = getIPath (i);
                 if (first)
                 {
-                    rect = p->getPath().getBounds();
+                    rect = p.getPath().getBounds();
                     first = false;
                 }
                 else
-                    rect = rect.getUnion (p->getPath().getBounds());
+                    rect = rect.getUnion (p.getPath().getBounds());
             }
         }
     }
@@ -1245,7 +1245,7 @@ void FrameEditor::setIPathSelection (const SparseSet<uint16>& selection)
 }
 
 void FrameEditor::getIPaths (const SparseSet<uint16>& selection,
-                             ReferenceCountedArray<IPath>& paths)
+                             Array<IPath>& paths)
 {
     paths.clear();
     
@@ -1253,13 +1253,13 @@ void FrameEditor::getIPaths (const SparseSet<uint16>& selection,
     {
         Range<uint16> r = selection.getRange (n);
         for (auto i = r.getStart(); i < r.getEnd(); ++i)
-            paths.add (new IPath (*(getIPath (i).get())));
+            paths.add (getIPath (i));
     }
 }
 
 bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
 {
-    ReferenceCountedArray<IPath> paths;
+    Array<IPath> paths;
     getSelectedIPaths (paths);
     if (! paths.size())
         return false;
@@ -1268,7 +1268,7 @@ bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
     
     for (auto n = 0; n < paths.size(); ++n)
     {
-        IPath::Ptr p = paths[n];
+        IPath* p = &paths.getReference (n);
         for (auto i = 0; i < p->getAnchorCount(); ++i)
         {
             Anchor a = p->getAnchor (i);
@@ -2595,7 +2595,7 @@ void FrameEditor::_deletePath (int index)
     }
 }
 
-void FrameEditor::_insertPath (int index, IPath* path)
+void FrameEditor::_insertPath (int index, IPath& path)
 {
     if ((index >= 0) && (index <= getIPathCount()))
     {
@@ -2605,7 +2605,7 @@ void FrameEditor::_insertPath (int index, IPath* path)
 }
 
 void FrameEditor::_setPaths (const SparseSet<uint16>& selection,
-                             const ReferenceCountedArray<IPath>& paths)
+                             const Array<IPath>& paths)
 {
     int pindex = 0;
     
@@ -2613,7 +2613,7 @@ void FrameEditor::_setPaths (const SparseSet<uint16>& selection,
     {
         Range<uint16> r = selection.getRange (n);
         for (auto i = r.getStart(); i < r.getEnd(); ++i)
-            currentFrame->replacePath (i, paths[pindex++].get());
+            currentFrame->replacePath (i, paths.getReference (pindex++));
     }
     
     sendActionMessage (EditorActions::iPathsChanged);

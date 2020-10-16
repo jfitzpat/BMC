@@ -298,9 +298,9 @@ void WorkingArea::mouseUpSketch (const MouseEvent& event)
         
         for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
         {
-            IPath::Ptr path = frameEditor->getIPath (n);
+            IPath path = frameEditor->getIPath (n);
 
-            Rectangle<float> bounds = path->getPath().getBounds();
+            Rectangle<float> bounds = path.getPath().getBounds();
             Rectangle<int> r (bounds.getX(), bounds.getY(),
                               bounds.getWidth(), bounds.getHeight());
             
@@ -383,18 +383,18 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
     int n;
     for (n = 0; n < frameEditor->getIPathCount(); ++n)
     {
-        IPath::Ptr path;
+        IPath path;
         Point<float> nearest;
         
         path = frameEditor->getIPath (n);
-        path->getPath().getNearestPoint (pos, nearest);
+        path.getPath().getNearestPoint (pos, nearest);
         float distance = pos.getDistanceFrom(nearest);
         if (abs(distance) <= (3 * activeInvScale))
         {
             if (drawSMark)
                 repaint (lastSMarkRect);
             
-            Rectangle<float> r = path->getPath().getBounds();
+            Rectangle<float> r = path.getPath().getBounds();
             r.expand (7 * activeInvScale, 7 * activeInvScale);
             lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
             
@@ -944,20 +944,20 @@ void WorkingArea::paint (juce::Graphics& g)
     {
         for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
         {
-            IPath::Ptr path = frameEditor->getIPath (n);
+            IPath path = frameEditor->getIPath (n);
             bool selected = frameEditor->getIPathSelection().contains (n);
             bool doubleline = (selected || (drawSMark && (sMarkIndex == n)));
             
-            Colour c = path->getColor();
+            Colour c = path.getColor();
             if (c == Colours::black)
                 c = Colours::darkgrey;
             
             g.setColour (c);
-            g.strokePath (path->getPath(), PathStrokeType (doubleline ? 2 * activeInvScale : activeInvScale));
+            g.strokePath (path.getPath(), PathStrokeType (doubleline ? 2 * activeInvScale : activeInvScale));
             
-            for (auto i = 0; i < path->getAnchorCount(); ++i)
+            for (auto i = 0; i < path.getAnchorCount(); ++i)
             {
-                Anchor a = path->getAnchor (i);
+                Anchor a = path.getAnchor (i);
                 
                 if (i == frameEditor->getSelectedAnchor() || selected)
                 {

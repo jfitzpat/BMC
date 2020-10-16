@@ -64,11 +64,11 @@ public:
     void removePoint (uint16 index);
   
     int getIPathCount() { return iPaths.size(); }
-    IPath::Ptr getIPath (int index) { return iPaths[index]; }
-    void addPath (IPath* p) { iPaths.add (p); }
+    const IPath getIPath (int index) { return iPaths[index]; }
+    void addPath (IPath& p) { iPaths.add (p); }
     void deletePath (int index) { iPaths.remove (index); }
-    void insertPath (int index, IPath* p) { iPaths.insert (index, p); }
-    void replacePath (int index, IPath* p) { iPaths.set (index, p); }
+    void insertPath (int index, const IPath& p) { iPaths.insert (index, p); }
+    void replacePath (int index, const IPath& p) { iPaths.set (index, p); }
     
     void buildThumbNail (int width = 150, int height = 150, float lineSize = 1.0);
     const Image& getThumbNail() { return thumbNail; }
@@ -159,7 +159,7 @@ private:
     float imageYoffset;
     
     Array<IPoint> framePoints;
-    ReferenceCountedArray<IPath> iPaths;
+    Array<IPath> iPaths;
 
     Image thumbNail;
 };

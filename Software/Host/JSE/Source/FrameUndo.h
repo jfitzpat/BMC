@@ -585,7 +585,7 @@ public:
         {
             Range<uint16> r = selection.getRange (n);
             for (auto i = r.getStart(); i < r.getEnd(); ++i)
-                frameEditor->_insertPath (i, paths.getObjectPointer(pindex++));
+                frameEditor->_insertPath (i, paths.getReference (pindex++));
         }
 
         frameEditor->decDirtyCounter();
@@ -593,7 +593,7 @@ public:
     }
     
 private:
-    ReferenceCountedArray<IPath> paths;
+    Array<IPath> paths;
     SparseSet<uint16> selection;
     FrameEditor* frameEditor;
 };
@@ -856,7 +856,7 @@ class UndoableSetPaths : public UndoableAction
 public:
     UndoableSetPaths (FrameEditor* editor,
                       const SparseSet<uint16>& select,
-                      const ReferenceCountedArray<IPath>& paths)
+                      const Array<IPath>& paths)
     : selection (select), newPaths (paths), frameEditor (editor) {;}
     
     bool perform() override
@@ -876,8 +876,8 @@ public:
     
 private:
     SparseSet<uint16> selection;
-    ReferenceCountedArray<IPath> oldPaths;
-    ReferenceCountedArray<IPath> newPaths;
+    Array<IPath> oldPaths;
+    Array<IPath> newPaths;
     FrameEditor* frameEditor;
 };
 
@@ -885,22 +885,14 @@ class UndoableAddPaths : public UndoableAction
 {
 public:
     UndoableAddPaths (FrameEditor* editor,
-                      const ReferenceCountedArray<IPath>& paths)
-    : frameEditor (editor)
-    {
-        // We have to make copies, not just increment reference count
-        for (auto n = 0; n < paths.size(); ++n)
-        {
-            IPath::Ptr p = paths[n];
-            newPaths.add (new IPath (*p.get()));
-        }
-    }
+                      const Array<IPath>& paths)
+    : newPaths (paths), frameEditor (editor) {;}
     
     bool perform() override
     {
         int insertIndex = frameEditor->getIPathCount();
         for (auto n = 0; n < newPaths.size(); ++n)
-            frameEditor->_insertPath (insertIndex++, newPaths.getObjectPointer(n));
+            frameEditor->_insertPath (insertIndex++, newPaths.getReference(n));
         return true;
     }
     
@@ -911,6 +903,6 @@ public:
         return true;
     }
 private:
-    ReferenceCountedArray<IPath> newPaths;
+    Array<IPath> newPaths;
     FrameEditor* frameEditor;
 };

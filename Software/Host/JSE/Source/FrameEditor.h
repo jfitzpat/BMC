@@ -187,10 +187,10 @@ public:
     const Image& getThumbNail (uint16 index) { return Frames[index]->getThumbNail(); }
     
     int getIPathCount() { return currentFrame->getIPathCount(); }
-    IPath::Ptr getIPath (int index) { return currentFrame->getIPath (index); }
-    void getSelectedIPaths (ReferenceCountedArray<IPath>& paths)
+    const IPath getIPath (int index) { return currentFrame->getIPath (index); }
+    void getSelectedIPaths (Array<IPath>& paths)
             { getIPaths (iPathSelection, paths); }
-    void getIPaths (const SparseSet<uint16>& selection, ReferenceCountedArray<IPath>& paths);
+    void getIPaths (const SparseSet<uint16>& selection, Array<IPath>& paths);
     int getSelectedAnchor() { return selectedAnchor; }
     const SparseSet<uint16>& getIPathSelection() { return iPathSelection; }
     void getCenterOfIPathSelection (int& x, int& y);
@@ -326,8 +326,8 @@ public:
 
     void _setIPathSelection (const SparseSet<uint16>& selection);
     void _deletePath (int index);
-    void _insertPath (int index, IPath* path);
-    void _setPaths (const SparseSet<uint16>& selection, const ReferenceCountedArray<IPath>& paths);
+    void _insertPath (int index, IPath& path);
+    void _setPaths (const SparseSet<uint16>& selection, const Array<IPath>& paths);
     
 private:
     File loadedFile;
@@ -367,7 +367,7 @@ private:
     SparseSet<uint16> iPathSelection;
     int activePath;
     int selectedAnchor;
-    ReferenceCountedArray<IPath> iPathCopy;
+    Array<IPath> iPathCopy;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)
 };
