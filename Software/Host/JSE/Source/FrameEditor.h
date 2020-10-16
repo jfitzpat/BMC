@@ -172,7 +172,7 @@ public:
     const SparseSet<uint16>& getIldaSelection() { return ildaSelection; }
     void getCenterOfIldaSelection (int16& x, int16& y, int16& z);
     const Point<int> getComponentCenterOfIldaSelection();
-    void getComponentCenterOfIldaSelection (int&x, int&y);
+    void getComponentCenterOfIldaSelection (int& x, int& y);
     
     void getIldaSelectedPoints (Array<Frame::IPoint>& points);
     void getIldaPoints (const SparseSet<uint16>& selection, Array<Frame::IPoint>& points);
@@ -182,8 +182,12 @@ public:
     
     int getIPathCount() { return currentFrame->getIPathCount(); }
     IPath::Ptr getIPath (int index) { return currentFrame->getIPath (index); }
+    void getSelectedIPaths (ReferenceCountedArray<IPath>& paths)
+            { getIPaths (iPathSelection, paths); }
+    void getIPaths (const SparseSet<uint16>& selection, ReferenceCountedArray<IPath>& paths);
     int getSelectedAnchor() { return selectedAnchor; }
     const SparseSet<uint16>& getIPathSelection() { return iPathSelection; }
+    void getCenterOfIPathSelection (int& x, int& y);
     
     // Undoable Commands
     // Transform operaitons must be proceeded with startTransform
@@ -268,7 +272,8 @@ public:
 
     void setIPathSelection (const SparseSet<uint16>& selection);
     void deletePaths();
-
+    bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
+    
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }
     void _setZoomFactor (float zoom);
@@ -313,6 +318,7 @@ public:
     void _setIPathSelection (const SparseSet<uint16>& selection);
     void _deletePath (int index);
     void _insertPath (int index, IPath* path);
+    void _setPaths (const SparseSet<uint16>& selection, const ReferenceCountedArray<IPath>& paths);
     
 private:
     File loadedFile;

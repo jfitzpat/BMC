@@ -850,3 +850,33 @@ private:
     SparseSet<uint16> newSelect;
     FrameEditor* frameEditor;
 };
+
+class UndoableSetPaths : public UndoableAction
+{
+    public:
+        UndoableSetPaths (FrameEditor* editor,
+                          const SparseSet<uint16>& select,
+                          const ReferenceCountedArray<IPath>& paths)
+        : selection (select), newPaths (paths), frameEditor (editor) {;}
+        
+        bool perform() override
+        {
+            frameEditor->incDirtyCounter();
+            frameEditor->getIPaths (selection, oldPaths);
+            frameEditor->_setPaths (selection, newPaths);
+            return true;
+        }
+        
+        bool undo() override
+        {
+            frameEditor->_setPaths (selection, oldPaths);
+            frameEditor->decDirtyCounter();
+            return true;
+        }
+        
+    private:
+        SparseSet<uint16> selection;
+        ReferenceCountedArray<IPath> oldPaths;
+        ReferenceCountedArray<IPath> newPaths;
+        FrameEditor* frameEditor;
+};

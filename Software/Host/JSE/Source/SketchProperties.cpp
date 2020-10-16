@@ -153,6 +153,46 @@ void SketchProperties::actionListenerCallback (const String& message)
         if (frameEditor->getActiveLayer() == FrameEditor::sketch)
             frameEditor->deletePaths();
     }
+    else if (message == EditorActions::upRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (0, -256);
+    }
+    else if (message == EditorActions::downRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (0, 256);
+    }
+    else if (message == EditorActions::leftRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (-256, 0);
+    }
+    else if (message == EditorActions::rightRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (256, 0);
+    }
+    else if (message == EditorActions::smallUpRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (0, -16);
+    }
+    else if (message == EditorActions::smallDownRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (0, 16);
+    }
+    else if (message == EditorActions::smallLeftRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (-16, 0);
+    }
+    else if (message == EditorActions::smallRightRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            frameEditor->moveSketchSelected (16, 0);
+    }
 }
 
 //==============================================================================

@@ -39,6 +39,12 @@ void IPath::removeAnchor (int index)
     buildPath();
 }
 
+void IPath::setAnchor (int index, const Anchor& a)
+{
+    anchors.set (index, a);
+    buildPath();
+}
+
 void IPath::clearAllAnchors()
 {
     anchors.clear();

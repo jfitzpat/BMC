@@ -36,6 +36,7 @@ public:
     void addAnchor (const Anchor& a);
     void insertAnchor (int index, const Anchor& a);
     void removeAnchor (int index);
+    void setAnchor (int index, const Anchor& a);
     void clearAllAnchors();
     
     const Colour& getColor() { return color; }

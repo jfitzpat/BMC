@@ -328,6 +328,35 @@ void FrameEditor::getIldaPoints (const SparseSet<uint16>& selection,
     }
 }
 
+void FrameEditor::getCenterOfIPathSelection (int& x, int& y)
+{
+    Rectangle<float> rect (0.0f,0.0f,65535.0f,65535.0f);
+
+    if (activeLayer == sketch)
+    {
+        bool first = true;
+        
+        for (auto n = 0; n < iPathSelection.getNumRanges(); ++n)
+        {
+            Range<uint16> r = iPathSelection.getRange (n);
+            for (auto i=0; i < r.getLength(); ++i)
+            {
+                IPath::Ptr p = getIPath (i);
+                if (first)
+                {
+                    rect = p->getPath().getBounds();
+                    first = false;
+                }
+                else
+                    rect = rect.getUnion (p->getPath().getBounds());
+            }
+        }
+    }
+    
+    x = (int)rect.getCentreX();
+    y = (int)rect.getCentreY();
+}
+
 //==============================================================================
 void FrameEditor::setActiveLayer (Layer layer)
 {
@@ -1154,6 +1183,69 @@ void FrameEditor::setIPathSelection (const SparseSet<uint16>& selection)
     }
 }
 
+void FrameEditor::getIPaths (const SparseSet<uint16>& selection,
+                             ReferenceCountedArray<IPath>& paths)
+{
+    paths.clear();
+    
+    for (auto n = 0; n < selection.getNumRanges(); ++n)
+    {
+        Range<uint16> r = selection.getRange (n);
+        for (auto i = r.getStart(); i < r.getEnd(); ++i)
+            paths.add (new IPath (*(getIPath (i).get())));
+    }
+}
+
+bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
+{
+    ReferenceCountedArray<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return false;
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath::Ptr p = paths[n];
+        for (auto i = 0; i < p->getAnchorCount(); ++i)
+        {
+            Anchor a = p->getAnchor (i);
+            
+            int x = a.getX();
+            x += xOffset;
+            if (x > 0xFFFF)
+            {
+                x = 0xFFFF;
+                clipped = true;
+            }
+            a.setX (x);
+            
+            int y = a.getY();
+            y += yOffset;
+            if (y > 0xFFFF)
+            {
+                y = 0xFFFF;
+                clipped = true;
+            }
+            a.setY (y);
+            
+            p->setAnchor (i, a);
+        }
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    if (getCurrentTransactionName() == "Path Move")
+        undoCurrentTransactionOnly();
+
+    beginNewTransaction ("Path Move");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+    return true;
+}
+
+//==========================================================================================
 void FrameEditor::startTransform (const String& name)
 {
     getIldaSelectedPoints (transformPoints);
@@ -2449,4 +2541,19 @@ void FrameEditor::_insertPath (int index, IPath* path)
         currentFrame->insertPath (index, path);
         sendActionMessage (EditorActions::iPathsChanged);
     }
+}
+
+void FrameEditor::_setPaths (const SparseSet<uint16>& selection,
+                             const ReferenceCountedArray<IPath>& paths)
+{
+    int pindex = 0;
+    
+    for (auto n = 0; n < selection.getNumRanges(); ++n)
+    {
+        Range<uint16> r = selection.getRange (n);
+        for (auto i = r.getStart(); i < r.getEnd(); ++i)
+            currentFrame->replacePath (i, paths[pindex++].get());
+    }
+    
+    sendActionMessage (EditorActions::iPathsChanged);
 }
