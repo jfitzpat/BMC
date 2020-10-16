@@ -69,6 +69,35 @@ namespace EditorActions
     const String transformEnded             ("TE");
 }
 
+
+// Class to hold selected iPaths
+class IPathSelection : public SparseSet<uint16>
+{
+public:
+    IPathSelection() : anchor (-1) {;}
+    
+    int getAnchor() { return anchor; }
+    void setAnchor (int a) { anchor = a; }
+
+    bool operator== (const IPathSelection& other) const noexcept
+    {
+        if (! SparseSet<uint16>::operator== (other))
+            return false;
+        
+        return anchor == other.anchor;
+    }
+    bool operator!= (const IPathSelection& other) const noexcept
+    {
+        if (SparseSet<uint16>::operator!= (other))
+            return true;
+        
+        return anchor != other.anchor;
+    }
+
+private:
+    int anchor;
+};
+
 //==============================================================================
 class FrameEditor  : public ActionBroadcaster,
                      public UndoManager
@@ -190,9 +219,8 @@ public:
     const IPath getIPath (int index) { return currentFrame->getIPath (index); }
     void getSelectedIPaths (Array<IPath>& paths)
             { getIPaths (iPathSelection, paths); }
-    void getIPaths (const SparseSet<uint16>& selection, Array<IPath>& paths);
-    int getSelectedAnchor() { return selectedAnchor; }
-    const SparseSet<uint16>& getIPathSelection() { return iPathSelection; }
+    void getIPaths (const IPathSelection& selection, Array<IPath>& paths);
+    IPathSelection& getIPathSelection() { return iPathSelection; }
     void getCenterOfIPathSelection (int& x, int& y);
     
     // Undoable Commands
@@ -279,7 +307,7 @@ public:
     void insertPoint (const Frame::IPoint& point);
     void deletePoints();
 
-    void setIPathSelection (const SparseSet<uint16>& selection);
+    void setIPathSelection (const IPathSelection& selection);
     void deletePaths();
     bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
     
@@ -324,10 +352,10 @@ public:
     void _setIldaPoints (const SparseSet<uint16>& selection,
                          const Array<Frame::IPoint>& points);
 
-    void _setIPathSelection (const SparseSet<uint16>& selection);
+    void _setIPathSelection (const IPathSelection& selection);
     void _deletePath (int index);
     void _insertPath (int index, IPath& path);
-    void _setPaths (const SparseSet<uint16>& selection, const Array<IPath>& paths);
+    void _setPaths (const IPathSelection& selection, const Array<IPath>& paths);
     
 private:
     File loadedFile;
@@ -364,9 +392,7 @@ private:
     int16 transformCenterZ;
     String transformName;
     
-    SparseSet<uint16> iPathSelection;
-    int activePath;
-    int selectedAnchor;
+    IPathSelection iPathSelection;
     Array<IPath> iPathCopy;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FrameEditor)

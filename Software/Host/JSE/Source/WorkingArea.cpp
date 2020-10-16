@@ -233,10 +233,15 @@ void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
     // Has user highlighted a point?
     if (drawSMark)
     {
-        SparseSet<uint16> selection;
+        IPathSelection selection;
         
         if (event.mods.isCommandDown() || event.mods.isAltDown())
+        {
             selection = frameEditor->getIPathSelection();
+            selection.setAnchor (-1);
+        }
+        else
+            selection.setAnchor (sMarkAnchorIndex);
         
         if (selection.contains (sMarkIndex) || event.mods.isAltDown())
             selection.removeRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
@@ -292,7 +297,7 @@ void WorkingArea::mouseUpSketch (const MouseEvent& event)
         repaint (lastDrawRect.expanded (expansion, expansion));
         
         // Should we be using existing selection?
-        SparseSet<uint16> selection;
+        IPathSelection selection;
         if (event.mods.isAltDown() || event.mods.isCommandDown())
             selection = frameEditor->getIPathSelection();
         
@@ -388,16 +393,33 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
         
         path = frameEditor->getIPath (n);
         path.getPath().getNearestPoint (pos, nearest);
-        float distance = pos.getDistanceFrom(nearest);
+        float distance = pos.getDistanceFrom (nearest);
         if (abs(distance) <= (3 * activeInvScale))
         {
             if (drawSMark)
                 repaint (lastSMarkRect);
             
             Rectangle<float> r = path.getPath().getBounds();
-            r.expand (7 * activeInvScale, 7 * activeInvScale);
+            r.expand (15 * activeInvScale, 15 * activeInvScale);
             lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
             
+            sMarkAnchorIndex = -1;
+            
+            // Check if we are highlighing an anchor, but no mods
+            if (! event.mods.isAnyModifierKeyDown())
+            {
+                for (auto i = 0; i < path.getAnchorCount(); ++i)
+                {
+                    Anchor a = path.getAnchor (i);
+                    nearest = Point<float>((float)a.getX(), (float)a.getY());
+                    distance = pos.getDistanceFrom (nearest);
+                    if (abs(distance) <= (3 * activeInvScale))
+                    {
+                        sMarkAnchorIndex = i;
+                        break;
+                    }
+                }
+            }
             sMarkIndex = n;
             drawSMark = true;
             repaint (lastSMarkRect);
@@ -946,6 +968,9 @@ void WorkingArea::paint (juce::Graphics& g)
         {
             IPath path = frameEditor->getIPath (n);
             bool selected = frameEditor->getIPathSelection().contains (n);
+            int markedAnchor = -1;
+            if (selected)
+                markedAnchor = frameEditor->getIPathSelection().getAnchor();
             bool doubleline = (selected || (drawSMark && (sMarkIndex == n)));
             
             Colour c = path.getColor();
@@ -959,13 +984,20 @@ void WorkingArea::paint (juce::Graphics& g)
             {
                 Anchor a = path.getAnchor (i);
                 
-                if (i == frameEditor->getSelectedAnchor() || selected)
+                if (drawSMark)
+                {
+                    if (n == sMarkIndex && i == sMarkAnchorIndex)
+                        g.drawRect (a.getX() - selectSize, a.getY() - selectSize,
+                                    2 * selectSize, 2 * selectSize, 2 * activeInvScale);
+                }
+                
+                if ((i == markedAnchor) || (selected && (markedAnchor == -1)))
                 {
                     g.drawRect (a.getX() - halfSelectSize, a.getY() - halfSelectSize,
                                 selectSize, selectSize, activeInvScale);
                 }
                 
-                if (i == frameEditor->getSelectedAnchor())
+                if (i == markedAnchor)
                 {
 
                     g.setColour (Colours::grey);

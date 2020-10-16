@@ -94,6 +94,7 @@ private:
 
     bool drawSMark;
     int sMarkIndex;
+    int sMarkAnchorIndex;
     Rectangle<int> lastSMarkRect;
     
     bool drawSDot;

@@ -47,9 +47,7 @@ FrameEditor::FrameEditor()
       refDrawGrid (true),
       refOpacity (1.0),
       frameIndex (0),
-      tranformInProgress (false),
-      activePath (-1),
-      selectedAnchor (-1)
+      tranformInProgress (false)
 {
     Frames.add (new Frame());
     currentFrame = Frames[frameIndex];
@@ -221,7 +219,12 @@ bool FrameEditor::hasMovableSelection()
 
 bool FrameEditor::canCopy()
 {
-    return activeLayer == sketch && (! iPathSelection.isEmpty());
+    if (activeLayer == sketch)
+        if (! iPathSelection.isEmpty())
+            if (iPathSelection.getAnchor() == -1)
+                return true;
+    
+    return false;
 }
 
 bool FrameEditor::canPaste()
@@ -478,7 +481,7 @@ void FrameEditor::paste()
     int rangeStart = getIPathCount();
     int rangeEnd = rangeStart + iPathCopy.size();
     perform (new UndoableAddPaths (this, iPathCopy));
-    SparseSet<uint16> selection;
+    IPathSelection selection;
     selection.addRange (Range<uint16> ((uint16)rangeStart, (uint16)rangeEnd));
     perform (new UndoableSetIPathSelection (this, selection));
 }
@@ -597,7 +600,7 @@ void FrameEditor::selectAll()
     {
         if (getIPathCount())
         {
-            SparseSet<uint16> s;
+            IPathSelection s;
             s.addRange (Range<uint16> (0, getIPathCount()));
             setIPathSelection (s);
         }
@@ -609,7 +612,7 @@ void FrameEditor::clearSelection()
     if (getActiveLayer() == ilda)
         setIldaSelection (SparseSet<uint16>());
     else if (getActiveLayer() == sketch)
-        setIPathSelection (SparseSet<uint16>());
+        setIPathSelection (IPathSelection());
 }
 
 void FrameEditor::selectImage()
@@ -758,7 +761,7 @@ void FrameEditor::loadFile (File& file)
     {
         beginNewTransaction ("Load File");
         perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
-        perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
+        perform (new UndoableSetIPathSelection (this, IPathSelection()));
         perform(new UndoableLoadFile (this, frames, file));
     }
 }
@@ -796,7 +799,7 @@ void FrameEditor::loadFile()
         {
             beginNewTransaction ("Load File");
             perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
-            perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
+            perform (new UndoableSetIPathSelection (this, IPathSelection()));
             perform(new UndoableLoadFile (this, frames, f));
         }
     }
@@ -819,7 +822,7 @@ void FrameEditor::newFile()
     
     beginNewTransaction ("New File");
     perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
-    perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
+    perform (new UndoableSetIPathSelection (this, IPathSelection()));
     perform (new UndoableLoadFile (this, frames, File()));
 }
 
@@ -1227,12 +1230,12 @@ void FrameEditor::deletePaths()
         return;
     
     beginNewTransaction ("Delete Path(s)");
-    SparseSet<uint16> selection = iPathSelection;
-    perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
+    IPathSelection selection = iPathSelection;
+    perform (new UndoableSetIPathSelection (this, IPathSelection()));
     perform (new UndoableDeletePaths (this, selection));
 }
 
-void FrameEditor::setIPathSelection (const SparseSet<uint16>& selection)
+void FrameEditor::setIPathSelection (const IPathSelection& selection)
 {
     if (selection.getTotalRange().getEnd() > getIPathCount())
         return;
@@ -1247,7 +1250,7 @@ void FrameEditor::setIPathSelection (const SparseSet<uint16>& selection)
     }
 }
 
-void FrameEditor::getIPaths (const SparseSet<uint16>& selection,
+void FrameEditor::getIPaths (const IPathSelection& selection,
                              Array<IPath>& paths)
 {
     paths.clear();
@@ -1272,7 +1275,17 @@ bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
     for (auto n = 0; n < paths.size(); ++n)
     {
         IPath* p = &paths.getReference (n);
-        for (auto i = 0; i < p->getAnchorCount(); ++i)
+        
+        int i = 0;
+        int end = p->getAnchorCount();
+        
+        if (iPathSelection.getAnchor() != -1)
+        {
+            i = iPathSelection.getAnchor();
+            end = i + 1;
+        }
+
+        for (; i < end; ++i)
         {
             Anchor a = p->getAnchor (i);
             
@@ -2574,7 +2587,7 @@ void FrameEditor::_deletePoint (uint16 index)
     }
 }
 
-void FrameEditor::_setIPathSelection (const SparseSet<uint16>& selection)
+void FrameEditor::_setIPathSelection (const IPathSelection& selection)
 {
     if (selection.getTotalRange().getEnd() > getIPathCount())
         return;
@@ -2607,7 +2620,7 @@ void FrameEditor::_insertPath (int index, IPath& path)
     }
 }
 
-void FrameEditor::_setPaths (const SparseSet<uint16>& selection,
+void FrameEditor::_setPaths (const IPathSelection& selection,
                              const Array<IPath>& paths)
 {
     int pindex = 0;

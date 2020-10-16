@@ -550,7 +550,7 @@ class UndoableDeletePaths : public UndoableAction
 {
 public:
     UndoableDeletePaths (FrameEditor* editor,
-                         const SparseSet<uint16>& select)
+                         const IPathSelection& select)
     : selection (select), frameEditor (editor) {;}
 
     bool perform() override
@@ -594,7 +594,7 @@ public:
     
 private:
     Array<IPath> paths;
-    SparseSet<uint16> selection;
+    IPathSelection selection;
     FrameEditor* frameEditor;
 };
 
@@ -829,7 +829,7 @@ private:
 class UndoableSetIPathSelection : public UndoableAction
 {
 public:
-    UndoableSetIPathSelection (FrameEditor* editor, const SparseSet<uint16>& select)
+    UndoableSetIPathSelection (FrameEditor* editor, const IPathSelection& select)
     : newSelect (select), frameEditor (editor) {;}
     
     bool perform() override
@@ -846,8 +846,8 @@ public:
     }
     
 private:
-    SparseSet<uint16> oldSelect;
-    SparseSet<uint16> newSelect;
+    IPathSelection oldSelect;
+    IPathSelection newSelect;
     FrameEditor* frameEditor;
 };
 
@@ -855,7 +855,7 @@ class UndoableSetPaths : public UndoableAction
 {
 public:
     UndoableSetPaths (FrameEditor* editor,
-                      const SparseSet<uint16>& select,
+                      const IPathSelection& select,
                       const Array<IPath>& paths)
     : selection (select), newPaths (paths), frameEditor (editor) {;}
     
@@ -875,7 +875,7 @@ public:
     }
     
 private:
-    SparseSet<uint16> selection;
+    IPathSelection selection;
     Array<IPath> oldPaths;
     Array<IPath> newPaths;
     FrameEditor* frameEditor;
