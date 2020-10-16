@@ -77,6 +77,12 @@ var JSEFileSaver::frameToObj (uint16 frameIndex)
         points.append (pointToObj (frameIndex, i));
     
     obj->setProperty (JSEFile::Points, points);
+    
+    var paths;
+    for (uint16 i = 0; i < frameEditor->getFrames()[frameIndex]->getIPathCount(); ++i)
+        paths.append (ipathToObj (frameIndex, i));
+    
+    obj->setProperty (JSEFile::iPaths, paths);
     return var (obj);
 }
 
@@ -94,6 +100,45 @@ var JSEFileSaver::pointToObj (uint16 frameIndex, uint16 pointIndex)
     obj->setProperty (JSEFile::PointGreen,  point.green);
     obj->setProperty (JSEFile::PointBlue,   point.blue);
     obj->setProperty (JSEFile::PointStatus, point.status);
+
+    return var (obj);
+}
+
+var JSEFileSaver::ipathToObj (uint16 frameIndex, uint16 pathIndex)
+{
+    IPath path = frameEditor->getFrames()[frameIndex]->getIPath (pathIndex);
+    DynamicObject* obj = new DynamicObject();
+
+    Colour c = path.getColor();
+    obj->setProperty (JSEFile::iPathRed, c.getRed());
+    obj->setProperty (JSEFile::iPathGreen, c.getGreen());
+    obj->setProperty (JSEFile::iPathBlue, c.getBlue());
+
+    obj->setProperty (JSEFile::iPathDensity, path.getPointDensity());
+    obj->setProperty (JSEFile::ExtraPerAnchor, path.getExtraPointsPerAnchor());
+    obj->setProperty (JSEFile::BlanksBefore, path.getBlankedPointsBeforeStart());
+    obj->setProperty (JSEFile::BlanksAfter, path.getBlankedPointsAfterEnd());
+
+    var anchors;
+    for (uint16 i = 0; i < path.getAnchorCount(); ++i)
+    {
+        Anchor a = path.getAnchor (i);
+        anchors.append (anchorToObj (a));
+    }
+    obj->setProperty (JSEFile::Anchors, anchors);
+    return var (obj);
+}
+
+var JSEFileSaver::anchorToObj (Anchor& a)
+{
+    DynamicObject* obj = new DynamicObject();
+
+    obj->setProperty (JSEFile::AnchorX, a.getX());
+    obj->setProperty (JSEFile::AnchorY, a.getY());
+    obj->setProperty (JSEFile::AnchorEntryX, a.getEntryXDelta());
+    obj->setProperty (JSEFile::AnchorEntryY, a.getEntryYDelta());
+    obj->setProperty (JSEFile::AnchorExitX, a.getExitXDelta());
+    obj->setProperty (JSEFile::AnchorExitY, a.getExitYDelta());
 
     return var (obj);
 }

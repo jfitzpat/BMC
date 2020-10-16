@@ -35,4 +35,19 @@ namespace JSEFile
     const Identifier PointGreen     ("g");
     const Identifier PointBlue      ("b");
     const Identifier PointStatus    ("s");
+    const Identifier iPaths         ("iPaths");
+    const Identifier iPathRed       ("R");
+    const Identifier iPathGreen     ("G");
+    const Identifier iPathBlue      ("B");
+    const Identifier iPathDensity   ("PointDensity");
+    const Identifier ExtraPerAnchor ("ExtraPerAnchor");
+    const Identifier BlanksBefore   ("BlanksBefore");
+    const Identifier BlanksAfter    ("BlanksAfter");
+    const Identifier Anchors        ("Anchors");
+    const Identifier AnchorX        ("X");
+    const Identifier AnchorY        ("Y");
+    const Identifier AnchorEntryX   ("enX");
+    const Identifier AnchorEntryY   ("enY");
+    const Identifier AnchorExitX    ("exX");
+    const Identifier AnchorExitY    ("exY");
 }

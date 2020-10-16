@@ -94,6 +94,51 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
                 frame->addPoint (point);
             }
         }
+        
+        // Copy Paths for this frame
+        var paths = frameData->getProperty (JSEFile::iPaths);
+        if (paths.isArray())
+        {
+            for (auto i = 0; i < paths.getArray()->size(); ++i)
+            {
+                IPath path;
+                DynamicObject* pathData = paths[i].getDynamicObject();
+                if (pathData == nullptr)
+                    return false;
+                
+                Colour c = Colour ((uint8)(int)pathData->getProperty (JSEFile::iPathRed),
+                                   (uint8)(int)pathData->getProperty (JSEFile::iPathGreen),
+                                   (uint8)(int)pathData->getProperty (JSEFile::iPathBlue));
+                
+                path.setColor (c);
+                path.setPointDensity ((uint16)(int)pathData->getProperty (JSEFile::iPathDensity));
+                path.setExtraPointsPerAnchor ((uint16)(int)pathData->getProperty (JSEFile::ExtraPerAnchor));
+                path.setBlankedPointsBeforeStart ((uint16)(int)pathData->getProperty (JSEFile::BlanksBefore));
+                path.setBlankedPointsAfterEnd ((uint16)(int)pathData->getProperty (JSEFile::BlanksAfter));
+                
+                var anchors = pathData->getProperty (JSEFile::Anchors);
+                if (anchors.isArray())
+                {
+                    for (auto j = 0; j < anchors.getArray()->size(); ++j)
+                    {
+                        DynamicObject* anchorData = anchors[j].getDynamicObject();
+                        if (anchorData == nullptr)
+                            return false;
+                        
+                        int x = anchorData->getProperty (JSEFile::AnchorX);
+                        int y = anchorData->getProperty (JSEFile::AnchorY);
+                        int enX = anchorData->getProperty (JSEFile::AnchorEntryX);
+                        int enY = anchorData->getProperty (JSEFile::AnchorEntryY);
+                        int exX = anchorData->getProperty (JSEFile::AnchorExitX);
+                        int exY = anchorData->getProperty (JSEFile::AnchorExitY);
+
+                        path.addAnchor (Anchor (x, y, enX, enY, exX, exY));
+                    }
+                }
+                
+                frame->addPath (path);
+            }
+        }
 
         // Build the thumbnail and add the frame
         frame->buildThumbNail();

@@ -758,6 +758,7 @@ void FrameEditor::loadFile (File& file)
     {
         beginNewTransaction ("Load File");
         perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
+        perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
         perform(new UndoableLoadFile (this, frames, file));
     }
 }
@@ -795,6 +796,7 @@ void FrameEditor::loadFile()
         {
             beginNewTransaction ("Load File");
             perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
+            perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
             perform(new UndoableLoadFile (this, frames, f));
         }
     }
@@ -817,6 +819,7 @@ void FrameEditor::newFile()
     
     beginNewTransaction ("New File");
     perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
+    perform (new UndoableSetIPathSelection (this, SparseSet<uint16>()));
     perform (new UndoableLoadFile (this, frames, File()));
 }
 

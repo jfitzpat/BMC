@@ -32,4 +32,5 @@ private:
     static var frameToObj (uint16 frameIndex);
     static var pointToObj (uint16 frameIndex, uint16 pointIndex);
     static var ipathToObj (uint16 frameIndex, uint16 pathIndex);
+    static var anchorToObj (Anchor& a);
 };
