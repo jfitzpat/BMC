@@ -68,12 +68,14 @@ private:
     void mouseDownIldaMove (const MouseEvent& event);
     void mouseDownIldaPoint (const MouseEvent& event);
     void mouseDownSketchSelect (const MouseEvent& event);
+    void mouseDownSketchMove (const MouseEvent& event);
     void mouseUpIlda (const MouseEvent& event);
     void mouseUpSketch (const MouseEvent& event);
     void mouseMoveIldaSelect (const MouseEvent& event);
     void mouseMoveIldaMove (const MouseEvent& event);
     void mouseMoveIldaPoint (const MouseEvent& event);
     void mouseMoveSketchSelect (const MouseEvent& event);
+    void mouseMoveSketchMove (const MouseEvent& event);
 
     FrameEditor* frameEditor;
     float activeScale;

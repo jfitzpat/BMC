@@ -82,6 +82,25 @@ void WorkingArea::insertAnchor (uint16 index, Colour c)
     frameEditor->insertPoint (point);
 }
 
+void WorkingArea::mouseDownSketchMove (const MouseEvent& event)
+{
+    // Left mouse only for now
+    if (! event.mods.isLeftButtonDown())
+        return;
+
+    if (drawSMark)
+    {
+        IPathSelection selection;
+        selection.addRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
+        selection.setAnchor (sMarkAnchorIndex);
+        drawSMark = false;
+        frameEditor->setIPathSelection (selection);
+    }
+    
+    if (! frameEditor->getIPathSelection().isEmpty())
+        frameEditor->startTransform ("Move Selection");
+}
+
 void WorkingArea::mouseDownIldaMove (const MouseEvent& event)
 {
     // Left mouse only for now
@@ -277,6 +296,8 @@ void WorkingArea::mouseDown (const MouseEvent& event)
             return;
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchSelectTool)
             mouseDownSketchSelect (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
+            mouseDownSketchMove (event);
     }
 }
 
@@ -323,6 +344,12 @@ void WorkingArea::mouseUpSketch (const MouseEvent& event)
         
         // Discard the rect
         lastDrawRect = Rectangle<int>();
+    }
+    
+    if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
+    {
+        if (frameEditor->isTransforming())
+            frameEditor->endTransform();
     }
 }
 
@@ -379,6 +406,11 @@ void WorkingArea::mouseUpIlda (const MouseEvent& event)
         if (frameEditor->isTransforming())
             frameEditor->endTransform();
     }
+}
+
+void WorkingArea::mouseMoveSketchMove (const MouseEvent& event)
+{
+    mouseMoveSketchSelect (event);
 }
 
 void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
@@ -709,6 +741,8 @@ void WorkingArea::mouseMove (const MouseEvent& event)
         }
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchSelectTool)
             mouseMoveSketchSelect (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
+            mouseMoveSketchMove (event);
     }
 }
 
@@ -747,6 +781,16 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
             zOffset = 0;
         
         frameEditor->translateIldaSelected (xOffset, yOffset, zOffset, false);
+    }
+    else if (frameEditor->getActiveLayer() == FrameEditor::sketch &&
+             frameEditor->getSketchVisible() &&
+             frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool &&
+            frameEditor->isTransforming())
+    {
+        int dx = event.getDistanceFromDragStartX();
+        int dy = event.getDistanceFromDragStartY();
+        
+        frameEditor->translateSketchSelected (dx, dy, false);
     }
 }
 

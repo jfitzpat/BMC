@@ -1344,8 +1344,21 @@ bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
 //==========================================================================================
 void FrameEditor::startTransform (const String& name)
 {
-    getIldaSelectedPoints (transformPoints);
-    getCenterOfIldaSelection (transformCenterX, transformCenterY, transformCenterZ);
+    if (activeLayer == ilda)
+    {
+        getIldaSelectedPoints (transformPoints);
+        getCenterOfIldaSelection (transformCenterX, transformCenterY, transformCenterZ);
+    }
+    else
+    {
+        getSelectedIPaths (transformPaths);
+        int x, y;
+        getCenterOfIPathSelection (x, y);
+        transformCenterX = (int16)x;
+        transformCenterY = (int16)y;
+        transformCenterZ = 0;
+    }
+    
     transformName = name;
     transformUsed = false;
     tranformInProgress = true;
@@ -2132,27 +2145,104 @@ bool FrameEditor::adjustHueIldaSelected (float hshift,
     return true;
 }
 
+bool FrameEditor::translateSketchSelected (int xOffset, int yOffset, bool constrain)
+{
+    Array<IPath> paths (transformPaths);
+    if (! paths.size())
+        return false;
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath* p = &paths.getReference (n);
+        
+        int i = 0;
+        int end = p->getAnchorCount();
+        
+        if (iPathSelection.getAnchor() != -1)
+        {
+            i = iPathSelection.getAnchor();
+            end = i + 1;
+        }
+
+        for (; i < end; ++i)
+        {
+            Anchor a = p->getAnchor (i);
+            
+            int x = a.getX();
+            x += xOffset;
+            if (x > 0xFFFF)
+            {
+                x = 0xFFFF;
+                clipped = true;
+            }
+            a.setX (x);
+            
+            int y = a.getY();
+            y += yOffset;
+            if (y > 0xFFFF)
+            {
+                y = 0xFFFF;
+                clipped = true;
+            }
+            a.setY (y);
+            
+            p->setAnchor (i, a);
+        }
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setPaths (iPathSelection, paths);
+    return true;
+}
+
 void FrameEditor::endTransform()
 {
-    // Already Transformed! So grab!
-    Array<Frame::IPoint> points;
-    getIldaSelectedPoints(points);
-
-    // Restore original
-    _setIldaPoints (ildaSelection, transformPoints);
-    
-    tranformInProgress = false;
-    transformPoints.clear();
-    
-    // Final undoable switch
-    if (transformUsed)
+    if (activeLayer == ilda)
     {
-        beginNewTransaction (transformName);
-        perform (new UndoableSetIldaPoints (this, ildaSelection, points));
-        transformUsed = false;
+        // Already Transformed! So grab!
+        Array<Frame::IPoint> points;
+        getIldaSelectedPoints(points);
 
-        refreshThumb();
+        // Restore original
+        _setIldaPoints (ildaSelection, transformPoints);
+        
+        tranformInProgress = false;
+        transformPoints.clear();
+        
+        // Final undoable switch
+        if (transformUsed)
+        {
+            beginNewTransaction (transformName);
+            perform (new UndoableSetIldaPoints (this, ildaSelection, points));
+
+            refreshThumb();
+        }
     }
+    else
+    {
+        // Grab transformed version
+        Array<IPath> paths;
+        getSelectedIPaths (paths);
+        
+        // Restore original
+        _setPaths (iPathSelection, transformPaths);
+        
+        tranformInProgress = false;
+        transformPaths.clear();
+    
+        if (transformUsed)
+        {
+            beginNewTransaction (transformName);
+            perform (new UndoableSetPaths (this, iPathSelection, paths));
+        }
+    }
+ 
+    transformUsed = false;
     sendActionMessage (EditorActions::transformEnded);
 }
 

@@ -228,6 +228,8 @@ public:
     // and ended with endTransform
     void startTransform (const String& name);
     bool isTransforming() { return tranformInProgress; }
+    
+    // ILDA Transforms
     bool scaleIldaSelected (float xScale, float yScale, float zScale, bool centerOnSelection, bool constrain = true);
     bool rotateIldaSelected (float xAngle, float yAngle, float zAngle, bool centerOnSelection, bool constrain = true);
     bool shearIldaSelected (float shearX, float shearY, bool centerOnSelection, bool constrain = true);
@@ -238,6 +240,9 @@ public:
     bool sphereIldaSelected (double xScale, double yScale, double rScale, bool centerOnSelection, bool constrain = true);
     bool gradientIldaSelected (const Colour& color1, const Colour& color2, float angle, float length, bool radial, bool centerOnSelection, const Colour& color3 = Colours::transparentBlack);
     bool adjustHueIldaSelected (float hshift, float saturation, float brightness);
+    
+    // Sketch Transforms
+    bool translateSketchSelected (int xOffset, int yOffset, bool constrain = true);
     void endTransform();
 
     // Non transform (atomic) undoable operations
@@ -390,6 +395,7 @@ private:
     bool tranformInProgress;
     bool transformUsed;
     Array<Frame::IPoint> transformPoints;
+    Array<IPath> transformPaths;
     int16 transformCenterX;
     int16 transformCenterY;
     int16 transformCenterZ;
