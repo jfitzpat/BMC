@@ -392,7 +392,13 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
         Point<float> nearest;
         
         path = frameEditor->getIPath (n);
-        path.getPath().getNearestPoint (pos, nearest);
+        
+        if (path.getAnchorCount() == 1)
+            nearest = Point<float> ((float)path.getAnchor (0).getX(),
+                                    (float)path.getAnchor (0).getY());
+        else
+            path.getPath().getNearestPoint (pos, nearest);
+        
         float distance = pos.getDistanceFrom (nearest);
         if (abs(distance) <= (3 * activeInvScale))
         {

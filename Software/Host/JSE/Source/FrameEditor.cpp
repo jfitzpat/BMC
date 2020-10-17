@@ -1240,6 +1240,14 @@ void FrameEditor::deleteAnchor()
     if (iPathSelection.isEmpty() || (iPathSelection.getAnchor() == -1))
         return;
     
+    // If it is the last anchor, delete the path instead
+    uint16 i = iPathSelection.getRange (0).getStart();
+    if (currentFrame->getIPath (i).getAnchorCount() <= 1)
+    {
+        deletePaths();
+        return;
+    }
+        
     beginNewTransaction ("Delete Anchor");
     IPathSelection selection = iPathSelection;
     perform (new UndoableSetIPathSelection (this, IPathSelection()));

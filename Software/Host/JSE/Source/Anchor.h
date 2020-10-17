@@ -34,24 +34,24 @@ public:
     
     ~Anchor() {;}
     
-    int getX() { return xPosition; }
+    int getX() const { return xPosition; }
     void setX (int x) { xPosition = x; }
-    int getY() { return yPosition; }
+    int getY() const { return yPosition; }
     void setY (int y) { yPosition = y; }
-    void getPosition (int& x, int& y) { x = xPosition; y = yPosition; }
+    void getPosition  (int& x, int& y) { x = xPosition; y = yPosition; }
     void setPosition (int x, int y) { xPosition = x; yPosition = y; }
-    int getEntryXDelta() { return entryXDelta; }
+    int getEntryXDelta()  { return entryXDelta; }
     void setEntryXDelta (int x) { entryXDelta = x; }
-    int getEntryYDelta() { return entryYDelta; }
+    int getEntryYDelta()  { return entryYDelta; }
     void setEntryYDelta (int y) { entryYDelta = y; }
-    void getEntryPosition (int& x, int& y) { x = xPosition + entryXDelta;
-                                             y = yPosition + entryYDelta; }
+    void getEntryPosition  (int& x, int& y) { x = xPosition + entryXDelta;
+                                                   y = yPosition + entryYDelta; }
     void setEntryPosition (int x, int y) { entryXDelta = x - xPosition;
                                            entryYDelta = y - yPosition; }
-    int getExitXDelta() { return exitXDelta; }
-    int getExitYDelta() { return exitYDelta; }
-    void getExitPosition (int& x, int& y) { x = xPosition + exitXDelta;
-                                            y = yPosition + exitYDelta; }
+    int getExitXDelta()  { return exitXDelta; }
+    int getExitYDelta()  { return exitYDelta; }
+    void getExitPosition  (int& x, int& y) { x = xPosition + exitXDelta;
+                                                  y = yPosition + exitYDelta; }
     void setExitPosition (int x, int y) { exitXDelta = x - xPosition;
                                           exitYDelta = y - yPosition; }
     
