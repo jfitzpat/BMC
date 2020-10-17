@@ -78,6 +78,22 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     toolColorButton->addChangeListener (this);
     toolColorButton->setColour (TextButton::buttonColourId, frameEditor->getPointToolColor());
 
+    selectLabel.reset (new Label ("selectLabel"));
+    addAndMakeVisible (selectLabel.get());
+    selectLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    selectLabel->setJustificationType (juce::Justification::centredLeft);
+    selectLabel->setEditable (false, false, false);
+    selectLabel->setColour (Label::textColourId, juce::Colours::white);
+    selectLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    pointsLabel.reset (new Label ("pointsLabel"));
+    addAndMakeVisible (pointsLabel.get());
+    pointsLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    pointsLabel->setJustificationType (juce::Justification::centredLeft);
+    pointsLabel->setEditable (false, false, false);
+    pointsLabel->setColour (Label::textColourId, juce::Colours::white);
+    pointsLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
     refresh();
 }
 
@@ -93,6 +109,8 @@ SketchProperties::~SketchProperties()
     penToolButton = nullptr;
     penIcon = nullptr;
     toolColorButton = nullptr;
+    selectLabel = nullptr;
+    pointsLabel = nullptr;
 }
 
 //==============================================================================
@@ -110,6 +128,9 @@ void SketchProperties::resized()
     ellipseToolButton->setBounds (82 + 12, 48, 32, 32);
     penToolButton->setBounds (118 + 12, 48, 32, 32);
     toolColorButton->setBounds (154 + 12, 54, 20, 20);
+    selectLabel->setBounds (16, 88, getWidth() - 32, 24);
+    pointsLabel->setBounds (16, 104, getWidth() - 32, 24);
+
 }
 
 //==============================================================================
@@ -146,8 +167,8 @@ void SketchProperties::actionListenerCallback (const String& message)
         updateTools();
     else if (message == EditorActions::sketchToolColorChanged)
         updateTools();
-    else if (message == EditorActions::viewChanged)
-        updateTools();
+    else if (message == EditorActions::iPathSelectionChanged)
+        updateSelection();
     else if (message == EditorActions::deleteRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::sketch)
@@ -207,7 +228,76 @@ void SketchProperties::actionListenerCallback (const String& message)
 void SketchProperties::refresh()
 {
     layerVisible->setToggleState (frameEditor->getSketchVisible(), dontSendNotification);
+    updateSelection();
     updateTools();
+}
+
+void SketchProperties::updateSelection()
+{
+    if (frameEditor->getIPathSelection().isEmpty())
+    {
+        selectLabel->setText ("No Shapes Selected", dontSendNotification);
+        selectLabel->setColour(Label::textColourId, Colours::grey);
+        pointsLabel->setText ("", dontSendNotification);
+    }
+    else
+    {
+        int selected = 0;
+        for (auto n = 0; n < frameEditor->getIPathSelection().getNumRanges(); ++n)
+            selected += frameEditor->getIPathSelection().getRange(n).getLength();
+        
+        String s (selected);
+        if (selected > 1)
+            s += " Shapes";
+        else
+            s += " Shape";
+        s += " Selected";
+        
+        selectLabel->setText (s, dontSendNotification);
+        selectLabel->setColour(Label::textColourId, Colours::white);
+
+        // Tabulate approximate points
+        int p = 0;
+        for (auto n = 0; n < frameEditor->getIPathSelection().getNumRanges(); ++n)
+        {
+            Range<uint16> r = frameEditor->getIPathSelection().getRange (n);
+            
+            for (auto i = r.getStart(); i < r.getEnd(); ++i)
+            {
+                float length = frameEditor->getIPath (i).getPath().getLength();
+                length /= (float)frameEditor->getIPath (i).getPointDensity();
+                length += 0.5f;
+                p += (int)length;
+                p += frameEditor->getIPath (i).getAnchorCount();
+                p += frameEditor->getIPath (i).getAnchorCount() * frameEditor->getIPath (i).getExtraPointsPerAnchor();
+                p += frameEditor->getIPath (i).getBlankedPointsBeforeStart();
+                p += frameEditor->getIPath (i).getBlankedPointsAfterEnd();
+                p += 4;
+            }
+        }
+        
+        if (p)
+        {
+            float frameRate = (float)frameEditor->getScanRate() / (float)p;
+            
+            if (frameRate < 15.0)
+                pointsLabel->setColour (Label::textColourId, juce::Colours::yellow);
+            else if (frameRate < 10.0)
+                pointsLabel->setColour (Label::textColourId, juce::Colours::red);
+            else
+                pointsLabel->setColour (Label::textColourId, juce::Colours::white);
+            
+            String s(p);
+            if (p > 1)
+                s += " points";
+            else
+                s += " point";
+            s += " (" + String(frameRate, 1) + " fps)";
+            pointsLabel->setText (s, dontSendNotification);
+        }
+        else
+            pointsLabel->setText ("", dontSendNotification);
+    }
 }
 
 void SketchProperties::updateTools()

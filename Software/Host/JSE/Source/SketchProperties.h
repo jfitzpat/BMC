@@ -51,6 +51,7 @@ public:
 private:
     void refresh();
     void updateTools();
+    void updateSelection();
     
     FrameEditor* frameEditor;
 
@@ -64,6 +65,8 @@ private:
     std::unique_ptr <Drawable> penIcon;
     std::unique_ptr<DrawableButton> penToolButton;
     std::unique_ptr<ColourButton> toolColorButton;
+    std::unique_ptr<Label> selectLabel;
+    std::unique_ptr<Label> pointsLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SketchProperties)
 };

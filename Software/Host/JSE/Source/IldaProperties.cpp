@@ -842,7 +842,13 @@ void IldaProperties::updatePointDisplay()
         else
             pointLabel->setColour (Label::textColourId, juce::Colours::white);
         
-        pointLabel->setText (String(p) + " points (" + String(frameRate, 1) + " fps)", dontSendNotification);
+        String s(p);
+        if (p > 1)
+            s += " points";
+        else
+            s += " point";
+        s += " (" + String(frameRate, 1) + " fps)";
+        pointLabel->setText (s, dontSendNotification);
     }
     else
     {

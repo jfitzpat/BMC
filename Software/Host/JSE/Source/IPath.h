@@ -42,16 +42,16 @@ public:
     const Colour& getColor() { return color; }
     void setColor (Colour c) { color = c; }
     
-    uint16 getPointDensity() { return pointDensity; }
+    uint16 getPointDensity() const { return pointDensity; }
     void setPointDensity (uint16 d) { pointDensity = d ? d : 1; }
-    uint16 getExtraPointsPerAnchor() { return extraPointsPerAnchor; }
+    uint16 getExtraPointsPerAnchor() const { return extraPointsPerAnchor; }
     void setExtraPointsPerAnchor (uint16 p) { extraPointsPerAnchor = p; }
-    uint16 getBlankedPointsBeforeStart() { return blankedPointsBeforeStart; }
+    uint16 getBlankedPointsBeforeStart() const { return blankedPointsBeforeStart; }
     void setBlankedPointsBeforeStart (uint16 p) { blankedPointsBeforeStart = p ? p : 1; }
-    uint16 getBlankedPointsAfterEnd() { return blankedPointsAfterEnd; }
+    uint16 getBlankedPointsAfterEnd() const { return blankedPointsAfterEnd; }
     void setBlankedPointsAfterEnd (uint16 p) { blankedPointsAfterEnd = p ? p : 1; }
 
-    const Path& getPath() { return path; }
+    const Path& getPath() const { return path; }
 
 private:
     void buildPath();
