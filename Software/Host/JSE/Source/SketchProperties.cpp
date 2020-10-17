@@ -151,7 +151,15 @@ void SketchProperties::actionListenerCallback (const String& message)
     else if (message == EditorActions::deleteRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::sketch)
-            frameEditor->deletePaths();
+        {
+            if (!frameEditor->getIPathSelection().isEmpty())
+            {
+                if (frameEditor->getIPathSelection().getAnchor() == -1)
+                    frameEditor->deletePaths();
+                else
+                    frameEditor->deleteAnchor();
+            }
+        }
     }
     else if (message == EditorActions::upRequest)
     {

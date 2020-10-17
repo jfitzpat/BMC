@@ -1235,6 +1235,17 @@ void FrameEditor::deletePaths()
     perform (new UndoableDeletePaths (this, selection));
 }
 
+void FrameEditor::deleteAnchor()
+{
+    if (iPathSelection.isEmpty() || (iPathSelection.getAnchor() == -1))
+        return;
+    
+    beginNewTransaction ("Delete Anchor");
+    IPathSelection selection = iPathSelection;
+    perform (new UndoableSetIPathSelection (this, IPathSelection()));
+    perform (new UndoableDeleteAnchor (this, selection));
+}
+
 void FrameEditor::setIPathSelection (const IPathSelection& selection)
 {
     if (selection.getTotalRange().getEnd() > getIPathCount())
@@ -2632,5 +2643,21 @@ void FrameEditor::_setPaths (const IPathSelection& selection,
             currentFrame->replacePath (i, paths.getReference (pindex++));
     }
     
+    sendActionMessage (EditorActions::iPathsChanged);
+}
+
+void FrameEditor::_deleteAnchor (int pindex, int aindex)
+{
+    IPath path = currentFrame->getIPath (pindex);
+    path.removeAnchor (aindex);
+    currentFrame->replacePath (pindex, path);
+    sendActionMessage (EditorActions::iPathsChanged);
+}
+
+void FrameEditor::_insertAnchor (int pindex, int aindex, const Anchor& a)
+{
+    IPath path = currentFrame->getIPath (pindex);
+    path.insertAnchor (aindex, a);
+    currentFrame->replacePath (pindex, path);
     sendActionMessage (EditorActions::iPathsChanged);
 }

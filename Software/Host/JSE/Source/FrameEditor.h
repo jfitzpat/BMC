@@ -309,6 +309,7 @@ public:
 
     void setIPathSelection (const IPathSelection& selection);
     void deletePaths();
+    void deleteAnchor();
     bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
     
     // Destructive Version (invoked by UndoManager)
@@ -356,6 +357,8 @@ public:
     void _deletePath (int index);
     void _insertPath (int index, IPath& path);
     void _setPaths (const IPathSelection& selection, const Array<IPath>& paths);
+    void _deleteAnchor (int pindex, int aindex);
+    void _insertAnchor (int pindex, int aindex, const Anchor& a);
     
 private:
     File loadedFile;

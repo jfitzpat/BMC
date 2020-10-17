@@ -598,6 +598,39 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableDeleteAnchor : public UndoableAction
+{
+public:
+    UndoableDeleteAnchor (FrameEditor* editor,
+                         const IPathSelection& select)
+    : selection (select), frameEditor (editor) {;}
+
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+
+        Range<uint16> r = selection.getRange(0);
+        IPath path = frameEditor->getIPath (r.getStart());
+        oldAnchor = path.getAnchor (selection.getAnchor());
+        frameEditor->_deleteAnchor (r.getStart(), selection.getAnchor());
+        return true;
+    }
+    
+    bool undo() override
+    {
+        Range<uint16> r = selection.getRange(0);
+        frameEditor->_insertAnchor (r.getStart(), selection.getAnchor(), oldAnchor);
+
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    Anchor oldAnchor;
+    IPathSelection selection;
+    FrameEditor* frameEditor;
+};
+
 class UndoableDeletePoints : public UndoableAction
 {
 public:
