@@ -29,6 +29,7 @@
 class SketchProperties  : public Component,
                           public ActionListener,
                           public Button::Listener,
+                          public TextEditor::Listener,
                           public ChangeListener
 {
 public:
@@ -41,6 +42,11 @@ public:
 
     //==============================================================================
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
+
+    //==============================================================================
+    void textEditorReturnKeyPressed (TextEditor& editor) override;
+    void textEditorEscapeKeyPressed (TextEditor& editor) override;
+    void textEditorFocusLost (TextEditor& editor) override;
 
     //==============================================================================
     void changeListenerCallback (ChangeBroadcaster* source) override;
@@ -67,6 +73,15 @@ private:
     std::unique_ptr<ColourButton> toolColorButton;
     std::unique_ptr<Label> selectLabel;
     std::unique_ptr<Label> pointsLabel;
+    std::unique_ptr<Label> spacingLabel;
+    std::unique_ptr<TextEditor> spacing;
+    std::unique_ptr<Label> extraPerLabel;
+    std::unique_ptr<TextEditor> extraPerAnchor;
+    std::unique_ptr<Label> blankBeforeLabel;
+    std::unique_ptr<TextEditor> blankBefore;
+    std::unique_ptr<Label> blankAfterLabel;
+    std::unique_ptr<TextEditor> blankAfter;
+    std::unique_ptr<ColourButton> selectColorButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SketchProperties)
 };

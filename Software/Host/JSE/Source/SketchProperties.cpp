@@ -94,6 +94,95 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     pointsLabel->setColour (Label::textColourId, juce::Colours::white);
     pointsLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
 
+    spacingLabel.reset (new Label ("spacing", "Point Spacing"));
+    addAndMakeVisible (spacingLabel.get());
+    spacingLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    spacingLabel->setJustificationType (juce::Justification::centred);
+    spacingLabel->setEditable (false, false, false);
+    spacingLabel->setColour (Label::textColourId, juce::Colours::grey);
+    spacingLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    spacing.reset (new TextEditor ("spacing"));
+    addAndMakeVisible (spacing.get());
+    spacing->setMultiLine (false);
+    spacing->setReturnKeyStartsNewLine (false);
+    spacing->setReadOnly (false);
+    spacing->setScrollbarsShown (true);
+    spacing->setCaretVisible (true);
+    spacing->setPopupMenuEnabled (true);
+    spacing->setColour (TextEditor::textColourId, Colours::white);
+    spacing->setTooltip ("Average distance between generated points");
+    spacing->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    spacing->addListener (this);
+
+    extraPerLabel.reset (new Label ("extraPerlabel", "Extra Anchor Points"));
+    addAndMakeVisible (extraPerLabel.get());
+    extraPerLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    extraPerLabel->setJustificationType (juce::Justification::centred);
+    extraPerLabel->setEditable (false, false, false);
+    extraPerLabel->setColour (Label::textColourId, juce::Colours::grey);
+    extraPerLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    extraPerAnchor.reset (new TextEditor ("extraPer"));
+    addAndMakeVisible (extraPerAnchor.get());
+    extraPerAnchor->setMultiLine (false);
+    extraPerAnchor->setReturnKeyStartsNewLine (false);
+    extraPerAnchor->setReadOnly (false);
+    extraPerAnchor->setScrollbarsShown (true);
+    extraPerAnchor->setCaretVisible (true);
+    extraPerAnchor->setPopupMenuEnabled (true);
+    extraPerAnchor->setColour (TextEditor::textColourId, Colours::white);
+    extraPerAnchor->setTooltip ("Extra points at each anchor position");
+    extraPerAnchor->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    extraPerAnchor->addListener (this);
+
+    blankBeforeLabel.reset (new Label ("blankBeforelabel", "Blanked Points Before"));
+    addAndMakeVisible (blankBeforeLabel.get());
+    blankBeforeLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    blankBeforeLabel->setJustificationType (juce::Justification::centred);
+    blankBeforeLabel->setEditable (false, false, false);
+    blankBeforeLabel->setColour (Label::textColourId, juce::Colours::grey);
+    blankBeforeLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    blankBefore.reset (new TextEditor ("blankBefore"));
+    addAndMakeVisible (blankBefore.get());
+    blankBefore->setMultiLine (false);
+    blankBefore->setReturnKeyStartsNewLine (false);
+    blankBefore->setReadOnly (false);
+    blankBefore->setScrollbarsShown (true);
+    blankBefore->setCaretVisible (true);
+    blankBefore->setPopupMenuEnabled (true);
+    blankBefore->setColour (TextEditor::textColourId, Colours::white);
+    blankBefore->setTooltip ("Blanked points before start of shape");
+    blankBefore->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    blankBefore->addListener (this);
+
+    blankAfterLabel.reset (new Label ("blankAfterlabel", "Blanked Points After"));
+    addAndMakeVisible (blankAfterLabel.get());
+    blankAfterLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    blankAfterLabel->setJustificationType (juce::Justification::centred);
+    blankAfterLabel->setEditable (false, false, false);
+    blankAfterLabel->setColour (Label::textColourId, juce::Colours::grey);
+    blankAfterLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    blankAfter.reset (new TextEditor ("blankAfter"));
+    addAndMakeVisible (blankAfter.get());
+    blankAfter->setMultiLine (false);
+    blankAfter->setReturnKeyStartsNewLine (false);
+    blankAfter->setReadOnly (false);
+    blankAfter->setScrollbarsShown (true);
+    blankAfter->setCaretVisible (true);
+    blankAfter->setPopupMenuEnabled (true);
+    blankAfter->setColour (TextEditor::textColourId, Colours::white);
+    blankAfter->setTooltip ("Blanked points after end of shape");
+    blankAfter->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    blankAfter->addListener (this);
+
+    selectColorButton.reset (new ColourButton ());
+    addAndMakeVisible (selectColorButton.get());
+    selectColorButton->setTooltip ("Shape color");
+    selectColorButton->addChangeListener (this);
+    
     refresh();
 }
 
@@ -111,6 +200,15 @@ SketchProperties::~SketchProperties()
     toolColorButton = nullptr;
     selectLabel = nullptr;
     pointsLabel = nullptr;
+    spacingLabel = nullptr;
+    spacing = nullptr;
+    extraPerLabel = nullptr;
+    extraPerAnchor = nullptr;
+    blankBeforeLabel = nullptr;
+    blankBefore = nullptr;
+    blankAfterLabel = nullptr;
+    blankAfter = nullptr;
+    selectColorButton = nullptr;
 }
 
 //==============================================================================
@@ -130,7 +228,15 @@ void SketchProperties::resized()
     toolColorButton->setBounds (154 + 12, 54, 20, 20);
     selectLabel->setBounds (16, 88, getWidth() - 32, 24);
     pointsLabel->setBounds (16, 104, getWidth() - 32, 24);
-
+    spacingLabel->setBounds (16, 128, getWidth() - 32, 12);
+    spacing->setBounds (16, 144, getWidth() - 32, 24);
+    extraPerLabel->setBounds (16, 176, getWidth() - 32, 12);
+    extraPerAnchor->setBounds (16, 192, getWidth() - 32, 24);
+    blankBeforeLabel->setBounds (16, 224, getWidth() - 32, 12);
+    blankBefore->setBounds (16, 240, getWidth() - 32, 24);
+    blankAfterLabel->setBounds (16, 272, getWidth() - 32, 12);
+    blankAfter->setBounds (16, 288, getWidth() - 32, 24);
+    selectColorButton->setBounds (getBounds().getCentreX() - 10, 320, 20, 20);
 }
 
 //==============================================================================
@@ -156,6 +262,21 @@ void SketchProperties::changeListenerCallback (ChangeBroadcaster* source)
         Colour c = toolColorButton->findColour (TextButton::buttonColourId);
         frameEditor->setSketchToolColor (c);
     }
+}
+
+//==============================================================================
+void SketchProperties::textEditorReturnKeyPressed (TextEditor& editor)
+{
+    layerVisible->grabKeyboardFocus();
+}
+
+void SketchProperties::textEditorEscapeKeyPressed (TextEditor&)
+{
+    layerVisible->grabKeyboardFocus();
+}
+
+void SketchProperties::textEditorFocusLost (TextEditor&)
+{
 }
 
 //==============================================================================
@@ -238,7 +359,20 @@ void SketchProperties::updateSelection()
     {
         selectLabel->setText ("No Shapes Selected", dontSendNotification);
         selectLabel->setColour(Label::textColourId, Colours::grey);
-        pointsLabel->setText ("", dontSendNotification);
+        pointsLabel->setText ("0 points", dontSendNotification);
+        pointsLabel->setColour (Label::textColourId, Colours::grey);
+        spacingLabel->setColour (Label::textColourId, Colours::grey);
+        extraPerLabel->setColour (Label::textColourId, Colours::grey);
+        blankBeforeLabel->setColour (Label::textColourId, Colours::grey);
+        blankAfterLabel->setColour (Label::textColourId, Colours::grey);
+        spacing->setText ("", dontSendNotification);
+        spacing->setEnabled (false);
+        extraPerAnchor->setText ("", dontSendNotification);
+        extraPerAnchor->setEnabled (false);
+        blankBefore->setText ("", dontSendNotification);
+        blankBefore->setEnabled (false);
+        blankAfter->setText ("", dontSendNotification);
+        blankAfter->setEnabled (false);
     }
     else
     {
@@ -272,7 +406,6 @@ void SketchProperties::updateSelection()
                 p += frameEditor->getIPath (i).getAnchorCount() * frameEditor->getIPath (i).getExtraPointsPerAnchor();
                 p += frameEditor->getIPath (i).getBlankedPointsBeforeStart();
                 p += frameEditor->getIPath (i).getBlankedPointsAfterEnd();
-                p += 4;
             }
         }
         
@@ -297,6 +430,15 @@ void SketchProperties::updateSelection()
         }
         else
             pointsLabel->setText ("", dontSendNotification);
+        
+        spacingLabel->setColour (Label::textColourId, Colours::white);
+        extraPerLabel->setColour (Label::textColourId, Colours::white);
+        blankBeforeLabel->setColour (Label::textColourId, Colours::white);
+        blankAfterLabel->setColour (Label::textColourId, Colours::white);
+        spacing->setEnabled (true);
+        extraPerAnchor->setEnabled (true);
+        blankBefore->setEnabled (true);
+        blankAfter->setEnabled (true);
     }
 }
 
