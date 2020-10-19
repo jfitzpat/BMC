@@ -47,9 +47,9 @@ public:
     uint16 getExtraPointsPerAnchor() const { return extraPointsPerAnchor; }
     void setExtraPointsPerAnchor (uint16 p) { extraPointsPerAnchor = p; }
     uint16 getBlankedPointsBeforeStart() const { return blankedPointsBeforeStart; }
-    void setBlankedPointsBeforeStart (uint16 p) { blankedPointsBeforeStart = p ? p : 1; }
+    void setBlankedPointsBeforeStart (uint16 p) { blankedPointsBeforeStart = p; }
     uint16 getBlankedPointsAfterEnd() const { return blankedPointsAfterEnd; }
-    void setBlankedPointsAfterEnd (uint16 p) { blankedPointsAfterEnd = p ? p : 1; }
+    void setBlankedPointsAfterEnd (uint16 p) { blankedPointsAfterEnd = p; }
 
     const Path& getPath() const { return path; }
 

@@ -317,6 +317,12 @@ public:
     void deleteAnchor();
     bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
     
+    void setSketchSelectedSpacing (uint16 newSpacing);
+    void setSketchSelectedExtraPerAnchor (uint16 extra);
+    void setSketchSelectedBlankingBefore (uint16 points);
+    void setSketchSelectedBlankingAfter (uint16 points);
+    void setSketchSelectedColor (const Colour& color);
+
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }
     void _setZoomFactor (float zoom);

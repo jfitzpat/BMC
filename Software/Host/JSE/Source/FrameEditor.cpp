@@ -1282,6 +1282,139 @@ void FrameEditor::getIPaths (const IPathSelection& selection,
     }
 }
 
+void FrameEditor::setSketchSelectedSpacing (uint16 newSpacing)
+{
+    bool changed = false;
+    
+    if (! newSpacing)
+        return;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getPointDensity() != newSpacing)
+        {
+            p->setPointDensity (newSpacing);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Point Spacing Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedExtraPerAnchor (uint16 extra)
+{
+    bool changed = false;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getExtraPointsPerAnchor() != extra)
+        {
+            p->setExtraPointsPerAnchor(extra);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Extra Per Anchor Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedBlankingBefore (uint16 points)
+{
+    bool changed = false;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getBlankedPointsBeforeStart() != points)
+        {
+            p->setBlankedPointsBeforeStart (points);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Blanked Before Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedBlankingAfter (uint16 points)
+{
+    bool changed = false;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getBlankedPointsAfterEnd() != points)
+        {
+            p->setBlankedPointsAfterEnd (points);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Blanked After Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedColor (const Colour& color)
+{
+    bool changed = false;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getColor() != color)
+        {
+            p->setColor (color);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Color Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
 bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
 {
     Array<IPath> paths;

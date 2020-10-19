@@ -1070,7 +1070,6 @@ void WorkingArea::paint (juce::Graphics& g)
                 
                 g.fillRect (a.getX() - halfDotSize, a.getY() - halfDotSize,
                             dotSize, dotSize);
-
             }
         }
     }

@@ -110,6 +110,7 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     spacing->setScrollbarsShown (true);
     spacing->setCaretVisible (true);
     spacing->setPopupMenuEnabled (true);
+    spacing->setJustification (Justification::centred);
     spacing->setColour (TextEditor::textColourId, Colours::white);
     spacing->setTooltip ("Average distance between generated points");
     spacing->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
@@ -131,6 +132,7 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     extraPerAnchor->setScrollbarsShown (true);
     extraPerAnchor->setCaretVisible (true);
     extraPerAnchor->setPopupMenuEnabled (true);
+    extraPerAnchor->setJustification (Justification::centred);
     extraPerAnchor->setColour (TextEditor::textColourId, Colours::white);
     extraPerAnchor->setTooltip ("Extra points at each anchor position");
     extraPerAnchor->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
@@ -152,6 +154,7 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     blankBefore->setScrollbarsShown (true);
     blankBefore->setCaretVisible (true);
     blankBefore->setPopupMenuEnabled (true);
+    blankBefore->setJustification (Justification::centred);
     blankBefore->setColour (TextEditor::textColourId, Colours::white);
     blankBefore->setTooltip ("Blanked points before start of shape");
     blankBefore->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
@@ -173,6 +176,7 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     blankAfter->setScrollbarsShown (true);
     blankAfter->setCaretVisible (true);
     blankAfter->setPopupMenuEnabled (true);
+    blankAfter->setJustification (Justification::centred);
     blankAfter->setColour (TextEditor::textColourId, Colours::white);
     blankAfter->setTooltip ("Blanked points after end of shape");
     blankAfter->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
@@ -262,12 +266,44 @@ void SketchProperties::changeListenerCallback (ChangeBroadcaster* source)
         Colour c = toolColorButton->findColour (TextButton::buttonColourId);
         frameEditor->setSketchToolColor (c);
     }
+    else if (source == selectColorButton.get())
+    {
+        Colour c = selectColorButton->findColour (TextButton::buttonColourId);
+        frameEditor->setSketchSelectedColor (c);
+    }
 }
 
 //==============================================================================
 void SketchProperties::textEditorReturnKeyPressed (TextEditor& editor)
 {
-    layerVisible->grabKeyboardFocus();
+    if (&editor == spacing.get())
+    {
+        if (! spacing->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedSpacing ((int16) spacing->getText().getIntValue());
+
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == extraPerAnchor.get())
+    {
+        if (! extraPerAnchor->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedExtraPerAnchor ((int16) extraPerAnchor->getText().getIntValue());
+        
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == blankBefore.get())
+    {
+        if (! blankBefore->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedBlankingBefore ((int16) blankBefore->getText().getIntValue());
+        
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == blankAfter.get())
+    {
+        if (! blankAfter->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedBlankingAfter ((int16) blankAfter->getText().getIntValue());
+        
+        layerVisible->grabKeyboardFocus();
+    }
 }
 
 void SketchProperties::textEditorEscapeKeyPressed (TextEditor&)
@@ -277,6 +313,7 @@ void SketchProperties::textEditorEscapeKeyPressed (TextEditor&)
 
 void SketchProperties::textEditorFocusLost (TextEditor&)
 {
+    updateSelection();
 }
 
 //==============================================================================
@@ -290,6 +327,8 @@ void SketchProperties::actionListenerCallback (const String& message)
         updateTools();
     else if (message == EditorActions::iPathSelectionChanged)
         updateSelection();
+    else if (message == EditorActions::iPathsChanged)
+        updateSelection();
     else if (message == EditorActions::deleteRequest)
     {
         if (frameEditor->getActiveLayer() == FrameEditor::sketch)
@@ -301,6 +340,14 @@ void SketchProperties::actionListenerCallback (const String& message)
                 else
                     frameEditor->deleteAnchor();
             }
+        }
+    }
+    else if (message == EditorActions::cancelRequest)
+    {
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+        {
+            if (! frameEditor->isTransforming())
+                frameEditor->setIPathSelection (IPathSelection());
         }
     }
     else if (message == EditorActions::upRequest)
@@ -373,6 +420,9 @@ void SketchProperties::updateSelection()
         blankBefore->setEnabled (false);
         blankAfter->setText ("", dontSendNotification);
         blankAfter->setEnabled (false);
+        selectColorButton->setEnabled (false);
+        selectColorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
+
     }
     else
     {
@@ -439,6 +489,37 @@ void SketchProperties::updateSelection()
         extraPerAnchor->setEnabled (true);
         blankBefore->setEnabled (true);
         blankAfter->setEnabled (true);
+        selectColorButton->setEnabled (true);
+        
+        bool ms = false; bool me = false; bool mbb = false;
+        bool mba = false; bool mc = false;
+        IPath lastPath;
+
+        for (auto n = 0; n < frameEditor->getIPathSelection().getNumRanges(); ++n)
+        {
+            IPath newPath;
+                        
+            Range<uint16> r = frameEditor->getIPathSelection().getRange (n);
+            if (n == 0)
+                lastPath = frameEditor->getIPath (r.getStart());
+
+            for (auto i = r.getStart(); i < r.getEnd(); ++i)
+            {
+                newPath = frameEditor->getIPath (i);
+                ms = lastPath.getPointDensity() != newPath.getPointDensity();
+                me = lastPath.getExtraPointsPerAnchor() != newPath.getExtraPointsPerAnchor();
+                mbb = lastPath.getBlankedPointsBeforeStart() != newPath.getBlankedPointsBeforeStart();
+                mba = lastPath.getBlankedPointsAfterEnd() != newPath.getBlankedPointsAfterEnd();
+                mc = lastPath.getColor() != newPath.getColor();
+            }
+        }
+        
+        spacing->setText (ms ? "*" : String (lastPath.getPointDensity()), dontSendNotification);
+        extraPerAnchor->setText (me ? "*" : String (lastPath.getExtraPointsPerAnchor()), dontSendNotification);
+        blankBefore->setText (mbb ? "*" : String (lastPath.getBlankedPointsBeforeStart()), dontSendNotification);
+        blankAfter->setText (mba ? "*" : String (lastPath.getBlankedPointsAfterEnd()), dontSendNotification);
+        selectColorButton->setColour (TextButton::buttonColourId, mc ? Colours::transparentBlack : lastPath.getColor());
+
     }
 }
 
