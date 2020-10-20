@@ -321,9 +321,6 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     rotateButton->setEdgeIndent (0);
     rotateButton->setTooltip ("Rotate the selected point(s)");
 
-    shearIcon = Drawable::createFromImageData  (BinaryData::shear_png,
-                                                BinaryData::shear_pngSize);
-
     barberIcon = Drawable::createFromImageData (BinaryData::barber_png,
                                                 BinaryData::barber_pngSize);
     
@@ -332,7 +329,10 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     barberButton->setImages (barberIcon.get());
     barberButton->setEdgeIndent (0);
     barberButton->setTooltip ("Barber Pole selected point(s)");
-    
+
+    shearIcon = Drawable::createFromImageData  (BinaryData::shear_png,
+                                                BinaryData::shear_pngSize);
+
     shearButton.reset (new ShearButton (frameEditor));
     addAndMakeVisible (shearButton.get());
     shearButton->setImages (shearIcon.get());

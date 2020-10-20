@@ -226,6 +226,34 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     scaleButton->setEdgeIndent (0);
     scaleButton->setTooltip ("Scale the selected shape(s)");
 
+    rotateIcon = Drawable::createFromImageData (BinaryData::rotate_png,
+                                                BinaryData::rotate_pngSize);
+
+    rotateButton.reset (new SketchRotateButton (frameEditor));
+    addAndMakeVisible (rotateButton.get());
+    rotateButton->setImages (rotateIcon.get());
+    rotateButton->setEdgeIndent (0);
+    rotateButton->setTooltip ("Rotate the selected shape(s)");
+
+    shearIcon = Drawable::createFromImageData  (BinaryData::shear_png,
+                                                BinaryData::shear_pngSize);
+
+    shearButton.reset (new SketchShearButton (frameEditor));
+    addAndMakeVisible (shearButton.get());
+    shearButton->setImages (shearIcon.get());
+    shearButton->setEdgeIndent (0);
+    shearButton->setTooltip ("Shear/Skew the selected shape(s)");
+
+    trashIcon = Drawable::createFromImageData (BinaryData::trash_png,
+                                               BinaryData::trash_pngSize);
+    
+    trashButton.reset (new DrawableButton ("trashButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (trashButton.get());
+    trashButton->setImages (trashIcon.get());
+    trashButton->setEdgeIndent (0);
+    trashButton->setTooltip ("Delete the selected shape(s)");
+    trashButton->addListener (this);
+
     refresh();
 }
 
@@ -260,6 +288,12 @@ SketchProperties::~SketchProperties()
     centerYIcon = nullptr;
     scaleButton = nullptr;
     scaleIcon = nullptr;
+    rotateButton = nullptr;
+    rotateIcon = nullptr;
+    shearButton = nullptr;
+    shearIcon = nullptr;
+    trashButton = nullptr;
+    trashIcon = nullptr;
 }
 
 //==============================================================================
@@ -292,6 +326,9 @@ void SketchProperties::resized()
     centerXButton->setBounds (118, 348, 32, 32);
     centerYButton->setBounds (154, 348, 32, 32);
     scaleButton->setBounds (82, 384, 32, 32);
+    rotateButton->setBounds (118, 384, 32, 32);
+    shearButton->setBounds (154, 384, 32, 32);
+    trashButton->setBounds (154, 420, 32, 32);
 }
 
 //==============================================================================
@@ -313,6 +350,8 @@ void SketchProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->centerSketchSelected (false, true, false);
     else if (buttonThatWasClicked == centerYButton.get())
         frameEditor->centerSketchSelected (true, false, false);
+    else if (buttonThatWasClicked == trashButton.get())
+        frameEditor->deletePaths();
 }
 
 //==============================================================================
@@ -483,6 +522,9 @@ void SketchProperties::updateSelection()
         centerXButton->setEnabled (false);
         centerYButton->setEnabled (false);
         scaleButton->setEnabled (false);
+        rotateButton->setEnabled (false);
+        shearButton->setEnabled (false);
+        trashButton->setEnabled (false);
     }
     else
     {
@@ -584,6 +626,9 @@ void SketchProperties::updateSelection()
         centerXButton->setEnabled (true);
         centerYButton->setEnabled (true);
         scaleButton->setEnabled (true);
+        shearButton->setEnabled (true);
+        rotateButton->setEnabled (true);
+        trashButton->setEnabled (true);
     }
 }
 

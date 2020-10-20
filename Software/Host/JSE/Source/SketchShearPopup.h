@@ -1,6 +1,6 @@
 /*
-    ShearPopup.h
-    Shear ilda Popup Controls
+    SketchShearPopup.h
+    Shear sketch Popup Controls
     Copyright 2020 Scrootch.me!
 
     Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,12 +22,12 @@
 #include "PopupTool.h"
 #include <JuceHeader.h>
 
-class ShearPopup : public Component,
-                   public juce::Slider::Listener,
-                   public juce::Button::Listener
+class SketchShearPopup : public Component,
+                         public juce::Slider::Listener,
+                         public juce::Button::Listener
 {
 public:
-    ShearPopup (FrameEditor* editor)
+    SketchShearPopup (FrameEditor* editor)
     : frameEditor (editor)
     {
         scaleXSlider.reset (new juce::Slider ("scaleXSlider"));
@@ -88,7 +88,7 @@ public:
         frameEditor->startTransform ("Skew Point(s)");
     }
     
-    ~ShearPopup()
+    ~SketchShearPopup()
     {
         frameEditor->endTransform();
         scaleXSlider = nullptr;
@@ -117,7 +117,7 @@ public:
         float x = (float)scaleXSlider->getValue();
         float y = (float)scaleYSlider->getValue();
         bool b = centerButton->getToggleState();
-        frameEditor->shearIldaSelected (x, y, b, false);
+        frameEditor->shearSketchSelected (x, y, b, false);
     }
 
 private:
@@ -131,17 +131,18 @@ private:
 };
 
 //==============================================================================
-class ShearButton : public PopupTool
+class SketchShearButton : public PopupTool
 {
 public:
-    ShearButton (FrameEditor* editor)
+    SketchShearButton (FrameEditor* editor)
     : PopupTool (editor)
     {;}
     
     std::unique_ptr<Component> makeComponent() override
     {
-        return std::make_unique<ShearPopup>(frameEditor);
+        return std::make_unique<SketchShearPopup>(frameEditor);
     }
 };
+
 
 

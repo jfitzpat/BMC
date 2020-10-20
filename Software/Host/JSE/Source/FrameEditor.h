@@ -243,6 +243,8 @@ public:
     
     // Sketch Transforms
     bool scaleSketchSelected (float xScale, float yScale, bool centerOnSelection, bool constrain = true);
+    bool rotateSketchSelected (float zAngle, bool centerOnSelection, bool constrain = true);
+    bool shearSketchSelected (float shearX, float shearY, bool centerOnSelection, bool constrain = true);
     bool translateSketchSelected (int xOffset, int yOffset, bool constrain = true);
     void endTransform();
 

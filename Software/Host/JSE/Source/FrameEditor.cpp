@@ -2433,6 +2433,183 @@ bool FrameEditor::scaleSketchSelected (float xScale, float yScale, bool centerOn
     return true;
 }
 
+bool FrameEditor::rotateSketchSelected (float zAngle, bool centerOnSelection, bool constrain)
+{
+    Array<IPath> paths (transformPaths);
+    if (! paths.size())
+        return false;
+
+    int xOffset = 32768;
+    int yOffset = 32768;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformSketchCenterX;
+        yOffset = transformSketchCenterY;
+    }
+
+    double rotZ = zAngle < 0 ? 360.0 + zAngle : zAngle;
+    
+    // Clip Z rotation
+    if (rotZ > 359.9)
+        rotZ = 0.0;
+
+    // Get sin and cos
+    const double pi = MathConstants<double>::pi;
+    double rad = rotZ * pi / 180.0;
+
+    AffineTransform matrix = AffineTransform::rotation((float)rad, (float)xOffset, (float)yOffset);
+
+    bool clipped = false;
+
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath* p = &paths.getReference (n);
+        
+        int i = 0;
+        int end = p->getAnchorCount();
+        
+        if (iPathSelection.getAnchor() != -1)
+        {
+            i = iPathSelection.getAnchor();
+            end = i + 1;
+        }
+
+        for (; i < end; ++i)
+        {
+            Anchor a = p->getAnchor (i);
+            
+            int x, y;
+            a.getPosition (x, y);
+            int enX, enY;
+            a.getEntryPosition (enX, enY);
+            int exX, exY;
+            a.getExitPosition (exX, exY);
+
+            matrix.transformPoint (x,y);
+            if (Frame::clipSketch (x))
+                clipped = true;
+            if (Frame::clipSketch (y))
+                clipped = true;
+            
+            matrix.transformPoint (enX, enY);
+            if (Frame::clipSketch (enX))
+                clipped = true;
+            if (Frame::clipSketch (enY))
+                clipped = true;
+
+            matrix.transformPoint (exX, exY);
+            if (Frame::clipSketch (exX))
+                clipped = true;
+            if (Frame::clipSketch (exY))
+                clipped = true;
+
+            a.setPosition (x, y);
+            a.setEntryPosition (enX, enY);
+            a.setExitPosition (exX, exY);
+
+            p->setAnchor (i, a);
+        }
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setPaths (iPathSelection, paths);
+    return true;
+}
+
+bool FrameEditor::shearSketchSelected (float shearX, float shearY,
+                                       bool centerOnSelection, bool constrain)
+{
+    Array<IPath> paths (transformPaths);
+    if (! paths.size())
+        return false;
+
+    int xOffset = 32768;
+    int yOffset = 32768;
+    
+    if (centerOnSelection)
+    {
+        xOffset = transformSketchCenterX;
+        yOffset = transformSketchCenterY;
+    }
+
+    AffineTransform matrix = AffineTransform::shear (-shearX, -shearY);
+
+    bool clipped = false;
+
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath* p = &paths.getReference (n);
+        
+        int i = 0;
+        int end = p->getAnchorCount();
+        
+        if (iPathSelection.getAnchor() != -1)
+        {
+            i = iPathSelection.getAnchor();
+            end = i + 1;
+        }
+
+        for (; i < end; ++i)
+        {
+            Anchor a = p->getAnchor (i);
+            
+            int x, y;
+            a.getPosition (x, y);
+            int enX, enY;
+            a.getEntryPosition (enX, enY);
+            int exX, exY;
+            a.getExitPosition (exX, exY);
+
+            x -= xOffset;
+            y -= yOffset;
+            matrix.transformPoint (x,y);
+            x += xOffset;
+            if (Frame::clipSketch (x))
+                clipped = true;
+            y += yOffset;
+            if (Frame::clipSketch (y))
+                clipped = true;
+            
+            enX -= xOffset;
+            enY -= yOffset;
+            matrix.transformPoint (enX, enY);
+            enX += xOffset;
+            if (Frame::clipSketch (enX))
+                clipped = true;
+            enY += yOffset;
+            if (Frame::clipSketch (enY))
+                clipped = true;
+
+            exX -= xOffset;
+            exY -= yOffset;
+            matrix.transformPoint (exX, exY);
+            exX += xOffset;
+            if (Frame::clipSketch (exX))
+                clipped = true;
+            exY += yOffset;
+            if (Frame::clipSketch (exY))
+                clipped = true;
+
+            a.setPosition (x, y);
+            a.setEntryPosition (enX, enY);
+            a.setExitPosition (exX, exY);
+
+            p->setAnchor (i, a);
+        }
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setPaths (iPathSelection, paths);
+    return true;
+}
+
 bool FrameEditor::translateSketchSelected (int xOffset, int yOffset, bool constrain)
 {
     Array<IPath> paths (transformPaths);

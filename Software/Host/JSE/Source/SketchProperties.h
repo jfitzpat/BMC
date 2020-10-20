@@ -22,6 +22,8 @@
 #include <JuceHeader.h>
 #include "ColourButton.h"
 #include "SketchScalePopup.h"
+#include "SketchRotatePopup.h"
+#include "SketchShearPopup.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -91,6 +93,12 @@ private:
     std::unique_ptr<DrawableButton> centerYButton;
     std::unique_ptr<Drawable> scaleIcon;
     std::unique_ptr<SketchScaleButton> scaleButton;
+    std::unique_ptr<Drawable> rotateIcon;
+    std::unique_ptr<SketchRotateButton> rotateButton;
+    std::unique_ptr<Drawable> shearIcon;
+    std::unique_ptr<SketchShearButton> shearButton;
+    std::unique_ptr<Drawable> trashIcon;
+    std::unique_ptr<DrawableButton> trashButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SketchProperties)
 };
