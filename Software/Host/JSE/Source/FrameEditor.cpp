@@ -2445,16 +2445,12 @@ bool FrameEditor::scaleSketchSelected (float xScale, float yScale, bool centerOn
             d *= xScale;
             d += (double)xOffset;
             enX = (int)d;
-            if (Frame::clipSketch (enX))
-                clipped = true;
 
             d = (double)exX;
             d -= (double)xOffset;
             d *= xScale;
             d += (double)xOffset;
             exX = (int)d;
-            if (Frame::clipSketch (exX))
-                clipped = true;
 
             d = (double)y;
             d -= (double)yOffset;
@@ -2469,16 +2465,12 @@ bool FrameEditor::scaleSketchSelected (float xScale, float yScale, bool centerOn
             d *= yScale;
             d += (double)yOffset;
             enY = (int)d;
-            if (Frame::clipSketch (enY))
-                clipped = true;
 
             d = (double)exY;
             d -= (double)yOffset;
             d *= yScale;
             d += (double)yOffset;
             exY = (int)d;
-            if (Frame::clipSketch (exY))
-                clipped = true;
 
             a.setPosition (x, y);
             a.setEntryPosition (enX, enY);
@@ -2556,16 +2548,7 @@ bool FrameEditor::rotateSketchSelected (float zAngle, bool centerOnSelection, bo
                 clipped = true;
             
             matrix.transformPoint (enX, enY);
-            if (Frame::clipSketch (enX))
-                clipped = true;
-            if (Frame::clipSketch (enY))
-                clipped = true;
-
             matrix.transformPoint (exX, exY);
-            if (Frame::clipSketch (exX))
-                clipped = true;
-            if (Frame::clipSketch (exY))
-                clipped = true;
 
             a.setPosition (x, y);
             a.setEntryPosition (enX, enY);
@@ -2641,21 +2624,13 @@ bool FrameEditor::shearSketchSelected (float shearX, float shearY,
             enY -= yOffset;
             matrix.transformPoint (enX, enY);
             enX += xOffset;
-            if (Frame::clipSketch (enX))
-                clipped = true;
             enY += yOffset;
-            if (Frame::clipSketch (enY))
-                clipped = true;
 
             exX -= xOffset;
             exY -= yOffset;
             matrix.transformPoint (exX, exY);
             exX += xOffset;
-            if (Frame::clipSketch (exX))
-                clipped = true;
             exY += yOffset;
-            if (Frame::clipSketch (exY))
-                clipped = true;
 
             a.setPosition (x, y);
             a.setEntryPosition (enX, enY);

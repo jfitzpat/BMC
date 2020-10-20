@@ -472,8 +472,10 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
                 lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
                 
                 drawSMark = true;
+                sMarkIndex = selection.getRange(0).getStart();
                 sMarkAnchorIndex = selection.getAnchor();
                 sMarkControlIndex = 1;
+                repaint (lastSMarkRect);
                 return;
             }
         }
@@ -494,8 +496,10 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
                 lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
                 
                 drawSMark = true;
+                sMarkIndex = selection.getRange(0).getStart();
                 sMarkAnchorIndex = selection.getAnchor();
                 sMarkControlIndex = 2;
+                repaint (lastSMarkRect);
                 return;
             }
         }
