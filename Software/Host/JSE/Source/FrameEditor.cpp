@@ -1485,18 +1485,37 @@ bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
         {
             Anchor a = p->getAnchor (i);
             
-            int x = a.getX();
-            x += xOffset;
-            if (Frame::clipSketch (x))
-                clipped = true;
-            a.setX (x);
-            
-            int y = a.getY();
-            y += yOffset;
-            if (Frame::clipSketch (y))
-                clipped = true;
-            a.setY (y);
-            
+            if (iPathSelection.getControl() == -1)
+            {
+                int x = a.getX();
+                x += xOffset;
+                if (Frame::clipSketch (x))
+                    clipped = true;
+                a.setX (x);
+                
+                int y = a.getY();
+                y += yOffset;
+                if (Frame::clipSketch (y))
+                    clipped = true;
+                a.setY (y);
+            }
+            else if (iPathSelection.getControl() == 1)
+            {
+                int x, y;
+                a.getEntryPosition (x, y);
+                x += xOffset;
+                y += yOffset;
+                a.setEntryPosition (x, y);
+            }
+            else if (iPathSelection.getControl() == 2)
+            {
+                int x, y;
+                a.getExitPosition (x, y);
+                x += xOffset;
+                y += yOffset;
+                a.setExitPosition (x, y);
+            }
+
             p->setAnchor (i, a);
         }
     }
@@ -2679,18 +2698,37 @@ bool FrameEditor::translateSketchSelected (int xOffset, int yOffset, bool constr
         {
             Anchor a = p->getAnchor (i);
             
-            int x = a.getX();
-            x += xOffset;
-            if (Frame::clipSketch (x))
-                clipped = true;
-            a.setX (x);
-            
-            int y = a.getY();
-            y += yOffset;
-            if (Frame::clipSketch (y))
-                clipped = true;
-            a.setY (y);
-            
+            if (iPathSelection.getControl() == -1)
+            {
+                int x = a.getX();
+                x += xOffset;
+                if (Frame::clipSketch (x))
+                    clipped = true;
+                a.setX (x);
+                
+                int y = a.getY();
+                y += yOffset;
+                if (Frame::clipSketch (y))
+                    clipped = true;
+                a.setY (y);
+            }
+            else if (iPathSelection.getControl() == 1)
+            {
+                int x, y;
+                a.getEntryPosition (x, y);
+                x += xOffset;
+                y += yOffset;
+                a.setEntryPosition (x, y);
+            }
+            else if (iPathSelection.getControl() == 2)
+            {
+                int x, y;
+                a.getExitPosition (x, y);
+                x += xOffset;
+                y += yOffset;
+                a.setExitPosition (x, y);
+            }
+
             p->setAnchor (i, a);
         }
     }

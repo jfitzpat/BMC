@@ -74,28 +74,38 @@ namespace EditorActions
 class IPathSelection : public SparseSet<uint16>
 {
 public:
-    IPathSelection() : anchor (-1) {;}
+    IPathSelection() : anchor (-1), control (-1) {;}
     
     int getAnchor() { return anchor; }
     void setAnchor (int a) { anchor = a; }
+    int getControl() { return control; }
+    void setControl (int c) { control = c; }
 
     bool operator== (const IPathSelection& other) const noexcept
     {
         if (! SparseSet<uint16>::operator== (other))
             return false;
         
-        return anchor == other.anchor;
+        if (! (anchor == other.anchor))
+            return false;
+        
+        return control == other.control;
     }
+    
     bool operator!= (const IPathSelection& other) const noexcept
     {
         if (SparseSet<uint16>::operator!= (other))
             return true;
         
-        return anchor != other.anchor;
+        if (anchor != other.anchor)
+            return true;
+        
+        return control != other.control;
     }
 
 private:
     int anchor;
+    int control;
 };
 
 //==============================================================================

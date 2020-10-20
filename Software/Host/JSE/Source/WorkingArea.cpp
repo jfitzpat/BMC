@@ -94,6 +94,7 @@ void WorkingArea::mouseDownSketchMove (const MouseEvent& event)
         IPathSelection selection;
         selection.addRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
         selection.setAnchor (sMarkAnchorIndex);
+        selection.setControl (sMarkControlIndex);
         drawSMark = false;
         frameEditor->setIPathSelection (selection);
     }
@@ -269,9 +270,13 @@ void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
         {
             selection = frameEditor->getIPathSelection();
             selection.setAnchor (-1);
+            selection.setControl (-1);
         }
         else
+        {
             selection.setAnchor (sMarkAnchorIndex);
+            selection.setControl (sMarkControlIndex);
+        }
         
         if (selection.contains (sMarkIndex) || event.mods.isAltDown())
             selection.removeRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
@@ -433,9 +438,69 @@ void WorkingArea::mouseMoveSketchMove (const MouseEvent& event)
     mouseMoveSketchSelect (event);
 }
 
+void WorkingArea::mouseMoveSketchPen (const MouseEvent& event)
+{
+    mouseMoveSketchSelect (event);
+}
+
 void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
 {
     Point<float> pos ((float)event.x, (float)event.y);
+    
+    IPathSelection selection = frameEditor->getIPathSelection();
+    
+    // If we already have a selected anchor, offer opporutnity
+    // to select controls
+    if ((!selection.isEmpty()) && (selection.getAnchor() != -1))
+    {
+        Anchor a = frameEditor->getIPath (selection.getRange(0).getStart()).getAnchor (selection.getAnchor());
+        
+        if (a.getEntryXDelta() || a.getEntryYDelta())
+        {
+            int x, y;
+            a.getEntryPosition (x, y);
+            Point<float> nearest ((float)x, (float) y);
+            
+            float distance = pos.getDistanceFrom (nearest);
+            if (abs(distance) <= (3* activeInvScale))
+            {
+                if (drawSMark)
+                    repaint (lastSMarkRect);
+                
+                Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                r.expand (15 * activeInvScale, 15 * activeInvScale);
+                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                
+                drawSMark = true;
+                sMarkAnchorIndex = selection.getAnchor();
+                sMarkControlIndex = 1;
+                return;
+            }
+        }
+        if (a.getExitXDelta() || a.getExitYDelta())
+        {
+            int x, y;
+            a.getExitPosition (x, y);
+            Point<float> nearest ((float)x, (float) y);
+            
+            float distance = pos.getDistanceFrom (nearest);
+            if (abs(distance) <= (3* activeInvScale))
+            {
+                if (drawSMark)
+                    repaint (lastSMarkRect);
+                
+                Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                r.expand (15 * activeInvScale, 15 * activeInvScale);
+                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                
+                drawSMark = true;
+                sMarkAnchorIndex = selection.getAnchor();
+                sMarkControlIndex = 2;
+                return;
+            }
+        }
+    }
+    
     
     int n;
     for (n = 0; n < frameEditor->getIPathCount(); ++n)
@@ -462,6 +527,7 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
             lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
             
             sMarkAnchorIndex = -1;
+            sMarkControlIndex = -1;
             
             // Check if we are highlighing an anchor, but no mods
             if (! event.mods.isAnyModifierKeyDown())
@@ -763,6 +829,8 @@ void WorkingArea::mouseMove (const MouseEvent& event)
             mouseMoveSketchSelect (event);
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
             mouseMoveSketchMove (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchPenTool)
+            mouseMoveSketchPen (event);
     }
 }
 
@@ -1053,8 +1121,12 @@ void WorkingArea::paint (juce::Graphics& g)
             IPath path = frameEditor->getIPath (n);
             bool selected = frameEditor->getIPathSelection().contains (n);
             int markedAnchor = -1;
+            int control = -1;
             if (selected)
+            {
                 markedAnchor = frameEditor->getIPathSelection().getAnchor();
+                control = frameEditor->getIPathSelection().getControl();
+            }
             bool doubleline = (selected || (drawSMark && (sMarkIndex == n)));
             
             Colour c = path.getColor();
@@ -1080,8 +1152,23 @@ void WorkingArea::paint (juce::Graphics& g)
                 if (drawSMark)
                 {
                     if (n == sMarkIndex && i == sMarkAnchorIndex)
+                    {
                         g.drawRect (a.getX() - selectSize, a.getY() - selectSize,
                                     2 * selectSize, 2 * selectSize, 2 * activeInvScale);
+                     
+                        if (sMarkControlIndex == 1)
+                        {
+                            int x, y;
+                            a.getEntryPosition (x, y);
+                            g.drawEllipse (x - halfSelectSize, y - halfSelectSize, selectSize, selectSize, activeInvScale);
+                        }
+                        else if (sMarkControlIndex == 2)
+                        {
+                            int x, y;
+                            a.getExitPosition (x, y);
+                            g.drawEllipse (x - halfSelectSize, y - halfSelectSize, selectSize, selectSize, activeInvScale);
+                        }
+                    }
                 }
                 
                 if ((i == markedAnchor) || (selected && (markedAnchor == -1)))
@@ -1092,7 +1179,6 @@ void WorkingArea::paint (juce::Graphics& g)
                 
                 if (i == markedAnchor)
                 {
-
                     g.setColour (Colours::grey);
                     if (a.getExitXDelta() != 0 || a.getExitYDelta() != 0)
                     {
@@ -1100,6 +1186,8 @@ void WorkingArea::paint (juce::Graphics& g)
                         a.getExitPosition (x, y);
                         g.drawLine(x, y, a.getX(), a.getY(), activeInvScale);
                         g.fillEllipse (x - halfDotSize, y - halfDotSize, dotSize, dotSize);
+                        if (control == 2)
+                            g.drawEllipse (x - halfSelectSize, y - halfSelectSize, selectSize, selectSize, activeInvScale);
                     }
                     if (a.getEntryXDelta() != 0 || a.getEntryYDelta() != 0)
                     {
@@ -1107,6 +1195,8 @@ void WorkingArea::paint (juce::Graphics& g)
                         a.getEntryPosition (x, y);
                         g.drawLine(x, y, a.getX(), a.getY(), activeInvScale);
                         g.fillEllipse (x - halfDotSize, y - halfDotSize, dotSize, dotSize);
+                        if (control == 1)
+                            g.drawEllipse (x - halfSelectSize, y - halfSelectSize, selectSize, selectSize, activeInvScale);
                     }
                     g.setColour (c);
                 }

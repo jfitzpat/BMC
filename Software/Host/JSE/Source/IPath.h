@@ -31,7 +31,7 @@ public:
     ~IPath() {;}
     
     int getAnchorCount() const { return anchors.size(); }
-    const Anchor& getAnchor (int index) { return anchors.getReference (index); }
+    const Anchor& getAnchor (int index) const { return anchors.getReference (index); }
     
     void addAnchor (const Anchor& a);
     void insertAnchor (int index, const Anchor& a);
