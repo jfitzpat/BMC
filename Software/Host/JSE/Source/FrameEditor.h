@@ -318,6 +318,7 @@ public:
     void setIPathSelection (const IPathSelection& selection);
     void deletePaths();
     void deleteAnchor();
+    void insertEllipsePath (Rectangle<int>& rect);
     bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
     
     void setSketchSelectedSpacing (uint16 newSpacing);

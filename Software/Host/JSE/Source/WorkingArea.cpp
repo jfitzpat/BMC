@@ -32,6 +32,7 @@ WorkingArea::WorkingArea (FrameEditor* frame)
     drawRect = false;
     drawDot = false;
     drawSMark = false;
+    drawEllipse = false;
     drawSDot = false;
 }
 
@@ -243,6 +244,16 @@ void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
     }
 }
 
+void WorkingArea::mouseDownSketchEllipse (const MouseEvent& event)
+{
+    // Left button?
+    if (! event.mods.isLeftButtonDown())
+        return;
+
+    drawEllipse = true;
+    lastEllipseRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
+}
+
 void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
 {
     // Left button?
@@ -298,6 +309,8 @@ void WorkingArea::mouseDown (const MouseEvent& event)
             mouseDownSketchSelect (event);
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
             mouseDownSketchMove (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchEllipseTool)
+            mouseDownSketchEllipse (event);
     }
 }
 
@@ -344,6 +357,13 @@ void WorkingArea::mouseUpSketch (const MouseEvent& event)
         
         // Discard the rect
         lastDrawRect = Rectangle<int>();
+    }
+    else if (drawEllipse)
+    {
+        drawEllipse = false;
+        repaint (lastEllipseRect);
+        frameEditor->insertEllipsePath (lastEllipseRect);
+        lastEllipseRect = Rectangle<int>();
     }
     
     if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
@@ -759,6 +779,20 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
         lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
         repaint (lastDrawRect.expanded (expansion, expansion));
     }
+    else if (drawEllipse)
+    {
+        int expansion = (int)(activeInvScale * 3);
+        repaint (lastEllipseRect.expanded (expansion, expansion));
+        lastEllipseRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
+        if (event.mods.isShiftDown())
+        {
+            if (lastEllipseRect.getWidth() > lastEllipseRect.getHeight())
+                lastEllipseRect.setHeight (lastEllipseRect.getWidth());
+            else if (lastEllipseRect.getWidth() < lastEllipseRect.getHeight())
+                lastEllipseRect.setWidth (lastEllipseRect.getHeight());
+        }
+        repaint (lastEllipseRect.expanded (expansion, expansion));
+    }
     
     if (frameEditor->getActiveLayer() == FrameEditor::ilda &&
         frameEditor->getIldaVisible() &&
@@ -1089,7 +1123,11 @@ void WorkingArea::paint (juce::Graphics& g)
         g.setColour (Colours::grey);
         g.drawRect (lastDrawRect, (int)activeInvScale >> 1);
     }
-
+    else if (drawEllipse)
+    {
+        g.setColour (Colours::grey);
+        g.drawEllipse(lastEllipseRect.getX(), lastEllipseRect.getY(), lastEllipseRect.getWidth(), lastEllipseRect.getHeight(), (int)activeInvScale >> 1);
+    }
 }
 
 void WorkingArea::resized()

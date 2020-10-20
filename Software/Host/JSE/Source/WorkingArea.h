@@ -69,6 +69,7 @@ private:
     void mouseDownIldaPoint (const MouseEvent& event);
     void mouseDownSketchSelect (const MouseEvent& event);
     void mouseDownSketchMove (const MouseEvent& event);
+    void mouseDownSketchEllipse (const MouseEvent& event);
     void mouseUpIlda (const MouseEvent& event);
     void mouseUpSketch (const MouseEvent& event);
     void mouseMoveIldaSelect (const MouseEvent& event);
@@ -98,6 +99,9 @@ private:
     int sMarkIndex;
     int sMarkAnchorIndex;
     Rectangle<int> lastSMarkRect;
+    
+    bool drawEllipse;
+    Rectangle<int> lastEllipseRect;
     
     bool drawSDot;
     Point<int> sDotAt;

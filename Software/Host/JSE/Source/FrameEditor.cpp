@@ -36,7 +36,7 @@ FrameEditor::FrameEditor()
       activeIldaTool (selectTool),
       pointToolColor (Colours::white),
       lastVisiblePointToolColor (Colours::white),
-      activeSketchTool (sketchSelectTool),
+      activeSketchTool (sketchPenTool),
       sketchToolColor (Colours::white),
       lastVisibleSketchToolColor (Colours::white),
       sketchVisible (true),
@@ -1252,6 +1252,50 @@ void FrameEditor::deleteAnchor()
     IPathSelection selection = iPathSelection;
     perform (new UndoableSetIPathSelection (this, IPathSelection()));
     perform (new UndoableDeleteAnchor (this, selection));
+}
+
+void FrameEditor::insertEllipsePath (Rectangle<int>& rect)
+{
+    const double kappa = .5522848;
+    double ox = (double)rect.getWidth() / 2.0 * kappa;
+    double oy = (double)rect.getHeight() / 2.0 * kappa;
+    
+    IPath path;
+    path.setColor (sketchToolColor);
+    Anchor a;
+    
+    a.setPosition (rect.getX(), rect.getCentreY());
+    a.setEntryPosition (rect.getX(), rect.getCentreY() + oy);
+    a.setExitPosition (rect.getX(), rect.getCentreY() - oy);
+    path.addAnchor (a);
+    
+    a.setPosition (rect.getCentreX(), rect.getY());
+    a.setEntryPosition (rect.getCentreX() - ox, rect.getY());
+    a.setExitPosition (rect.getCentreX() + ox, rect.getY());
+    path.addAnchor (a);
+    
+    a.setPosition(rect.getX() + rect.getWidth(), rect.getCentreY());
+    a.setEntryPosition (rect.getX() + rect.getWidth(), rect.getCentreY() - oy);
+    a.setExitPosition (rect.getX() + rect.getWidth(), rect.getCentreY() + oy);
+    path.addAnchor (a);
+    
+    a.setPosition (rect.getCentreX(), rect.getY() + rect.getHeight());
+    a.setEntryPosition (rect.getCentreX() + ox, rect.getY() + rect.getHeight());
+    a.setExitPosition (rect.getCentreX() - ox, rect.getY() + rect.getHeight());
+    path.addAnchor (a);
+
+    a.setPosition (rect.getX(), rect.getCentreY());
+    a.setEntryPosition (rect.getX(), rect.getCentreY() + oy);
+    a.setExitPosition (rect.getX(), rect.getCentreY() - oy);
+    path.addAnchor (a);
+
+    beginNewTransaction ("New Ellipse");
+    Array<IPath> array;
+    array.add (path);
+    IPathSelection selection;
+    selection.addRange (Range<uint16> (getIPathCount(), getIPathCount() + 1));
+    perform (new UndoableAddPaths (this, array));
+    perform (new UndoableSetIPathSelection (this, selection));
 }
 
 void FrameEditor::setIPathSelection (const IPathSelection& selection)

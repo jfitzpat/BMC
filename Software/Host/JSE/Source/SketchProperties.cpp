@@ -59,7 +59,7 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     addAndMakeVisible (ellipseToolButton.get());
     ellipseToolButton->setImages (ellipseIcon.get());
     ellipseToolButton->setEdgeIndent (0);
-    ellipseToolButton->setTooltip ("Ellipse Tool");
+    ellipseToolButton->setTooltip ("Ellipse Tool (hold <shift> for Circle)");
     ellipseToolButton->addListener (this);
 
     penIcon = Drawable::createFromImageData (BinaryData::pen_png,
