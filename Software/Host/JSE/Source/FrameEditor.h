@@ -242,6 +242,7 @@ public:
     bool adjustHueIldaSelected (float hshift, float saturation, float brightness);
     
     // Sketch Transforms
+    bool scaleSketchSelected (float xScale, float yScale, bool centerOnSelection, bool constrain = true);
     bool translateSketchSelected (int xOffset, int yOffset, bool constrain = true);
     void endTransform();
 
@@ -407,6 +408,8 @@ private:
     int16 transformCenterX;
     int16 transformCenterY;
     int16 transformCenterZ;
+    int transformSketchCenterX;
+    int transformSketchCenterY;
     String transformName;
     
     IPathSelection iPathSelection;

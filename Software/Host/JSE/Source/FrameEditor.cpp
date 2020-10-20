@@ -1443,20 +1443,14 @@ bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
             
             int x = a.getX();
             x += xOffset;
-            if (x > 0xFFFF)
-            {
-                x = 0xFFFF;
+            if (Frame::clipSketch (x))
                 clipped = true;
-            }
             a.setX (x);
             
             int y = a.getY();
             y += yOffset;
-            if (y > 0xFFFF)
-            {
-                y = 0xFFFF;
+            if (Frame::clipSketch (y))
                 clipped = true;
-            }
             a.setY (y);
             
             p->setAnchor (i, a);
@@ -1509,11 +1503,8 @@ bool FrameEditor::centerSketchSelected (bool doX, bool doY, bool constrain)
             {
                 int x = a.getX();
                 x += xOffset;
-                if (x > 0xFFFF)
-                {
-                    x = 0xFFFF;
+                if (Frame::clipSketch (x))
                     clipped = true;
-                }
                 a.setX (x);
             }
             
@@ -1521,11 +1512,8 @@ bool FrameEditor::centerSketchSelected (bool doX, bool doY, bool constrain)
             {
                 int y = a.getY();
                 y += yOffset;
-                if (y > 0xFFFF)
-                {
-                    y = 0xFFFF;
+                if (Frame::clipSketch (y))
                     clipped = true;
-                }
                 a.setY (y);
             }
             p->setAnchor (i, a);
@@ -1551,11 +1539,7 @@ void FrameEditor::startTransform (const String& name)
     else
     {
         getSelectedIPaths (transformPaths);
-        int x, y;
-        getCenterOfIPathSelection (x, y);
-        transformCenterX = (int16)x;
-        transformCenterY = (int16)y;
-        transformCenterZ = 0;
+        getCenterOfIPathSelection (transformSketchCenterX, transformSketchCenterY);
     }
     
     transformName = name;
@@ -2344,6 +2328,111 @@ bool FrameEditor::adjustHueIldaSelected (float hshift,
     return true;
 }
 
+bool FrameEditor::scaleSketchSelected (float xScale, float yScale, bool centerOnSelected, bool constrain)
+{
+    Array<IPath> paths (transformPaths);
+    if (! paths.size())
+        return false;
+
+    int xOffset = 32768;
+    int yOffset = 32768;
+    
+    if (centerOnSelected)
+    {
+        xOffset = transformSketchCenterX;
+        yOffset = transformSketchCenterY;
+    }
+    
+    bool clipped = false;
+
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath* p = &paths.getReference (n);
+        
+        int i = 0;
+        int end = p->getAnchorCount();
+        
+        if (iPathSelection.getAnchor() != -1)
+        {
+            i = iPathSelection.getAnchor();
+            end = i + 1;
+        }
+
+        for (; i < end; ++i)
+        {
+            Anchor a = p->getAnchor (i);
+            
+            int x, y;
+            a.getPosition (x, y);
+            int enX, enY;
+            a.getEntryPosition (enX, enY);
+            int exX, exY;
+            a.getExitPosition (exX, exY);
+            
+            double d = (double)x;
+            d -= (double)xOffset;
+            d *= xScale;
+            d += (double)xOffset;
+            x = (int)d;
+            if (Frame::clipSketch (x))
+                clipped = true;
+
+            d = (double)enX;
+            d -= (double)xOffset;
+            d *= xScale;
+            d += (double)xOffset;
+            enX = (int)d;
+            if (Frame::clipSketch (enX))
+                clipped = true;
+
+            d = (double)exX;
+            d -= (double)xOffset;
+            d *= xScale;
+            d += (double)xOffset;
+            exX = (int)d;
+            if (Frame::clipSketch (exX))
+                clipped = true;
+
+            d = (double)y;
+            d -= (double)yOffset;
+            d *= yScale;
+            d += (double)yOffset;
+            y = (int)d;
+            if (Frame::clipSketch (y))
+                clipped = true;
+
+            d = (double)enY;
+            d -= (double)yOffset;
+            d *= yScale;
+            d += (double)yOffset;
+            enY = (int)d;
+            if (Frame::clipSketch (enY))
+                clipped = true;
+
+            d = (double)exY;
+            d -= (double)yOffset;
+            d *= yScale;
+            d += (double)yOffset;
+            exY = (int)d;
+            if (Frame::clipSketch (exY))
+                clipped = true;
+
+            a.setPosition (x, y);
+            a.setEntryPosition (enX, enY);
+            a.setExitPosition (exX, exY);
+            
+            p->setAnchor (i, a);
+        }
+    }
+
+    if (constrain && clipped)
+        return false;
+
+    transformUsed = true;
+    _setPaths (iPathSelection, paths);
+    return true;
+}
+
 bool FrameEditor::translateSketchSelected (int xOffset, int yOffset, bool constrain)
 {
     Array<IPath> paths (transformPaths);
@@ -2371,20 +2460,14 @@ bool FrameEditor::translateSketchSelected (int xOffset, int yOffset, bool constr
             
             int x = a.getX();
             x += xOffset;
-            if (x > 0xFFFF)
-            {
-                x = 0xFFFF;
+            if (Frame::clipSketch (x))
                 clipped = true;
-            }
             a.setX (x);
             
             int y = a.getY();
             y += yOffset;
-            if (y > 0xFFFF)
-            {
-                y = 0xFFFF;
+            if (Frame::clipSketch (y))
                 clipped = true;
-            }
             a.setY (y);
             
             p->setAnchor (i, a);

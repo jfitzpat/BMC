@@ -49,7 +49,9 @@ public:
     void setEntryPosition (int x, int y) { entryXDelta = x - xPosition;
                                            entryYDelta = y - yPosition; }
     int getExitXDelta()  { return exitXDelta; }
+    void setExitXDelta (int x) { exitXDelta = x; }
     int getExitYDelta()  { return exitYDelta; }
+    void setExitYDelta (int y) { exitYDelta = y;}
     void getExitPosition  (int& x, int& y) { x = xPosition + exitXDelta;
                                                   y = yPosition + exitYDelta; }
     void setExitPosition (int x, int y) { exitXDelta = x - xPosition;

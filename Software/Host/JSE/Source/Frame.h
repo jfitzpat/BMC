@@ -148,6 +148,23 @@ public:
         
         return clipped;
     }
+    
+    static bool clipSketch (int& val)
+    {
+        bool clipped = false;
+        if (val < 0)
+        {
+            val = 0;
+            clipped = true;
+        }
+        else if (val > 0xFFFF)
+        {
+            val = 0xFFFF;
+            clipped = true;
+        }
+        
+        return clipped;
+    }
 
 private:
     std::unique_ptr<Image> backgroundImage;

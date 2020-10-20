@@ -217,6 +217,15 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     centerYButton->setTooltip ("Center the selected shape(s) left/right");
     centerYButton->addListener (this);
 
+    scaleIcon = Drawable::createFromImageData (BinaryData::scale_png,
+                                            BinaryData::scale_pngSize);
+
+    scaleButton.reset (new SketchScaleButton (frameEditor));
+    addAndMakeVisible (scaleButton.get());
+    scaleButton->setImages (scaleIcon.get());
+    scaleButton->setEdgeIndent (0);
+    scaleButton->setTooltip ("Scale the selected shape(s)");
+
     refresh();
 }
 
@@ -249,6 +258,8 @@ SketchProperties::~SketchProperties()
     centerXIcon = nullptr;
     centerYButton = nullptr;
     centerYIcon = nullptr;
+    scaleButton = nullptr;
+    scaleIcon = nullptr;
 }
 
 //==============================================================================
@@ -280,6 +291,7 @@ void SketchProperties::resized()
     centerButton->setBounds (82, 348, 32, 32);
     centerXButton->setBounds (118, 348, 32, 32);
     centerYButton->setBounds (154, 348, 32, 32);
+    scaleButton->setBounds (82, 384, 32, 32);
 }
 
 //==============================================================================
@@ -470,6 +482,7 @@ void SketchProperties::updateSelection()
         centerButton->setEnabled (false);
         centerXButton->setEnabled (false);
         centerYButton->setEnabled (false);
+        scaleButton->setEnabled (false);
     }
     else
     {
@@ -570,6 +583,7 @@ void SketchProperties::updateSelection()
         centerButton->setEnabled (true);
         centerXButton->setEnabled (true);
         centerYButton->setEnabled (true);
+        scaleButton->setEnabled (true);
     }
 }
 
