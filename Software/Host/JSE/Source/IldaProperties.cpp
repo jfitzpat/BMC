@@ -835,10 +835,10 @@ void IldaProperties::updatePointDisplay()
     {
         float frameRate = (float)frameEditor->getScanRate() / (float)p;
         
-        if (frameRate < 15.0)
-            pointLabel->setColour (Label::textColourId, juce::Colours::yellow);
-        else if (frameRate < 10.0)
+        if (frameRate < 10.0)
             pointLabel->setColour (Label::textColourId, juce::Colours::red);
+        else if (frameRate < 15.0)
+            pointLabel->setColour (Label::textColourId, juce::Colours::yellow);
         else
             pointLabel->setColour (Label::textColourId, juce::Colours::white);
         

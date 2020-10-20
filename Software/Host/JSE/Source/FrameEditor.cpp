@@ -380,7 +380,7 @@ void FrameEditor::getCenterOfIPathSelection (int& x, int& y)
         for (auto n = 0; n < iPathSelection.getNumRanges(); ++n)
         {
             Range<uint16> r = iPathSelection.getRange (n);
-            for (auto i=0; i < r.getLength(); ++i)
+            for (auto i = r.getStart(); i < r.getEnd(); ++i)
             {
                 IPath p = getIPath (i);
                 if (first)
@@ -1466,10 +1466,76 @@ bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
     if (constrain && clipped)
         return false;
 
-    if (getCurrentTransactionName() == "Path Move")
+    if (getCurrentTransactionName() == "Shape Move")
         undoCurrentTransactionOnly();
 
-    beginNewTransaction ("Path Move");
+    beginNewTransaction ("Shape Move");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+    return true;
+}
+
+bool FrameEditor::centerSketchSelected (bool doX, bool doY, bool constrain)
+{
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return false;
+    
+    int x,y;
+    getCenterOfIPathSelection (x, y);
+    int xOffset = 32768 - x;
+    int yOffset = 32768 - y;
+    
+    bool clipped = false;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath* p = &paths.getReference (n);
+        
+        int i = 0;
+        int end = p->getAnchorCount();
+        
+        if (iPathSelection.getAnchor() != -1)
+        {
+            i = iPathSelection.getAnchor();
+            end = i + 1;
+        }
+
+        for (; i < end; ++i)
+        {
+            Anchor a = p->getAnchor (i);
+            
+            if (doX)
+            {
+                int x = a.getX();
+                x += xOffset;
+                if (x > 0xFFFF)
+                {
+                    x = 0xFFFF;
+                    clipped = true;
+                }
+                a.setX (x);
+            }
+            
+            if (doY)
+            {
+                int y = a.getY();
+                y += yOffset;
+                if (y > 0xFFFF)
+                {
+                    y = 0xFFFF;
+                    clipped = true;
+                }
+                a.setY (y);
+            }
+            p->setAnchor (i, a);
+        }
+    }
+    
+    if (constrain && clipped)
+        return false;
+
+    beginNewTransaction ("Center Shape");
     perform (new UndoableSetPaths (this, iPathSelection, paths));
     return true;
 }

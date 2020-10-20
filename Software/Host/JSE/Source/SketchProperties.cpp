@@ -186,7 +186,37 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     addAndMakeVisible (selectColorButton.get());
     selectColorButton->setTooltip ("Shape color");
     selectColorButton->addChangeListener (this);
+
+    centerIcon = Drawable::createFromImageData (BinaryData::center_png,
+                                                BinaryData::center_pngSize);
     
+    centerButton.reset (new DrawableButton ("centerButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerButton.get());
+    centerButton->setImages (centerIcon.get());
+    centerButton->setEdgeIndent (0);
+    centerButton->setTooltip ("Center the selected shape(s)");
+    centerButton->addListener (this);
+
+    centerXIcon = Drawable::createFromImageData (BinaryData::centerx_png,
+                                                 BinaryData::centerx_pngSize);
+    
+    centerXButton.reset (new DrawableButton ("centerXButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerXButton.get());
+    centerXButton->setImages (centerXIcon.get());
+    centerXButton->setEdgeIndent (0);
+    centerXButton->setTooltip ("Center the selected shape(s) up/down");
+    centerXButton->addListener (this);
+
+    centerYIcon = Drawable::createFromImageData (BinaryData::centery_png,
+                                                 BinaryData::centery_pngSize);
+    
+    centerYButton.reset (new DrawableButton ("centerYButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerYButton.get());
+    centerYButton->setImages (centerYIcon.get());
+    centerYButton->setEdgeIndent (0);
+    centerYButton->setTooltip ("Center the selected shape(s) left/right");
+    centerYButton->addListener (this);
+
     refresh();
 }
 
@@ -213,6 +243,12 @@ SketchProperties::~SketchProperties()
     blankAfterLabel = nullptr;
     blankAfter = nullptr;
     selectColorButton = nullptr;
+    centerButton = nullptr;
+    centerIcon = nullptr;
+    centerXButton = nullptr;
+    centerXIcon = nullptr;
+    centerYButton = nullptr;
+    centerYIcon = nullptr;
 }
 
 //==============================================================================
@@ -241,6 +277,9 @@ void SketchProperties::resized()
     blankAfterLabel->setBounds (16, 272, getWidth() - 32, 12);
     blankAfter->setBounds (16, 288, getWidth() - 32, 24);
     selectColorButton->setBounds (getBounds().getCentreX() - 10, 320, 20, 20);
+    centerButton->setBounds (82, 348, 32, 32);
+    centerXButton->setBounds (118, 348, 32, 32);
+    centerYButton->setBounds (154, 348, 32, 32);
 }
 
 //==============================================================================
@@ -256,6 +295,12 @@ void SketchProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->setActiveSketchTool (FrameEditor::sketchEllipseTool);
     else if (buttonThatWasClicked == penToolButton.get())
         frameEditor->setActiveSketchTool (FrameEditor::sketchPenTool);
+    else if (buttonThatWasClicked == centerButton.get())
+        frameEditor->centerSketchSelected (true, true, false);
+    else if (buttonThatWasClicked == centerXButton.get())
+        frameEditor->centerSketchSelected (false, true, false);
+    else if (buttonThatWasClicked == centerYButton.get())
+        frameEditor->centerSketchSelected (true, false, false);
 }
 
 //==============================================================================
@@ -422,7 +467,9 @@ void SketchProperties::updateSelection()
         blankAfter->setEnabled (false);
         selectColorButton->setEnabled (false);
         selectColorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
-
+        centerButton->setEnabled (false);
+        centerXButton->setEnabled (false);
+        centerYButton->setEnabled (false);
     }
     else
     {
@@ -463,10 +510,10 @@ void SketchProperties::updateSelection()
         {
             float frameRate = (float)frameEditor->getScanRate() / (float)p;
             
-            if (frameRate < 15.0)
-                pointsLabel->setColour (Label::textColourId, juce::Colours::yellow);
-            else if (frameRate < 10.0)
+            if (frameRate < 10.0)
                 pointsLabel->setColour (Label::textColourId, juce::Colours::red);
+            else if (frameRate < 15.0)
+                pointsLabel->setColour (Label::textColourId, juce::Colours::yellow);
             else
                 pointsLabel->setColour (Label::textColourId, juce::Colours::white);
             
@@ -519,7 +566,10 @@ void SketchProperties::updateSelection()
         blankBefore->setText (mbb ? "*" : String (lastPath.getBlankedPointsBeforeStart()), dontSendNotification);
         blankAfter->setText (mba ? "*" : String (lastPath.getBlankedPointsAfterEnd()), dontSendNotification);
         selectColorButton->setColour (TextButton::buttonColourId, mc ? Colours::transparentBlack : lastPath.getColor());
-
+        
+        centerButton->setEnabled (true);
+        centerXButton->setEnabled (true);
+        centerYButton->setEnabled (true);
     }
 }
 

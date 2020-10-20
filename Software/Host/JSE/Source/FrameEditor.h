@@ -322,6 +322,8 @@ public:
     void setSketchSelectedBlankingBefore (uint16 points);
     void setSketchSelectedBlankingAfter (uint16 points);
     void setSketchSelectedColor (const Colour& color);
+    
+    bool centerSketchSelected (bool doX = true, bool doY = true, bool constrain = true);
 
     // Destructive Version (invoked by UndoManager)
     void _setLoadedFile (const File& file) { loadedFile = file; }

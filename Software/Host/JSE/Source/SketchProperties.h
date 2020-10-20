@@ -82,6 +82,12 @@ private:
     std::unique_ptr<Label> blankAfterLabel;
     std::unique_ptr<TextEditor> blankAfter;
     std::unique_ptr<ColourButton> selectColorButton;
+    std::unique_ptr<Drawable> centerIcon;
+    std::unique_ptr<DrawableButton> centerButton;
+    std::unique_ptr<Drawable> centerXIcon;
+    std::unique_ptr<DrawableButton> centerXButton;
+    std::unique_ptr<Drawable> centerYIcon;
+    std::unique_ptr<DrawableButton> centerYButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SketchProperties)
 };

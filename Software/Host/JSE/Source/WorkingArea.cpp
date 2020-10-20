@@ -1024,11 +1024,20 @@ void WorkingArea::paint (juce::Graphics& g)
             bool doubleline = (selected || (drawSMark && (sMarkIndex == n)));
             
             Colour c = path.getColor();
+            Path p = path.getPath();
+            
             if (c == Colours::black)
+            {
+                float dashes[] = { selectSize, selectSize };
                 c = Colours::darkgrey;
+                
+                Path dp;
+                PathStrokeType(1).createDashedStroke(dp, p, dashes, numElementsInArray(dashes));
+                p = dp;
+            }
             
             g.setColour (c);
-            g.strokePath (path.getPath(), PathStrokeType (doubleline ? 2 * activeInvScale : activeInvScale));
+            g.strokePath (p, PathStrokeType (doubleline ? 2 * activeInvScale : activeInvScale));
             
             for (auto i = 0; i < path.getAnchorCount(); ++i)
             {
