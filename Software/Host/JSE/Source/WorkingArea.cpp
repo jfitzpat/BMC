@@ -468,6 +468,8 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
                     repaint (lastSMarkRect);
                 
                 Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                Rectangle<float> u(pos, nearest);
+                r = r.getUnion (u);
                 r.expand (15 * activeInvScale, 15 * activeInvScale);
                 lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
                 
@@ -492,6 +494,8 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
                     repaint (lastSMarkRect);
                 
                 Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                Rectangle<float> u(pos, nearest);
+                r = r.getUnion (u);
                 r.expand (15 * activeInvScale, 15 * activeInvScale);
                 lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
                 
@@ -1125,12 +1129,11 @@ void WorkingArea::paint (juce::Graphics& g)
             IPath path = frameEditor->getIPath (n);
             bool selected = frameEditor->getIPathSelection().contains (n);
             int markedAnchor = -1;
-            int control = -1;
+            int control = frameEditor->getIPathSelection().getControl();
+
             if (selected)
-            {
                 markedAnchor = frameEditor->getIPathSelection().getAnchor();
-                control = frameEditor->getIPathSelection().getControl();
-            }
+
             bool doubleline = (selected || (drawSMark && (sMarkIndex == n)));
             
             Colour c = path.getColor();
