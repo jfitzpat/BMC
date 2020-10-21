@@ -42,7 +42,7 @@ namespace BinaryData
     const int            duplicatewhite_pngSize = 2727;
 
     extern const char*   ellipse_png;
-    const int            ellipse_pngSize = 1953;
+    const int            ellipse_pngSize = 2157;
 
     extern const char*   gradient_png;
     const int            gradient_pngSize = 2098;

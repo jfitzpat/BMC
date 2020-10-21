@@ -38,21 +38,21 @@ public:
     void setX (int x) { xPosition = x; }
     int getY() const { return yPosition; }
     void setY (int y) { yPosition = y; }
-    void getPosition  (int& x, int& y) { x = xPosition; y = yPosition; }
+    void getPosition  (int& x, int& y) const { x = xPosition; y = yPosition; }
     void setPosition (int x, int y) { xPosition = x; yPosition = y; }
-    int getEntryXDelta()  { return entryXDelta; }
+    int getEntryXDelta() const { return entryXDelta; }
     void setEntryXDelta (int x) { entryXDelta = x; }
-    int getEntryYDelta()  { return entryYDelta; }
+    int getEntryYDelta() const { return entryYDelta; }
     void setEntryYDelta (int y) { entryYDelta = y; }
-    void getEntryPosition  (int& x, int& y) { x = xPosition + entryXDelta;
+    void getEntryPosition  (int& x, int& y) const { x = xPosition + entryXDelta;
                                                    y = yPosition + entryYDelta; }
     void setEntryPosition (int x, int y) { entryXDelta = x - xPosition;
                                            entryYDelta = y - yPosition; }
-    int getExitXDelta()  { return exitXDelta; }
+    int getExitXDelta() const { return exitXDelta; }
     void setExitXDelta (int x) { exitXDelta = x; }
-    int getExitYDelta()  { return exitYDelta; }
+    int getExitYDelta()  const { return exitYDelta; }
     void setExitYDelta (int y) { exitYDelta = y;}
-    void getExitPosition  (int& x, int& y) { x = xPosition + exitXDelta;
+    void getExitPosition (int& x, int& y) const { x = xPosition + exitXDelta;
                                                   y = yPosition + exitYDelta; }
     void setExitPosition (int x, int y) { exitXDelta = x - xPosition;
                                           exitYDelta = y - yPosition; }

@@ -83,6 +83,29 @@ void WorkingArea::insertAnchor (uint16 index, Colour c)
     frameEditor->insertPoint (point);
 }
 
+void WorkingArea::mouseDownSketchPen (const MouseEvent& event)
+{
+    if (drawSDot && (sDotIndex == -1))
+        frameEditor->insertPath (sDotAt);
+    else if (drawSDot)
+    {
+        Anchor a = frameEditor->getIPath (sDotIndex).getAnchor (sDotFrom);
+        if (a.getExitXDelta() != 0 || a.getExitYDelta() != 0)
+        {
+            if (event.getPosition().getDistanceFrom (Point<int>(a.getX(), a.getY())) <= (int)(3 * activeInvScale))
+            {
+                drawSDot = false;
+                sDotIndex = -1;
+                sDotFrom = -1;
+                frameEditor->zeroExitControl();
+                return;
+            }
+        }
+        
+        frameEditor->insertAnchor (sDotAt);
+    }
+}
+
 void WorkingArea::mouseDownSketchMove (const MouseEvent& event)
 {
     // Left mouse only for now
@@ -314,6 +337,8 @@ void WorkingArea::mouseDown (const MouseEvent& event)
             mouseDownSketchSelect (event);
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
             mouseDownSketchMove (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchPenTool)
+            mouseDownSketchPen (event);
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchEllipseTool)
             mouseDownSketchEllipse (event);
     }
@@ -440,10 +465,85 @@ void WorkingArea::mouseMoveSketchMove (const MouseEvent& event)
 
 void WorkingArea::mouseMoveSketchPen (const MouseEvent& event)
 {
-    mouseMoveSketchSelect (event);
+    if (drawSDot)
+        repaint (lastSDotRect);
+
+    if (frameEditor->getIPathSelection().getAnchor() == -1)
+    {
+        sDotFrom = -1;
+        sDotIndex = -1;
+    }
+    else
+    {
+        sDotIndex = frameEditor->getIPathSelection().getRange(0).getStart();
+        sDotFrom = frameEditor->getIPathSelection().getAnchor();
+    }
+
+    int x = event.x;
+    int y = event.y;
+    
+    // Ctrl snaps to nearest anchor (if one)
+    // Shift forces to nearest 45 degree angle
+    if (event.mods.isCtrlDown())
+    {
+        for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
+        {
+            IPath path = frameEditor->getIPath (n);
+            for (auto i = 0; i < path.getAnchorCount(); ++i)
+            {
+                int ax, ay;
+                path.getAnchor (i).getPosition (ax, ay);
+                if (event.getPosition().getDistanceFrom (Point<int>(ax, ay)) <= (int)(3 * activeInvScale))
+                {
+                    x = ax;
+                    y = ay;
+                    break;
+                }
+            }
+        }
+    }
+    else if (event.mods.isShiftDown() && (sDotIndex != -1))
+    {
+        // Since 45 dgrees is tan 1, could probably
+        // do this more efficiently with two distances and ratio
+        // but this is easy...
+        Anchor a = frameEditor->getIPath (sDotIndex).getAnchor (sDotFrom);
+        Point<int> p = Point<int> (a.getX(), a.getY());
+        float angle = p.getAngleToPoint (Point<int>(x, y));
+        
+        float absA = abs(angle);
+        
+        if ((absA >= 0.0f && absA < 0.3926991f) ||
+            (abs(angle) >= 2.7488936f && abs(angle) < 3.15f))
+            x = p.getX();   // Force vertical
+        else if (absA >= 0.3926991f && absA < 1.178097f)
+            y = p.y - p.getDistanceFrom (Point<int>(x, p.getY()));  // 45 up
+        else if (absA >= 1.178097f && absA < 1.9634954f )
+            y = p.getY();   // Force horizontal
+        else if (absA >= 1.9634954f && absA < 2.7488936f)
+            y = p.y + p.getDistanceFrom (Point<int>(x, p.getY()));  // 45 down
+    }
+    
+    sDotAt = Point<int> (x, y);
+    
+    // Build a new rectange
+    if (sDotIndex == -1)
+    {
+        lastSDotRect = Rectangle<int> (x - (int)(3 * activeInvScale), y - (int)(3 * activeInvScale), (int)(6 * activeInvScale), (int)(6 * activeInvScale));
+    }
+    else
+    {
+        sDotPath = frameEditor->getIPath (sDotIndex);
+        sDotPath.insertAnchor (sDotFrom + 1, Anchor (sDotAt.getX(), sDotAt.getY()));
+        Rectangle<float> r = sDotPath.getPath().getBounds().expanded (6 * activeInvScale);
+        lastSDotRect = Rectangle<int> ((int)r.getX(), (int)r.getY(),
+                                       (int)r.getWidth(), (int)r.getHeight());
+    }
+    drawSDot = true;
+    repaint (lastSDotRect);
 }
 
-void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
+void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event, bool testControls)
 {
     Point<float> pos ((float)event.x, (float)event.y);
     
@@ -451,64 +551,66 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
     
     // If we already have a selected anchor, offer opporutnity
     // to select controls
-    if ((!selection.isEmpty()) && (selection.getAnchor() != -1))
+    if (testControls)
     {
-        Anchor a = frameEditor->getIPath (selection.getRange(0).getStart()).getAnchor (selection.getAnchor());
-        
-        if (a.getEntryXDelta() || a.getEntryYDelta())
+        if ((!selection.isEmpty()) && (selection.getAnchor() != -1))
         {
-            int x, y;
-            a.getEntryPosition (x, y);
-            Point<float> nearest ((float)x, (float) y);
+            Anchor a = frameEditor->getIPath (selection.getRange(0).getStart()).getAnchor (selection.getAnchor());
             
-            float distance = pos.getDistanceFrom (nearest);
-            if (abs(distance) <= (3* activeInvScale))
+            if (a.getEntryXDelta() || a.getEntryYDelta())
             {
-                if (drawSMark)
+                int x, y;
+                a.getEntryPosition (x, y);
+                Point<float> nearest ((float)x, (float) y);
+                
+                float distance = pos.getDistanceFrom (nearest);
+                if (abs(distance) <= (3* activeInvScale))
+                {
+                    if (drawSMark)
+                        repaint (lastSMarkRect);
+                    
+                    Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                    Rectangle<float> u(pos, nearest);
+                    r = r.getUnion (u);
+                    r.expand (15 * activeInvScale, 15 * activeInvScale);
+                    lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                    
+                    drawSMark = true;
+                    sMarkIndex = selection.getRange(0).getStart();
+                    sMarkAnchorIndex = selection.getAnchor();
+                    sMarkControlIndex = 1;
                     repaint (lastSMarkRect);
-                
-                Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
-                Rectangle<float> u(pos, nearest);
-                r = r.getUnion (u);
-                r.expand (15 * activeInvScale, 15 * activeInvScale);
-                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
-                
-                drawSMark = true;
-                sMarkIndex = selection.getRange(0).getStart();
-                sMarkAnchorIndex = selection.getAnchor();
-                sMarkControlIndex = 1;
-                repaint (lastSMarkRect);
-                return;
+                    return;
+                }
             }
-        }
-        if (a.getExitXDelta() || a.getExitYDelta())
-        {
-            int x, y;
-            a.getExitPosition (x, y);
-            Point<float> nearest ((float)x, (float) y);
-            
-            float distance = pos.getDistanceFrom (nearest);
-            if (abs(distance) <= (3* activeInvScale))
+            if (a.getExitXDelta() || a.getExitYDelta())
             {
-                if (drawSMark)
+                int x, y;
+                a.getExitPosition (x, y);
+                Point<float> nearest ((float)x, (float) y);
+                
+                float distance = pos.getDistanceFrom (nearest);
+                if (abs(distance) <= (3* activeInvScale))
+                {
+                    if (drawSMark)
+                        repaint (lastSMarkRect);
+                    
+                    Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                    Rectangle<float> u(pos, nearest);
+                    r = r.getUnion (u);
+                    r.expand (15 * activeInvScale, 15 * activeInvScale);
+                    lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                    
+                    drawSMark = true;
+                    sMarkIndex = selection.getRange(0).getStart();
+                    sMarkAnchorIndex = selection.getAnchor();
+                    sMarkControlIndex = 2;
                     repaint (lastSMarkRect);
-                
-                Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
-                Rectangle<float> u(pos, nearest);
-                r = r.getUnion (u);
-                r.expand (15 * activeInvScale, 15 * activeInvScale);
-                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
-                
-                drawSMark = true;
-                sMarkIndex = selection.getRange(0).getStart();
-                sMarkAnchorIndex = selection.getAnchor();
-                sMarkControlIndex = 2;
-                repaint (lastSMarkRect);
-                return;
+                    return;
+                }
             }
         }
     }
-    
     
     int n;
     for (n = 0; n < frameEditor->getIPathCount(); ++n)
@@ -902,6 +1004,14 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
         
         frameEditor->translateSketchSelected (dx, dy, false);
     }
+    else if (frameEditor->getActiveLayer() == FrameEditor::sketch &&
+             frameEditor->getSketchVisible() &&
+             frameEditor->getActiveSketchTool() == FrameEditor::sketchPenTool &&
+             (sDotIndex != -1))
+    {
+        if (! event.mods.isAnyModifierKeyDown())
+            frameEditor->insertControls (event.getPosition());
+    }
 }
 
 void WorkingArea::paint (juce::Graphics& g)
@@ -1126,7 +1236,13 @@ void WorkingArea::paint (juce::Graphics& g)
     {
         for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
         {
-            IPath path = frameEditor->getIPath (n);
+            IPath path;
+            
+            if (drawSDot && (sDotIndex == n))
+                path = sDotPath;
+            else
+                path = frameEditor->getIPath (n);
+            
             bool selected = frameEditor->getIPathSelection().contains (n);
             int markedAnchor = -1;
             int control = frameEditor->getIPathSelection().getControl();
@@ -1211,6 +1327,13 @@ void WorkingArea::paint (juce::Graphics& g)
                 g.fillRect (a.getX() - halfDotSize, a.getY() - halfDotSize,
                             dotSize, dotSize);
             }
+        }
+        
+        if (drawSDot && (sDotIndex == -1))
+        {
+            g.setColour (frameEditor->getSketchToolColor());
+            g.fillRect (sDotAt.getX() - halfDotSize, sDotAt.getY() - halfDotSize,
+                        dotSize, dotSize);
         }
     }
 

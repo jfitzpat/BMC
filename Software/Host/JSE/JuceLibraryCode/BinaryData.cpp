@@ -257,18 +257,19 @@ const char* duplicatewhite_png = (const char*) temp_binary_data_10;
 static const unsigned char temp_binary_data_11[] =
 "\x89PNG\r\n"
 "\x1a\n"
-"\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x17g\0\0\x17g\x01n8\xc3\x93\0\0\x05\xf7iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:"
-"xmptk=\"Adobe XMP Core 6.0-c002 79.164460, 2020/05/12-16:04:17        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:xmpMM=\"http://ns.adobe.com"
-"/xap/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmp:CreatorTool=\"Adobe Photoshop 21.2 (Macintosh)\" xmp:CreateDate=\""
-"2020-10-14T11:24:06-07:00\" xmp:MetadataDate=\"2020-10-14T11:24:06-07:00\" xmp:ModifyDate=\"2020-10-14T11:24:06-07:00\" xmpMM:InstanceID=\"xmp.iid:f0b058c6-3b56-4747-83e7-e68edb8563fd\" xmpMM:DocumentID=\"adobe:docid:photoshop:3ca97797-74fb-724d-9794"
-"-515af6bb893c\" xmpMM:OriginalDocumentID=\"xmp.did:781fc3bf-7586-4ecd-b507-e22d7c61a941\" dc:format=\"image/png\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\"> <xmpMM:History> <rdf:Seq> <rdf:li stEvt:action=\"created\" stEvt:i"
-"nstanceID=\"xmp.iid:781fc3bf-7586-4ecd-b507-e22d7c61a941\" stEvt:when=\"2020-10-14T11:24:06-07:00\" stEvt:softwareAgent=\"Adobe Photoshop 21.2 (Macintosh)\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:f0b058c6-3b56-4747-83e7-e68edb856"
-"3fd\" stEvt:when=\"2020-10-14T11:24:06-07:00\" stEvt:softwareAgent=\"Adobe Photoshop 21.2 (Macintosh)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\xc9\x84\xf7\xde\0\0\x01PIDATH\xc7"
-"\xed\xd5?/\x04""A\x18\xc7\xf1\x9b\x8d\x84[\xd4\x87""FD\xa9\x14\xf6\"\x1b\xb9""D$\xf4:/`\xc5{Py\t\x17j\xa1\x92\xe8\x94\xe2""4\"\xf1\xef:Z\x1d""9-\x0e\tY\xdf=\xcf$c\x82\x1dvWe\x92Os;\xf3{.\x99\x99gT\x1c\xc7\xa5\"\x87W*x\x14^\xa0+\xe5\xfb\x08\x16\x10""b"
-"\x0c\x03\xe8""E\x1b""7\xb8\xc0!vp\xf5Y\x80\xfa""b\x0f&\xb0\x8aY\t;\xc1""9Z\xb8""C?*\x18\xc7$|\xec""a\x05\xa7\x1f\x92\x92\x02\x86n\xd4\xf1\x8a&\x16Q\xb6\xe6\xd8\xca""2\xaf)\xeb\xea\x92\xd3\xf9nN\xec\xc1>\xda\x88\xe0\xa5\x04\xdb<Y\xf7\x80\x86\xfe""c\xe6"
-"\x84""5<\"\xfc""a\xb0-\x94\x9cu\xb3@\x10\xbf\x8f\xe5\x8c\xe1Z$y\x81\xde\xe4-Lc\x14/9\x9cN\x85K\x9c\xe9{0\x85\xed\x9c\xc2;g\x07\xbb\x98\xd1\x05\x86p\xeb\xb8\xd0\xb5\xb7$G\xba\xa2\x0b\\c8\xe7K\x9c\xe4\xb5t\x81#\xcc""9\xb4\x0e%\\Z\xd0<\x1az\xd7\xab\xb2\xeb"
-"Q\xce\xa7\xa8j\xfe\xb8!\xe7\xb7\x96""1\xbc&9\x9b\xf6""E\xf3q\x80',\xfd\xf2&'\xeb\x9e%\xc7\xb7\x0b\x14\xd2\x8b\\\xbb\xe9\xb1\xd1M\xef\xd1gt\xd3\xe0\xbbn\xaaR\x9eL\xfb=\x18\x94\xb0\xcc\xef\xc1\xff\x9b\xfcw\x05\xde\0\xd9]\x9d\x08\xa1t\\\xb9\0\0\0\0IEND\xae"
-"B`\x82";
+"\0\0\0\rIHDR\0\0\0\x18\0\0\0\x18\x08\x06\0\0\0\xe0w=\xf8\0\0\0\tpHYs\0\0\x17`\0\0\x17`\x01<|e\xec\0\0\x06\xc6iTXtXML:com.adobe.xmp\0\0\0\0\0<?xpacket begin=\"\xef\xbb\xbf\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmp"
+"tk=\"Adobe XMP Core 6.0-c002 79.164460, 2020/05/12-16:04:17        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmlns:xmpMM=\"http://ns.adobe.com/xa"
+"p/1.0/mm/\" xmlns:stEvt=\"http://ns.adobe.com/xap/1.0/sType/ResourceEvent#\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:photoshop=\"http://ns.adobe.com/photoshop/1.0/\" xmp:CreatorTool=\"Adobe Photoshop 21.2 (Macintosh)\" xmp:CreateDate=\"20"
+"20-10-14T11:24:06-07:00\" xmp:MetadataDate=\"2020-10-21T12:40:20-07:00\" xmp:ModifyDate=\"2020-10-21T12:40:20-07:00\" xmpMM:InstanceID=\"xmp.iid:17d96c32-eb2a-4211-ae43-1ae822641555\" xmpMM:DocumentID=\"adobe:docid:photoshop:3ca97797-74fb-724d-9794-5"
+"15af6bb893c\" xmpMM:OriginalDocumentID=\"xmp.did:781fc3bf-7586-4ecd-b507-e22d7c61a941\" dc:format=\"image/png\" photoshop:ColorMode=\"3\" photoshop:ICCProfile=\"sRGB IEC61966-2.1\"> <xmpMM:History> <rdf:Seq> <rdf:li stEvt:action=\"created\" stEvt:ins"
+"tanceID=\"xmp.iid:781fc3bf-7586-4ecd-b507-e22d7c61a941\" stEvt:when=\"2020-10-14T11:24:06-07:00\" stEvt:softwareAgent=\"Adobe Photoshop 21.2 (Macintosh)\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:f0b058c6-3b56-4747-83e7-e68edb8563f"
+"d\" stEvt:when=\"2020-10-14T11:24:06-07:00\" stEvt:softwareAgent=\"Adobe Photoshop 21.2 (Macintosh)\" stEvt:changed=\"/\"/> <rdf:li stEvt:action=\"saved\" stEvt:instanceID=\"xmp.iid:17d96c32-eb2a-4211-ae43-1ae822641555\" stEvt:when=\"2020-10-21T12:40"
+":20-07:00\" stEvt:softwareAgent=\"Adobe Photoshop 21.2 (Macintosh)\" stEvt:changed=\"/\"/> </rdf:Seq> </xmpMM:History> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\x99p\x92o\0\0\x01MIDATH\xc7\xed\xd5=/\x04""A\x1c\xc7\xf1\xdb\x8d\x84"
+"[\xd4\x87""FD\xa9\x14\xf6\"\x1b\xb9""D$\xf4:/`\xc5{Py\t\x17j\xa1\x92\xe8\x94\xe2""4\"\xf1t\x1d\xad\x8e\x9c\x16\x87\x84\xac\xef\x9c\xff$c\x82\x1dvWe\x92O\xb3;\xf3\xfbO2O^\x92$\xa5\"\x9b_*\xb8\x15^\xa0+\xe5\xff\x08\x16\x10""a\x0c\x03\xe8""E\x1b""7\xb8\xc0"
+"!vp\xf5Y\x80\xf7\xc5\x1aL`\x15\xb3\x12v\x82s\xb4p\x87~T0\x8eI\x04\xd8\xc3\n"
+"N?$\xa9\x02\x86n\xd4\xf1\x8a&\x16Q\xb6\xfa\xd8\xca\xd2\xaf)\xe3\xea\x92\xd3\xf9ov\xec\xc1>\xda\x88\xe1\xa7\x04\xdb|\x19\xf7\x80\x86\x9e\x98\xd9""a\r\x8f\x88~\x18l\x8b$g\xdd,\x10&\xefm9c\xb8\x16K^\xa8\x17y\x0b\xd3\x18\xc5K\x0e\xbb\xd3\xc3%\xce\xf4""9\x98"
+"\xc2vN\xe1\x9d\xbd\x83]\xcc\xe8\x02""C\xb8u\x9c\x99kS[\xba\xa2\x0b\\c\xd8qf\xaeM\xe5\xb5t\x81#\xcc\xe5xu\xa8\x9cy4\xf4\xaaWe\xd5\xe3\x9cwQ\xd5\xfc\xb8!\xfb\xb7\x96""1\xbc&9\x9b\xf6""A\x0bp\x80',\xfd\xf2$\xabq\xcf\x92\x13\xd8\x05\n"
+"\xb9\x8b\\o\xd3""c\xe3""6\xbdG\x9fq\x9b\x86\xdf\xdd\xa6^\xca\x93i\xbf\x07\x83\x12\x96\xf9=\xf8\x7f\x93\xff\xae\xc0\x1b\xc0\xf7\x9c\x08\x84u'\x9c\0\0\0\0IEND\xae""B`\x82";
 
 const char* ellipse_png = (const char*) temp_binary_data_11;
 
@@ -704,7 +705,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0xc67757df:  numBytes = 2173; return croshair_png;
         case 0x4c7962b1:  numBytes = 2538; return downwhite_png;
         case 0x7ff4a068:  numBytes = 2727; return duplicatewhite_png;
-        case 0xe423de48:  numBytes = 1953; return ellipse_png;
+        case 0xe423de48:  numBytes = 2157; return ellipse_png;
         case 0x1d55c09a:  numBytes = 2098; return gradient_png;
         case 0x8aee96ed:  numBytes = 2204; return gradient3_png;
         case 0xf9cbccbb:  numBytes = 2156; return move_png;

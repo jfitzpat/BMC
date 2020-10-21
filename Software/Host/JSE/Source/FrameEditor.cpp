@@ -50,46 +50,7 @@ FrameEditor::FrameEditor()
       tranformInProgress (false)
 {
     Frames.add (new Frame());
-    currentFrame = Frames[frameIndex];
-    
-    // !!!!
-    IPath p;
-    
-    p.addAnchor (Anchor (10000, 50000, 3000, 3000, 3000, -3000));
-    p.addAnchor (Anchor (50000, 50000, -3000, -3000, 3000, -3000));
-    p.addAnchor (Anchor (50000, 10000, 3000, 3000, -3000, -3000));
-    p.addAnchor (Anchor (10000, 10000));
-    p.addAnchor (Anchor (10000, 50000));
-
-    currentFrame->addPath (p);
-
-    p.clearAllAnchors();
-    p.addAnchor (Anchor (30000, 40000, 3000, 3000, 3000, -3000));
-    p.addAnchor (Anchor (40000, 40000, -3000, -3000, 3000, -3000));
-    p.addAnchor (Anchor (20000, 30000, 3000, 3000, -3000, -3000));
-    p.setColor (Colours::red);
-
-    currentFrame->addPath (p);
-
-    p.clearAllAnchors();
-    p.addAnchor (Anchor (10000, 30000, 3000, 3000, 3000, -3000));
-    p.addAnchor (Anchor (30000, 30000, -3000, -3000, 3000, -3000));
-    p.addAnchor (Anchor (10000, 20000, 3000, 3000, -3000, -3000));
-    p.setColor (Colours::blue);
-
-    currentFrame->addPath (p);
-
-    p.clearAllAnchors();
-    p.addAnchor (Anchor (12000, 48000, 3000, 3000, 3000, -3000));
-    p.addAnchor (Anchor (46000, 46000, -3000, -3000, 3000, -3000));
-    p.addAnchor (Anchor (46000, 12000, 3000, 3000, -3000, -3000));
-    p.addAnchor (Anchor (17000, 13000));
-    p.addAnchor (Anchor (12000, 47000));
-    p.setColor (Colours::orange);
-
-    currentFrame->addPath (p);
-
-    //selectedAnchor = 1;
+    currentFrame = Frames[frameIndex];    
 }
 
 FrameEditor::~FrameEditor()
@@ -1254,7 +1215,7 @@ void FrameEditor::deleteAnchor()
     perform (new UndoableDeleteAnchor (this, selection));
 }
 
-void FrameEditor::insertEllipsePath (Rectangle<int>& rect)
+int FrameEditor::insertEllipsePath (Rectangle<int>& rect)
 {
     const double kappa = .5522848;
     double ox = (double)rect.getWidth() / 2.0 * kappa;
@@ -1293,10 +1254,118 @@ void FrameEditor::insertEllipsePath (Rectangle<int>& rect)
     Array<IPath> array;
     array.add (path);
     IPathSelection selection;
-    selection.addRange (Range<uint16> (getIPathCount(), getIPathCount() + 1));
+    int index = getIPathCount();
+    selection.addRange (Range<uint16> (index, index + 1));
     perform (new UndoableAddPaths (this, array));
     perform (new UndoableSetIPathSelection (this, selection));
+    
+    return index;
 }
+
+int FrameEditor::insertPath (Point<int> firstAnchor)
+{
+    IPath path;
+    path.setColor (sketchToolColor);
+    path.addAnchor (Anchor (firstAnchor.getX(), firstAnchor.getY()));
+
+    beginNewTransaction ("New Shape");
+    Array<IPath> array;
+    array.add (path);
+    IPathSelection selection;
+    int index = getIPathCount();
+    selection.addRange (Range<uint16> (index, index + 1));
+    selection.setAnchor (0);
+    perform (new UndoableAddPaths (this, array));
+    perform (new UndoableSetIPathSelection (this, selection));
+    
+    return index;
+}
+
+int FrameEditor::insertAnchor (Point<int> location)
+{
+    int aIndex = iPathSelection.getAnchor();
+    if (aIndex == -1)
+        return -1;
+    
+    int pIndex = iPathSelection.getRange(0).getStart();
+    IPath path = currentFrame->getIPath (pIndex);
+    path.insertAnchor (aIndex + 1, Anchor (location.getX(), location.getY()));
+    
+    IPathSelection selection;
+    selection.addRange (Range<uint16> (pIndex, pIndex + 1));
+    
+    beginNewTransaction ("New Anchor");
+    Array<IPath> paths;
+    paths.add (path);
+    perform (new UndoableSetPaths (this, selection, paths));
+
+    selection.setAnchor (aIndex + 1);
+    perform (new UndoableSetIPathSelection (this, selection));
+    
+    return aIndex + 1;
+}
+
+void FrameEditor::zeroExitControl()
+{
+    int aIndex = iPathSelection.getAnchor();
+    if (aIndex == -1)
+        return;
+
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+
+    IPath* path = &paths.getReference (0);
+    Anchor a = path->getAnchor (aIndex);
+
+    a.setExitXDelta(0);
+    a.setExitYDelta(0);
+    path->setAnchor (aIndex, a);
+
+    beginNewTransaction ("Zero Exit Control");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::insertControls (Point<int> location)
+{
+    int aIndex = iPathSelection.getAnchor();
+    if (aIndex == -1)
+        return;
+
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+
+    IPath* path = &paths.getReference (0);
+    Anchor a = path->getAnchor (aIndex);
+    
+    int x, y;
+    a.getPosition (x, y);
+    Point<int> position (x, y);
+    
+    double angle = location.getAngleToPoint (position);
+    int distance = location.getDistanceFrom (position);
+    
+    if (distance == 0)
+        return;
+    
+    Line<double> l = Line<double>::fromStartAndAngle (position.toDouble(), abs((double)distance), angle);
+    
+    Point<double> entry = l.getEnd();
+    
+    a.setEntryPosition (entry.toInt().getX(), entry.toInt().getY());
+    a.setExitPosition (location.getX(), location.getY());
+    path->setAnchor (aIndex, a);
+    
+    if (getCurrentTransactionName() == "Insert Controls")
+        undoCurrentTransactionOnly();
+
+    beginNewTransaction ("Insert Controls");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
 
 void FrameEditor::setIPathSelection (const IPathSelection& selection)
 {

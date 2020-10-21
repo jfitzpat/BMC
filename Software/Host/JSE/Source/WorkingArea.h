@@ -76,7 +76,7 @@ private:
     void mouseMoveIldaSelect (const MouseEvent& event);
     void mouseMoveIldaMove (const MouseEvent& event);
     void mouseMoveIldaPoint (const MouseEvent& event);
-    void mouseMoveSketchSelect (const MouseEvent& event);
+    void mouseMoveSketchSelect (const MouseEvent& event, bool testControls = true);
     void mouseMoveSketchMove (const MouseEvent& event);
     void mouseMoveSketchPen (const MouseEvent& event);
 
@@ -108,8 +108,9 @@ private:
     
     bool drawSDot;
     Point<int> sDotAt;
+    int sDotIndex;
     int sDotFrom;
-    int sDotTo;
+    IPath sDotPath;
     Rectangle<int> lastSDotRect;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WorkingArea)

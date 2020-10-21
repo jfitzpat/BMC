@@ -65,7 +65,7 @@ void IPath::buildPath()
             Anchor next = getAnchor (i);
 
             if (last.getExitXDelta() == 0 && last.getExitYDelta() == 0 &&
-                next.getExitXDelta() == 0 && next.getExitYDelta() == 0)
+                next.getEntryXDelta() == 0 && next.getEntryYDelta() == 0)
                 path.lineTo ((float)next.getX(), (float)next.getY());
             else
             {
