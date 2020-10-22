@@ -1298,7 +1298,8 @@ void WorkingArea::paint (juce::Graphics& g)
             else
                 path = frameEditor->getIPath (n);
             
-            bool selected = frameEditor->getIPathSelection().contains (n);
+            bool selected = frameEditor->getIPathSelection().contains (n) &&
+                            frameEditor->getActiveLayer() == FrameEditor::sketch;
             int markedAnchor = -1;
             int control = frameEditor->getIPathSelection().getControl();
 

@@ -86,7 +86,12 @@ public:
         blankingToggleRequest,
         cycleColorsRequest,
         selectionDownRequest,
-        selectionUpRequest
+        selectionUpRequest,
+        pointPenToolRequest,
+        moveToolRequest,
+        selectToolRequest,
+        lineToolRequest,
+        rectToolRequest,
     };
 
     //==============================================================================

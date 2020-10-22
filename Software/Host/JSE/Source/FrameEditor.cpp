@@ -36,7 +36,7 @@ FrameEditor::FrameEditor()
       activeIldaTool (selectTool),
       pointToolColor (Colours::white),
       lastVisiblePointToolColor (Colours::white),
-      activeSketchTool (sketchPenTool),
+      activeSketchTool (sketchLineTool),
       sketchToolColor (Colours::white),
       lastVisibleSketchToolColor (Colours::white),
       sketchVisible (true),

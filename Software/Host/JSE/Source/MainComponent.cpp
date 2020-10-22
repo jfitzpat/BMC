@@ -174,6 +174,15 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
             menu.addSeparator();
             menu.addCommandItem (&commandManager, CommandIDs::blankingToggleRequest);
             menu.addCommandItem (&commandManager, CommandIDs::cycleColorsRequest);
+            menu.addSeparator();
+            menu.addCommandItem (&commandManager, CommandIDs::selectToolRequest);
+            menu.addCommandItem (&commandManager, CommandIDs::moveToolRequest);
+            menu.addCommandItem (&commandManager, CommandIDs::pointPenToolRequest);
+        }
+        if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+        {
+            menu.addCommandItem (&commandManager, CommandIDs::lineToolRequest);
+            menu.addCommandItem (&commandManager, CommandIDs::rectToolRequest);
         }
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::newFrame);
@@ -317,7 +326,12 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::blankingToggleRequest,
                                 CommandIDs::cycleColorsRequest,
                                 CommandIDs::selectionDownRequest,
-                                CommandIDs::selectionUpRequest };
+                                CommandIDs::selectionUpRequest,
+                                CommandIDs::pointPenToolRequest,
+                                CommandIDs::moveToolRequest,
+                                CommandIDs::selectToolRequest,
+                                CommandIDs::lineToolRequest,
+                                CommandIDs::rectToolRequest };
     
     c.addArray (commands);
 }
@@ -545,7 +559,45 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress ('[', 0);
             result.setActive (frameEditor->hasMovableSelection());
             break;
-
+        case CommandIDs::pointPenToolRequest:
+            result.setInfo (frameEditor->getActiveLayer() == FrameEditor::ilda ? "Point Tool" : "Pen Tool", "Select Point/Pen Tool", "Menu", 0);
+            result.addDefaultKeypress ('p', 0);
+            result.setActive (frameEditor->getActiveLayer() != FrameEditor::reference);
+            result.setTicked ((frameEditor->getActiveLayer() == FrameEditor::sketch &&
+                               frameEditor->getActiveSketchTool() == FrameEditor::sketchPenTool) ||
+                              (frameEditor->getActiveLayer() == FrameEditor::ilda &&
+                                                 frameEditor->getActiveIldaTool() == FrameEditor::pointTool));
+            break;
+        case CommandIDs::moveToolRequest:
+            result.setInfo ("Move Tool", "Select Move Tool", "Menu", 0);
+            result.addDefaultKeypress ('o', 0);
+            result.setActive (frameEditor->getActiveLayer() != FrameEditor::reference);
+            result.setTicked ((frameEditor->getActiveLayer() == FrameEditor::sketch &&
+                               frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool) ||
+                              (frameEditor->getActiveLayer() == FrameEditor::ilda &&
+                                                 frameEditor->getActiveIldaTool() == FrameEditor::moveTool));
+            break;
+        case CommandIDs::selectToolRequest:
+            result.setInfo ("Select Tool", "Select Selection Tool", "Menu", 0);
+            result.addDefaultKeypress ('i', 0);
+            result.setActive (frameEditor->getActiveLayer() != FrameEditor::reference);
+            result.setTicked ((frameEditor->getActiveLayer() == FrameEditor::sketch &&
+                               frameEditor->getActiveSketchTool() == FrameEditor::sketchSelectTool) ||
+                              (frameEditor->getActiveLayer() == FrameEditor::ilda &&
+                                                 frameEditor->getActiveIldaTool() == FrameEditor::selectTool));
+            break;
+        case CommandIDs::lineToolRequest:
+            result.setInfo ("Line Tool", "Select Line Tool", "Menu", 0);
+            result.addDefaultKeypress ('l', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch);
+            result.setTicked (frameEditor->getActiveSketchTool() == FrameEditor::sketchLineTool);
+            break;
+        case CommandIDs::rectToolRequest:
+            result.setInfo ("Rectangle Tool", "Select Rectangle Tool", "Menu", 0);
+            result.addDefaultKeypress ('k', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch);
+            result.setTicked (frameEditor->getActiveSketchTool() == FrameEditor::sketchRectTool);
+            break;
         default:
             break;
     }
@@ -760,6 +812,31 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::selectionDownRequest:
             frameEditor->adjustIldaSelection (-1);
+            break;
+            
+        case CommandIDs::pointPenToolRequest:
+            if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+                frameEditor->setActiveSketchTool (FrameEditor::sketchPenTool);
+            else
+                frameEditor->setActiveIldaTool (FrameEditor::pointTool);
+            break;
+        case CommandIDs::moveToolRequest:
+            if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+                frameEditor->setActiveSketchTool (FrameEditor::sketchMoveTool);
+            else
+                frameEditor->setActiveIldaTool (FrameEditor::moveTool);
+            break;
+        case CommandIDs::selectToolRequest:
+            if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+                frameEditor->setActiveSketchTool (FrameEditor::sketchSelectTool);
+            else
+                frameEditor->setActiveIldaTool (FrameEditor::selectTool);
+            break;
+        case CommandIDs::lineToolRequest:
+            frameEditor->setActiveSketchTool (FrameEditor::sketchLineTool);
+            break;
+        case CommandIDs::rectToolRequest:
+            frameEditor->setActiveSketchTool (FrameEditor::sketchRectTool);
             break;
     }
     return true;
