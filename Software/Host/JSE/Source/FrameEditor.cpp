@@ -708,7 +708,7 @@ void FrameEditor::loadFile (File& file)
     ReferenceCountedArray<Frame> frames;
     bool b = false;
     
-    if (file.getFileExtension() == ".ild")
+    if (file.getFileExtension().toLowerCase() == ".ild")
         b = IldaLoader::load (frames, file);
     else
         b = JSEFileLoader::load (frames, file);
@@ -746,7 +746,7 @@ void FrameEditor::loadFile()
         ReferenceCountedArray<Frame> frames;
         bool b = false;
         
-        if (f.getFileExtension() == ".ild")
+        if (f.getFileExtension().toLowerCase() == ".ild")
             b = IldaLoader::load (frames, f);
         else
             b = JSEFileLoader::load (frames, f);

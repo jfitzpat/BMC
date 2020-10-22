@@ -560,8 +560,7 @@ void WorkingArea::mouseMoveSketchPen (const MouseEvent& event)
         sDotPath = frameEditor->getIPath (sDotIndex);
         sDotPath.insertAnchor (sDotFrom + 1, Anchor (sDotAt.getX(), sDotAt.getY()));
         Rectangle<float> r = sDotPath.getPath().getBounds().expanded (6 * activeInvScale);
-        lastSDotRect = Rectangle<int> ((int)r.getX(), (int)r.getY(),
-                                       (int)r.getWidth(), (int)r.getHeight());
+        lastSDotRect = r.getSmallestIntegerContainer();
     }
     drawSDot = true;
     repaint (lastSDotRect);
@@ -595,7 +594,7 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
                 Rectangle<float> u(pos, nearest);
                 r = r.getUnion (u);
                 r.expand (15 * activeInvScale, 15 * activeInvScale);
-                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                lastSMarkRect = r.getSmallestIntegerContainer();
                 
                 drawSMark = true;
                 sMarkIndex = selection.getRange(0).getStart();
@@ -621,7 +620,7 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
                 Rectangle<float> u(pos, nearest);
                 r = r.getUnion (u);
                 r.expand (15 * activeInvScale, 15 * activeInvScale);
-                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                lastSMarkRect = r.getSmallestIntegerContainer();
                 
                 drawSMark = true;
                 sMarkIndex = selection.getRange(0).getStart();
@@ -655,7 +654,7 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
             
             Rectangle<float> r = path.getPath().getBounds();
             r.expand (15 * activeInvScale, 15 * activeInvScale);
-            lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+            lastSMarkRect = r.getSmallestIntegerContainer();
             
             sMarkAnchorIndex = -1;
             sMarkControlIndex = -1;
@@ -784,8 +783,7 @@ void WorkingArea::mouseMoveIldaPoint (const MouseEvent& event)
         
         Rectangle<float> rect = p.getBounds();
         rect = rect.expanded (30 * activeInvScale, 30 * activeInvScale);
-        lastDotRect = Rectangle<int> ((int)rect.getX(), (int)rect.getY(),
-                                      (int)rect.getWidth(), (int)rect.getHeight());
+        lastDotRect = rect.getSmallestIntegerContainer();
         repaint (lastDotRect);
     }
     else

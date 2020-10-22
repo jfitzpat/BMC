@@ -31,6 +31,8 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
     GZIPDecompressorInputStream z(input);
 
     var fileObj = JSON::parse (z);
+    if (fileObj.isVoid())
+        return false;
     
     // JSE version?
     String s = fileObj.getDynamicObject()->getProperty (JSEFile::AppVersion);
