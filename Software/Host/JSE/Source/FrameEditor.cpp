@@ -1215,7 +1215,36 @@ void FrameEditor::deleteAnchor()
     perform (new UndoableDeleteAnchor (this, selection));
 }
 
-int FrameEditor::insertEllipsePath (Rectangle<int>& rect)
+int FrameEditor::insertRectPath (const Rectangle<int>& rect)
+{
+    IPath path;
+    path.setColor (sketchToolColor);
+    Anchor a;
+    
+    a.setPosition (rect.getX(), rect.getY());
+    path.addAnchor (a);
+    a.setPosition (rect.getRight(), rect.getY());
+    path.addAnchor (a);
+    a.setPosition (rect.getRight(), rect.getBottom());
+    path.addAnchor (a);
+    a.setPosition (rect.getX(), rect.getBottom());
+    path.addAnchor (a);
+    a.setPosition (rect.getX(), rect.getY());
+    path.addAnchor (a);
+
+    beginNewTransaction ("New Rectangle");
+    Array<IPath> array;
+    array.add (path);
+    IPathSelection selection;
+    int index = getIPathCount();
+    selection.addRange (Range<uint16> (index, index + 1));
+    perform (new UndoableAddPaths (this, array));
+    perform (new UndoableSetIPathSelection (this, selection));
+    
+    return index;
+}
+
+int FrameEditor::insertEllipsePath (const Rectangle<int>& rect)
 {
     const double kappa = .5522848;
     double ox = (double)rect.getWidth() / 2.0 * kappa;

@@ -278,6 +278,16 @@ void WorkingArea::mouseDownSketchEllipse (const MouseEvent& event)
     lastEllipseRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
 }
 
+void WorkingArea::mouseDownSketchRect (const MouseEvent& event)
+{
+    // Left button?
+    if (! event.mods.isLeftButtonDown())
+        return;
+
+    drawRect = true;
+    lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
+}
+
 void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
 {
     // Left button?
@@ -341,6 +351,10 @@ void WorkingArea::mouseDown (const MouseEvent& event)
             mouseDownSketchPen (event);
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchEllipseTool)
             mouseDownSketchEllipse (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchLineTool)
+            mouseDownSketchPen (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchRectTool)
+            mouseDownSketchRect (event);
     }
 }
 
@@ -359,32 +373,42 @@ void WorkingArea::mouseUpSketch (const MouseEvent& event)
         drawRect = false;
         int expansion = (int)(activeInvScale * 3);
         repaint (lastDrawRect.expanded (expansion, expansion));
-        
-        // Should we be using existing selection?
-        IPathSelection selection;
-        if (event.mods.isAltDown() || event.mods.isCommandDown())
-            selection = frameEditor->getIPathSelection();
-        
-        for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
+         
+        if (frameEditor->getActiveSketchTool() == FrameEditor::sketchSelectTool)
         {
-            IPath path = frameEditor->getIPath (n);
-
-            Rectangle<float> bounds = path.getPath().getBounds();
-            Rectangle<int> r (bounds.getX(), bounds.getY(),
-                              bounds.getWidth(), bounds.getHeight());
+            // Should we be using existing selection?
+            IPathSelection selection;
+            if (event.mods.isAltDown() || event.mods.isCommandDown())
+                selection = frameEditor->getIPathSelection();
             
-            if (lastDrawRect.contains (r))
+            for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
             {
-                if (event.mods.isAltDown())
-                    selection.removeRange (Range<uint16>(n, n + 1));
-                else
-                    selection.addRange (Range<uint16>(n, n + 1));
+                IPath path = frameEditor->getIPath (n);
+
+                Rectangle<float> bounds = path.getPath().getBounds();
+                Rectangle<int> r (bounds.getX(), bounds.getY(),
+                                  bounds.getWidth(), bounds.getHeight());
+                
+                if (lastDrawRect.contains (r))
+                {
+                    if (event.mods.isAltDown())
+                        selection.removeRange (Range<uint16>(n, n + 1));
+                    else
+                        selection.addRange (Range<uint16>(n, n + 1));
+                }
             }
+
+            // Make the selection
+            frameEditor->setIPathSelection (selection);
+        }
+        else    // Rectangle Tool
+        {
+            drawRect = false;
+            repaint (lastDrawRect);
+            frameEditor->insertRectPath (lastDrawRect);
+            lastDrawRect = Rectangle<int>();
         }
 
-        // Make the selection
-        frameEditor->setIPathSelection (selection);
-        
         // Discard the rect
         lastDrawRect = Rectangle<int>();
     }
@@ -543,7 +567,7 @@ void WorkingArea::mouseMoveSketchPen (const MouseEvent& event)
     repaint (lastSDotRect);
 }
 
-void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event, bool testControls)
+void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event)
 {
     Point<float> pos ((float)event.x, (float)event.y);
     
@@ -551,63 +575,60 @@ void WorkingArea::mouseMoveSketchSelect (const MouseEvent& event, bool testContr
     
     // If we already have a selected anchor, offer opporutnity
     // to select controls
-    if (testControls)
+    if ((!selection.isEmpty()) && (selection.getAnchor() != -1))
     {
-        if ((!selection.isEmpty()) && (selection.getAnchor() != -1))
+        Anchor a = frameEditor->getIPath (selection.getRange(0).getStart()).getAnchor (selection.getAnchor());
+        
+        if (a.getEntryXDelta() || a.getEntryYDelta())
         {
-            Anchor a = frameEditor->getIPath (selection.getRange(0).getStart()).getAnchor (selection.getAnchor());
+            int x, y;
+            a.getEntryPosition (x, y);
+            Point<float> nearest ((float)x, (float) y);
             
-            if (a.getEntryXDelta() || a.getEntryYDelta())
+            float distance = pos.getDistanceFrom (nearest);
+            if (abs(distance) <= (3* activeInvScale))
             {
-                int x, y;
-                a.getEntryPosition (x, y);
-                Point<float> nearest ((float)x, (float) y);
-                
-                float distance = pos.getDistanceFrom (nearest);
-                if (abs(distance) <= (3* activeInvScale))
-                {
-                    if (drawSMark)
-                        repaint (lastSMarkRect);
-                    
-                    Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
-                    Rectangle<float> u(pos, nearest);
-                    r = r.getUnion (u);
-                    r.expand (15 * activeInvScale, 15 * activeInvScale);
-                    lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
-                    
-                    drawSMark = true;
-                    sMarkIndex = selection.getRange(0).getStart();
-                    sMarkAnchorIndex = selection.getAnchor();
-                    sMarkControlIndex = 1;
+                if (drawSMark)
                     repaint (lastSMarkRect);
-                    return;
-                }
+                
+                Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                Rectangle<float> u(pos, nearest);
+                r = r.getUnion (u);
+                r.expand (15 * activeInvScale, 15 * activeInvScale);
+                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                
+                drawSMark = true;
+                sMarkIndex = selection.getRange(0).getStart();
+                sMarkAnchorIndex = selection.getAnchor();
+                sMarkControlIndex = 1;
+                repaint (lastSMarkRect);
+                return;
             }
-            if (a.getExitXDelta() || a.getExitYDelta())
+        }
+        if (a.getExitXDelta() || a.getExitYDelta())
+        {
+            int x, y;
+            a.getExitPosition (x, y);
+            Point<float> nearest ((float)x, (float) y);
+            
+            float distance = pos.getDistanceFrom (nearest);
+            if (abs(distance) <= (3* activeInvScale))
             {
-                int x, y;
-                a.getExitPosition (x, y);
-                Point<float> nearest ((float)x, (float) y);
-                
-                float distance = pos.getDistanceFrom (nearest);
-                if (abs(distance) <= (3* activeInvScale))
-                {
-                    if (drawSMark)
-                        repaint (lastSMarkRect);
-                    
-                    Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
-                    Rectangle<float> u(pos, nearest);
-                    r = r.getUnion (u);
-                    r.expand (15 * activeInvScale, 15 * activeInvScale);
-                    lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
-                    
-                    drawSMark = true;
-                    sMarkIndex = selection.getRange(0).getStart();
-                    sMarkAnchorIndex = selection.getAnchor();
-                    sMarkControlIndex = 2;
+                if (drawSMark)
                     repaint (lastSMarkRect);
-                    return;
-                }
+                
+                Rectangle<float> r = frameEditor->getIPath (selection.getRange(0).getStart()).getPath().getBounds();
+                Rectangle<float> u(pos, nearest);
+                r = r.getUnion (u);
+                r.expand (15 * activeInvScale, 15 * activeInvScale);
+                lastSMarkRect = Rectangle<int> ((int)r.getX(), (int)r.getY(), (int)r.getWidth(), (int)r.getHeight());
+                
+                drawSMark = true;
+                sMarkIndex = selection.getRange(0).getStart();
+                sMarkAnchorIndex = selection.getAnchor();
+                sMarkControlIndex = 2;
+                repaint (lastSMarkRect);
+                return;
             }
         }
     }
@@ -941,6 +962,8 @@ void WorkingArea::mouseMove (const MouseEvent& event)
             mouseMoveSketchMove (event);
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchPenTool)
             mouseMoveSketchPen (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchLineTool)
+            mouseMoveSketchPen (event);
     }
 }
 
@@ -955,6 +978,13 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
         int expansion = (int)(activeInvScale * 3);
         repaint (lastDrawRect.expanded (expansion, expansion));
         lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
+        if (event.mods.isShiftDown())
+        {
+            if (lastDrawRect.getWidth() > lastDrawRect.getHeight())
+                lastDrawRect.setHeight (lastDrawRect.getWidth());
+            else if (lastDrawRect.getWidth() < lastDrawRect.getHeight())
+                lastDrawRect.setWidth (lastDrawRect.getHeight());
+        }
         repaint (lastDrawRect.expanded (expansion, expansion));
     }
     else if (drawEllipse)
@@ -1387,6 +1417,8 @@ void WorkingArea::updateCursor()
                 
             case FrameEditor::sketchPenTool:
             case FrameEditor::sketchEllipseTool:
+            case FrameEditor::sketchLineTool:
+            case FrameEditor::sketchRectTool:
                 setMouseCursor (MouseCursor::CrosshairCursor);
                 break;
 

@@ -69,6 +69,10 @@ private:
     std::unique_ptr<DrawableButton> selectToolButton;
     std::unique_ptr<Drawable> moveIcon;
     std::unique_ptr<DrawableButton> moveToolButton;
+    std::unique_ptr <Drawable> lineIcon;
+    std::unique_ptr<DrawableButton> lineToolButton;
+    std::unique_ptr <Drawable> rectIcon;
+    std::unique_ptr<DrawableButton> rectToolButton;
     std::unique_ptr <Drawable> ellipseIcon;
     std::unique_ptr<DrawableButton> ellipseToolButton;
     std::unique_ptr <Drawable> penIcon;

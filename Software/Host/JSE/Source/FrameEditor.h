@@ -133,6 +133,8 @@ public:
     typedef enum {
         sketchSelectTool = 0,
         sketchMoveTool,
+        sketchLineTool,
+        sketchRectTool,
         sketchEllipseTool,
         sketchPenTool
     } SketchTool;
@@ -328,7 +330,8 @@ public:
     void setIPathSelection (const IPathSelection& selection);
     void deletePaths();
     void deleteAnchor();
-    int insertEllipsePath (Rectangle<int>& rect);
+    int insertEllipsePath (const Rectangle<int>& rect);
+    int insertRectPath (const Rectangle<int>& rect);
     int insertPath (Point<int> firstAnchor);
     int insertAnchor (Point<int> location);
     void insertControls (Point<int> location);

@@ -70,13 +70,14 @@ private:
     void mouseDownSketchSelect (const MouseEvent& event);
     void mouseDownSketchMove (const MouseEvent& event);
     void mouseDownSketchEllipse (const MouseEvent& event);
+    void mouseDownSketchRect (const MouseEvent& event);
     void mouseDownSketchPen (const MouseEvent& event);
     void mouseUpIlda (const MouseEvent& event);
     void mouseUpSketch (const MouseEvent& event);
     void mouseMoveIldaSelect (const MouseEvent& event);
     void mouseMoveIldaMove (const MouseEvent& event);
     void mouseMoveIldaPoint (const MouseEvent& event);
-    void mouseMoveSketchSelect (const MouseEvent& event, bool testControls = true);
+    void mouseMoveSketchSelect (const MouseEvent& event);
     void mouseMoveSketchMove (const MouseEvent& event);
     void mouseMoveSketchPen (const MouseEvent& event);
 

@@ -50,6 +50,9 @@ namespace BinaryData
     extern const char*   gradient3_png;
     const int            gradient3_pngSize = 2204;
 
+    extern const char*   line_png;
+    const int            line_pngSize = 1825;
+
     extern const char*   move_png;
     const int            move_pngSize = 2156;
 
@@ -61,6 +64,9 @@ namespace BinaryData
 
     extern const char*   pointinghand_png;
     const int            pointinghand_pngSize = 2438;
+
+    extern const char*   rectangle_png;
+    const int            rectangle_pngSize = 1687;
 
     extern const char*   rotate_png;
     const int            rotate_pngSize = 2059;
@@ -93,7 +99,7 @@ namespace BinaryData
     const int            zoomout_pngSize = 3300;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 28;
+    const int namedResourceListSize = 30;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];
