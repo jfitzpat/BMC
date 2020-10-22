@@ -64,6 +64,7 @@ private:
     void findAllSameVisibility (bool blanked, SparseSet<uint16>& set);
     void findAllSameVisibility (uint16 index, SparseSet<uint16>& set);
     void rightClickIldaSelect (const MouseEvent& event);
+    void findNearestAnchor (const Point<int>& pos, int& x, int& y);
     void mouseDownIldaSelect (const MouseEvent& event);
     void mouseDownIldaMove (const MouseEvent& event);
     void mouseDownIldaPoint (const MouseEvent& event);
@@ -84,6 +85,9 @@ private:
     FrameEditor* frameEditor;
     float activeScale;
     float activeInvScale;
+    
+    int moveStartX;
+    int moveStartY;
     
     bool drawMark;
     uint16 markIndex;

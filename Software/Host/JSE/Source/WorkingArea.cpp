@@ -112,6 +112,9 @@ void WorkingArea::mouseDownSketchMove (const MouseEvent& event)
     if (! event.mods.isLeftButtonDown())
         return;
 
+    moveStartX = event.x;
+    moveStartY = event.y;
+    
     if (drawSMark)
     {
         IPathSelection selection;
@@ -120,6 +123,19 @@ void WorkingArea::mouseDownSketchMove (const MouseEvent& event)
         selection.setControl (sMarkControlIndex);
         drawSMark = false;
         frameEditor->setIPathSelection (selection);
+        
+        if (sMarkIndex != -1)
+        {
+            if (sMarkControlIndex != -1)
+            {
+                if (sMarkControlIndex == 1)
+                    frameEditor->getIPath (sMarkIndex).getAnchor (sMarkAnchorIndex).getEntryPosition (moveStartX, moveStartY);
+                else
+                    frameEditor->getIPath (sMarkIndex).getAnchor (sMarkAnchorIndex).getExitPosition (moveStartX, moveStartY);
+            }
+            else if (sMarkAnchorIndex != -1)
+                frameEditor->getIPath (sMarkIndex).getAnchor (sMarkAnchorIndex).getPosition (moveStartX, moveStartY);
+        }
     }
     
     if (! frameEditor->getIPathSelection().isEmpty())
@@ -484,7 +500,27 @@ void WorkingArea::mouseUpIlda (const MouseEvent& event)
 
 void WorkingArea::mouseMoveSketchMove (const MouseEvent& event)
 {
-    mouseMoveSketchSelect (event);
+    if (! frameEditor->isTransforming())
+        mouseMoveSketchSelect (event);
+}
+
+void WorkingArea::findNearestAnchor (const Point<int>& pos, int& x, int& y)
+{
+    for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
+    {
+        IPath path = frameEditor->getIPath (n);
+        for (auto i = 0; i < path.getAnchorCount(); ++i)
+        {
+            int ax, ay;
+            path.getAnchor (i).getPosition (ax, ay);
+            if (pos.getDistanceFrom (Point<int>(ax, ay)) <= (int)(3 * activeInvScale))
+            {
+                x = ax;
+                y = ay;
+                break;
+            }
+        }
+    }
 }
 
 void WorkingArea::mouseMoveSketchPen (const MouseEvent& event)
@@ -509,23 +545,7 @@ void WorkingArea::mouseMoveSketchPen (const MouseEvent& event)
     // Ctrl snaps to nearest anchor (if one)
     // Shift forces to nearest 45 degree angle
     if (event.mods.isCtrlDown())
-    {
-        for (auto n = 0; n < frameEditor->getIPathCount(); ++n)
-        {
-            IPath path = frameEditor->getIPath (n);
-            for (auto i = 0; i < path.getAnchorCount(); ++i)
-            {
-                int ax, ay;
-                path.getAnchor (i).getPosition (ax, ay);
-                if (event.getPosition().getDistanceFrom (Point<int>(ax, ay)) <= (int)(3 * activeInvScale))
-                {
-                    x = ax;
-                    y = ay;
-                    break;
-                }
-            }
-        }
-    }
+        findNearestAnchor (event.getPosition(), x, y);
     else if (event.mods.isShiftDown() && (sDotIndex != -1))
     {
         // Since 45 dgrees is tan 1, could probably
@@ -1027,8 +1047,15 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
              frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool &&
             frameEditor->isTransforming())
     {
-        int dx = event.getDistanceFromDragStartX();
-        int dy = event.getDistanceFromDragStartY();
+        int x = event.x;
+        int y = event.y;
+        
+        if (event.mods.isCtrlDown())
+            findNearestAnchor (event.getPosition(), x, y);
+        
+        Point<int> p (x, y);
+        int dx = x - moveStartX;
+        int dy = y - moveStartY;
         
         frameEditor->translateSketchSelected (dx, dy, false);
     }
