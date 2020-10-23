@@ -562,7 +562,7 @@ void FrameEditor::selectAll()
         if (getIPathCount())
         {
             IPathSelection s;
-            s.addRange (Range<uint16> (0, getIPathCount()));
+            s.addRange (Range<uint16> (0, (uint16)getIPathCount()));
             setIPathSelection (s);
         }
     }
@@ -1237,7 +1237,7 @@ int FrameEditor::insertRectPath (const Rectangle<int>& rect)
     array.add (path);
     IPathSelection selection;
     int index = getIPathCount();
-    selection.addRange (Range<uint16> (index, index + 1));
+    selection.addRange (Range<uint16> ((uint16)index, (uint16)index + 1));
     perform (new UndoableAddPaths (this, array));
     perform (new UndoableSetIPathSelection (this, selection));
     
@@ -1255,28 +1255,28 @@ int FrameEditor::insertEllipsePath (const Rectangle<int>& rect)
     Anchor a;
     
     a.setPosition (rect.getX(), rect.getCentreY());
-    a.setEntryPosition (rect.getX(), rect.getCentreY() + oy);
-    a.setExitPosition (rect.getX(), rect.getCentreY() - oy);
+    a.setEntryPosition (rect.getX(), rect.getCentreY() + (int)oy);
+    a.setExitPosition (rect.getX(), rect.getCentreY() - (int)oy);
     path.addAnchor (a);
     
     a.setPosition (rect.getCentreX(), rect.getY());
-    a.setEntryPosition (rect.getCentreX() - ox, rect.getY());
-    a.setExitPosition (rect.getCentreX() + ox, rect.getY());
+    a.setEntryPosition (rect.getCentreX() - (int)ox, rect.getY());
+    a.setExitPosition (rect.getCentreX() + (int)ox, rect.getY());
     path.addAnchor (a);
     
     a.setPosition(rect.getX() + rect.getWidth(), rect.getCentreY());
-    a.setEntryPosition (rect.getX() + rect.getWidth(), rect.getCentreY() - oy);
-    a.setExitPosition (rect.getX() + rect.getWidth(), rect.getCentreY() + oy);
+    a.setEntryPosition (rect.getX() + rect.getWidth(), rect.getCentreY() - (int)oy);
+    a.setExitPosition (rect.getX() + rect.getWidth(), rect.getCentreY() + (int)oy);
     path.addAnchor (a);
     
     a.setPosition (rect.getCentreX(), rect.getY() + rect.getHeight());
-    a.setEntryPosition (rect.getCentreX() + ox, rect.getY() + rect.getHeight());
-    a.setExitPosition (rect.getCentreX() - ox, rect.getY() + rect.getHeight());
+    a.setEntryPosition (rect.getCentreX() + (int)ox, rect.getY() + rect.getHeight());
+    a.setExitPosition (rect.getCentreX() - (int)ox, rect.getY() + rect.getHeight());
     path.addAnchor (a);
 
     a.setPosition (rect.getX(), rect.getCentreY());
-    a.setEntryPosition (rect.getX(), rect.getCentreY() + oy);
-    a.setExitPosition (rect.getX(), rect.getCentreY() - oy);
+    a.setEntryPosition (rect.getX(), rect.getCentreY() + (int)oy);
+    a.setExitPosition (rect.getX(), rect.getCentreY() - (int)oy);
     path.addAnchor (a);
 
     beginNewTransaction ("New Ellipse");
@@ -1284,7 +1284,7 @@ int FrameEditor::insertEllipsePath (const Rectangle<int>& rect)
     array.add (path);
     IPathSelection selection;
     int index = getIPathCount();
-    selection.addRange (Range<uint16> (index, index + 1));
+    selection.addRange (Range<uint16> ((uint16)index, (uint16)index + 1));
     perform (new UndoableAddPaths (this, array));
     perform (new UndoableSetIPathSelection (this, selection));
     
@@ -1302,7 +1302,7 @@ int FrameEditor::insertPath (Point<int> firstAnchor)
     array.add (path);
     IPathSelection selection;
     int index = getIPathCount();
-    selection.addRange (Range<uint16> (index, index + 1));
+    selection.addRange (Range<uint16> ((uint16)index, (uint16)index + 1));
     selection.setAnchor (0);
     perform (new UndoableAddPaths (this, array));
     perform (new UndoableSetIPathSelection (this, selection));
@@ -1321,7 +1321,7 @@ int FrameEditor::insertAnchor (Point<int> location)
     path.insertAnchor (aIndex + 1, Anchor (location.getX(), location.getY()));
     
     IPathSelection selection;
-    selection.addRange (Range<uint16> (pIndex, pIndex + 1));
+    selection.addRange (Range<uint16> ((uint16)pIndex, (uint16)pIndex + 1));
     
     beginNewTransaction ("New Anchor");
     Array<IPath> paths;
@@ -1374,15 +1374,14 @@ void FrameEditor::insertControls (Point<int> location)
     a.getPosition (x, y);
     Point<int> position (x, y);
     
-    double angle = location.getAngleToPoint (position);
+    float angle = location.getAngleToPoint (position);
     int distance = location.getDistanceFrom (position);
     
     if (distance == 0)
         return;
     
-    Line<double> l = Line<double>::fromStartAndAngle (position.toDouble(), abs((double)distance), angle);
-    
-    Point<double> entry = l.getEnd();
+    Line<float> l = Line<float>::fromStartAndAngle (position.toFloat(), abs((float)distance), angle);
+    Point<float> entry = l.getEnd();
     
     a.setEntryPosition (entry.toInt().getX(), entry.toInt().getY());
     a.setExitPosition (location.getX(), location.getY());
@@ -1714,10 +1713,10 @@ bool FrameEditor::centerSketchSelected (bool doX, bool doY, bool constrain)
     if (! paths.size())
         return false;
     
-    int x,y;
-    getCenterOfIPathSelection (x, y);
-    int xOffset = 32768 - x;
-    int yOffset = 32768 - y;
+    int ox, oy;
+    getCenterOfIPathSelection (ox, oy);
+    int xOffset = 32768 - ox;
+    int yOffset = 32768 - oy;
     
     bool clipped = false;
     

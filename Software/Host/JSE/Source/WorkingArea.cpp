@@ -118,7 +118,7 @@ void WorkingArea::mouseDownSketchMove (const MouseEvent& event)
     if (drawSMark)
     {
         IPathSelection selection;
-        selection.addRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
+        selection.addRange (Range<uint16>((uint16)sMarkIndex, (uint16)sMarkIndex + 1));
         selection.setAnchor (sMarkAnchorIndex);
         selection.setControl (sMarkControlIndex);
         drawSMark = false;
@@ -327,10 +327,10 @@ void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
             selection.setControl (sMarkControlIndex);
         }
         
-        if (selection.contains (sMarkIndex) || event.mods.isAltDown())
-            selection.removeRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
+        if (selection.contains ((uint16)sMarkIndex) || event.mods.isAltDown())
+            selection.removeRange (Range<uint16>((uint16)sMarkIndex, (uint16)sMarkIndex + 1));
         else
-            selection.addRange (Range<uint16>(sMarkIndex, sMarkIndex + 1));
+            selection.addRange (Range<uint16>((uint16)sMarkIndex, (uint16)sMarkIndex + 1));
         
         drawSMark = false;
         frameEditor->setIPathSelection (selection);
@@ -401,16 +401,14 @@ void WorkingArea::mouseUpSketch (const MouseEvent& event)
             {
                 IPath path = frameEditor->getIPath (n);
 
-                Rectangle<float> bounds = path.getPath().getBounds();
-                Rectangle<int> r (bounds.getX(), bounds.getY(),
-                                  bounds.getWidth(), bounds.getHeight());
+                Rectangle<int> r (path.getPath().getBounds().getSmallestIntegerContainer());
                 
                 if (lastDrawRect.contains (r))
                 {
                     if (event.mods.isAltDown())
-                        selection.removeRange (Range<uint16>(n, n + 1));
+                        selection.removeRange (Range<uint16>((uint16)n, (uint16)n + 1));
                     else
-                        selection.addRange (Range<uint16>(n, n + 1));
+                        selection.addRange (Range<uint16>((uint16)n, (uint16)n + 1));
                 }
             }
 
@@ -1298,7 +1296,7 @@ void WorkingArea::paint (juce::Graphics& g)
             else
                 path = frameEditor->getIPath (n);
             
-            bool selected = frameEditor->getIPathSelection().contains (n) &&
+            bool selected = frameEditor->getIPathSelection().contains ((uint16)n) &&
                             frameEditor->getActiveLayer() == FrameEditor::sketch;
             int markedAnchor = -1;
             int control = frameEditor->getIPathSelection().getControl();
@@ -1363,19 +1361,19 @@ void WorkingArea::paint (juce::Graphics& g)
                     {
                         int x, y;
                         a.getExitPosition (x, y);
-                        g.drawLine(x, y, a.getX(), a.getY(), activeInvScale);
-                        g.fillEllipse (x - halfDotSize, y - halfDotSize, dotSize, dotSize);
+                        g.drawLine((float)x, (float)y, (float)a.getX(), (float)a.getY(), activeInvScale);
+                        g.fillEllipse ((float)x - halfDotSize, (float)y - halfDotSize, dotSize, dotSize);
                         if (control == 2)
-                            g.drawEllipse (x - halfSelectSize, y - halfSelectSize, selectSize, selectSize, activeInvScale);
+                            g.drawEllipse ((float)x - halfSelectSize, (float)y - halfSelectSize, selectSize, selectSize, activeInvScale);
                     }
                     if (a.getEntryXDelta() != 0 || a.getEntryYDelta() != 0)
                     {
                         int x, y;
                         a.getEntryPosition (x, y);
-                        g.drawLine(x, y, a.getX(), a.getY(), activeInvScale);
-                        g.fillEllipse (x - halfDotSize, y - halfDotSize, dotSize, dotSize);
+                        g.drawLine((float)x, (float)y, (float)a.getX(), (float)a.getY(), activeInvScale);
+                        g.fillEllipse ((float)x - halfDotSize, (float)y - halfDotSize, dotSize, dotSize);
                         if (control == 1)
-                            g.drawEllipse (x - halfSelectSize, y - halfSelectSize, selectSize, selectSize, activeInvScale);
+                            g.drawEllipse ((float)x - halfSelectSize, (float)y - halfSelectSize, selectSize, selectSize, activeInvScale);
                     }
                     g.setColour (c);
                 }
@@ -1402,7 +1400,9 @@ void WorkingArea::paint (juce::Graphics& g)
     else if (drawEllipse)
     {
         g.setColour (Colours::grey);
-        g.drawEllipse(lastEllipseRect.getX(), lastEllipseRect.getY(), lastEllipseRect.getWidth(), lastEllipseRect.getHeight(), (int)activeInvScale >> 1);
+        g.drawEllipse(lastEllipseRect.toFloat().getX(), lastEllipseRect.toFloat().getY(), 
+                      lastEllipseRect.toFloat().getWidth(), lastEllipseRect.toFloat().getHeight(), 
+                      (float)((int)activeInvScale >> 1));
     }
 }
 

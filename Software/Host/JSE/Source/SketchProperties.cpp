@@ -603,13 +603,13 @@ void SketchProperties::updateSelection()
             else
                 pointsLabel->setColour (Label::textColourId, juce::Colours::white);
             
-            String s(p);
+            String sp(p);
             if (p > 1)
-                s += " points";
+                sp += " points";
             else
-                s += " point";
-            s += " (" + String(frameRate, 1) + " fps)";
-            pointsLabel->setText (s, dontSendNotification);
+                sp += " point";
+            sp += " (" + String(frameRate, 1) + " fps)";
+            pointsLabel->setText (sp, dontSendNotification);
         }
         else
             pointsLabel->setText ("", dontSendNotification);
