@@ -335,6 +335,10 @@ public:
     int insertPath (Point<int> firstAnchor);
     int insertAnchor (Point<int> location);
     void insertControls (Point<int> location);
+    void forceAnchorCurved();
+    void forceAnchorStraight();
+    void selectEntry();
+    void selectExit();
     void zeroExitControl();
     bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
     

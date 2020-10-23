@@ -183,6 +183,12 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         {
             menu.addCommandItem (&commandManager, CommandIDs::lineToolRequest);
             menu.addCommandItem (&commandManager, CommandIDs::rectToolRequest);
+            menu.addSeparator();
+            menu.addCommandItem (&commandManager, CommandIDs::forceStraight);
+            menu.addCommandItem (&commandManager, CommandIDs::zeroExit);
+            menu.addCommandItem (&commandManager, CommandIDs::forceCurve);
+            menu.addCommandItem (&commandManager, CommandIDs::selectEntry);
+            menu.addCommandItem (&commandManager, CommandIDs::selectEntry);
         }
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::newFrame);
@@ -331,7 +337,12 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::moveToolRequest,
                                 CommandIDs::selectToolRequest,
                                 CommandIDs::lineToolRequest,
-                                CommandIDs::rectToolRequest };
+                                CommandIDs::rectToolRequest,
+                                CommandIDs::forceCurve,
+                                CommandIDs::forceStraight,
+                                CommandIDs::zeroExit,
+                                CommandIDs::selectEntry,
+                                CommandIDs::selectExit };
     
     c.addArray (commands);
 }
@@ -598,6 +609,31 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch);
             result.setTicked (frameEditor->getActiveSketchTool() == FrameEditor::sketchRectTool);
             break;
+        case CommandIDs::forceCurve:
+            result.setInfo ("Curve Anchor", "", "Menu", 0);
+            result.addDefaultKeypress (',', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch && (frameEditor->getIPathSelection().getAnchor() != -1));
+            break;
+        case CommandIDs::forceStraight:
+            result.setInfo ("Straighten Anchor", "", "Menu", 0);
+            result.addDefaultKeypress ('.', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch && (frameEditor->getIPathSelection().getAnchor() != -1));
+            break;
+        case CommandIDs::selectEntry:
+            result.setInfo ("Select Anchor Entry", "", "Menu", 0);
+            result.addDefaultKeypress (';', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch && (frameEditor->getIPathSelection().getAnchor() != -1));
+            break;
+        case CommandIDs::selectExit:
+            result.setInfo ("Select Anchor Exit", "", "Menu", 0);
+            result.addDefaultKeypress ('\'', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch && (frameEditor->getIPathSelection().getAnchor() != -1));
+            break;
+        case CommandIDs::zeroExit:
+            result.setInfo ("Straighten Anchor Exit", "", "Menu", 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch && (frameEditor->getIPathSelection().getAnchor() != -1));
+            break;
+
         default:
             break;
     }
@@ -837,6 +873,21 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::rectToolRequest:
             frameEditor->setActiveSketchTool (FrameEditor::sketchRectTool);
+            break;
+        case CommandIDs::forceCurve:
+            frameEditor->forceAnchorCurved();
+            break;
+        case CommandIDs::forceStraight:
+            frameEditor->forceAnchorStraight();
+            break;
+        case CommandIDs::selectEntry:
+            frameEditor->selectEntry();
+            break;
+        case CommandIDs::selectExit:
+            frameEditor->selectExit();
+            break;
+        case CommandIDs::zeroExit:
+            frameEditor->zeroExitControl();
             break;
     }
     return true;

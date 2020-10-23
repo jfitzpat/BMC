@@ -1395,6 +1395,84 @@ void FrameEditor::insertControls (Point<int> location)
     perform (new UndoableSetPaths (this, iPathSelection, paths));
 }
 
+void FrameEditor::selectEntry()
+{
+    int aIndex = iPathSelection.getAnchor();
+    if (aIndex == -1)
+        return;
+
+    IPathSelection selection = iPathSelection;
+    selection.setControl (1);
+    
+    beginNewTransaction ("Select Anchor Entry");
+    perform (new UndoableSetIPathSelection (this, selection));
+}
+
+void FrameEditor::selectExit()
+{
+    int aIndex = iPathSelection.getAnchor();
+    if (aIndex == -1)
+        return;
+
+    IPathSelection selection = iPathSelection;
+    selection.setControl (2);
+    
+    beginNewTransaction ("Select Anchor Exit");
+    perform (new UndoableSetIPathSelection (this, selection));
+}
+
+void FrameEditor::forceAnchorCurved()
+{
+    int aIndex = iPathSelection.getAnchor();
+    if (aIndex == -1)
+        return;
+
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+
+    IPath* path = &paths.getReference (0);
+    Anchor a = path->getAnchor (aIndex);
+    
+    int x, y;
+    a.getPosition (x, y);
+    x -= 1000;
+    y += 500;
+    a.setEntryPosition (x, y);
+    x += 2000;
+    y -= 1000;
+    a.setExitPosition (x, y);
+    path->setAnchor (aIndex, a);
+    
+    beginNewTransaction ("Curve Anchor");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::forceAnchorStraight()
+{
+    int aIndex = iPathSelection.getAnchor();
+    if (aIndex == -1)
+        return;
+
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+
+    IPath* path = &paths.getReference (0);
+    Anchor a = path->getAnchor (aIndex);
+
+    a.setEntryXDelta (0);
+    a.setEntryYDelta (0);
+    a.setExitXDelta (0);
+    a.setExitYDelta (0);
+    path->setAnchor (aIndex, a);
+    
+    beginNewTransaction ("Straighten Anchor");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
 
 void FrameEditor::setIPathSelection (const IPathSelection& selection)
 {

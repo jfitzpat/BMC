@@ -1064,7 +1064,7 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
              frameEditor->getActiveSketchTool() == FrameEditor::sketchPenTool &&
              (sDotIndex != -1))
     {
-        if (! event.mods.isAnyModifierKeyDown())
+        if (! event.mods.isShiftDown())
             frameEditor->insertControls (event.getPosition());
     }
 }

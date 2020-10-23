@@ -92,6 +92,11 @@ public:
         selectToolRequest,
         lineToolRequest,
         rectToolRequest,
+        selectEntry,
+        selectExit,
+        forceCurve,
+        forceStraight,
+        zeroExit
     };
 
     //==============================================================================
