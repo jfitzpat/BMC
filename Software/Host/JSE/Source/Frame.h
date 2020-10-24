@@ -57,6 +57,8 @@ public:
     
     bool getPoint (uint16 index, IPoint& point);
     IPoint getPoint (uint16 index) { return framePoints[index]; }
+    const Array<IPoint>& getPoints() { return framePoints; }
+    void setPoints (const Array<IPoint>& points) { framePoints = points; }
     
     void addPoint (IPoint& point);
     void replacePoint (uint16 index, const IPoint& newPoint);
@@ -65,6 +67,8 @@ public:
   
     int getIPathCount() { return iPaths.size(); }
     const IPath getIPath (int index) { return iPaths[index]; }
+    const Array<IPath>& getIPaths() { return iPaths; }
+    void setIPaths (const Array<IPath>& paths) { iPaths = paths; }
     void addPath (IPath& p) { iPaths.add (p); }
     void deletePath (int index) { iPaths.remove (index); }
     void insertPath (int index, const IPath& p) { iPaths.insert (index, p); }

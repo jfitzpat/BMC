@@ -32,9 +32,20 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     layerVisible->setButtonText ("Visible");
     layerVisible->addListener (this);
 
+    renderIcon = Drawable::createFromImageData (BinaryData::render_png,
+                                                BinaryData::render_pngSize);
+
+    renderButton.reset (new RenderButton (frameEditor));
+    addAndMakeVisible (renderButton.get());
+//    renderButton->setButtonStyle (DrawableButton::ImageAboveTextLabel);
+    renderButton->setEdgeIndent (0);
+    renderButton->setImages (renderIcon.get());
+    renderButton->setTooltip ("Render sketch layer to ILDA points");
+    renderButton->setButtonText ("Render");
+    
     selectIcon = Drawable::createFromImageData (BinaryData::pointinghand_png,
                                                 BinaryData::pointinghand_pngSize);
-    
+
     selectToolButton.reset (new DrawableButton ("selToolButton", DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (selectToolButton.get());
     selectToolButton->setImages (selectIcon.get());
@@ -280,6 +291,8 @@ SketchProperties::SketchProperties (FrameEditor* editor)
 SketchProperties::~SketchProperties()
 {
     layerVisible = nullptr;
+    renderButton = nullptr;
+    renderIcon = nullptr;
     selectToolButton = nullptr;
     selectIcon = nullptr;
     moveToolButton = nullptr;
@@ -329,7 +342,8 @@ void SketchProperties::paint (juce::Graphics& g)
 
 void SketchProperties::resized()
 {
-    layerVisible->setBounds (16, 16, getWidth() - 32, 24);
+    layerVisible->setBounds (16, 16, 84, 24);
+    renderButton->setBounds (94, 12, 92, 28);
     lineToolButton->setBounds (10 + 12, 48, 32, 32);
     rectToolButton->setBounds (46 + 12, 48, 32, 32);
     ellipseToolButton->setBounds (82 + 12, 48, 32, 32);
@@ -529,6 +543,11 @@ void SketchProperties::refresh()
 
 void SketchProperties::updateSelection()
 {
+    if (frameEditor->getIPathCount())
+        renderButton->setEnabled (true);
+    else
+        renderButton->setEnabled (false);
+
     if (frameEditor->getIPathSelection().isEmpty())
     {
         selectLabel->setText ("No Shapes Selected", dontSendNotification);

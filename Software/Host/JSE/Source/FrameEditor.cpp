@@ -1472,6 +1472,64 @@ void FrameEditor::forceAnchorStraight()
     perform (new UndoableSetPaths (this, iPathSelection, paths));
 }
 
+void FrameEditor::renderSketch (bool shortestPath, bool updateSketch)
+{
+    if (! currentFrame->getIPathCount())
+        return;
+    
+    Array<Frame::IPoint> points;
+    Array<IPath> paths;
+
+    IPath lastPath;
+    IPath newPath;
+    
+    // Build connecting blanked paths
+    for (auto n = 0; n < currentFrame->getIPathCount(); ++n)
+    {
+        newPath = currentFrame->getIPath (n);
+        if (n != 0)
+        {
+            Anchor lastA = lastPath.getAnchor (lastPath.getAnchorCount() -1);
+            Anchor newA = newPath.getAnchor (0);
+            
+            if (lastA.getX() != newA.getX() || lastA.getY() != newA.getY())
+            {
+                IPath blankPath;
+                blankPath.setColor (Colours::black);
+                blankPath.setPointDensity (1800);
+                
+                blankPath.addAnchor (Anchor (lastA.getX(), lastA.getY()));
+                blankPath.addAnchor (Anchor (newA.getX(), newA.getY()));
+                paths.add (blankPath);
+            }
+        }
+        paths.add (newPath);
+        lastPath = newPath;
+    }
+    
+    Anchor startA = paths[0].getAnchor (0);
+    Anchor endA = paths[paths.size() - 1].getAnchor (paths[paths.size() - 1].getAnchorCount() - 1);
+    if (startA.getX() != endA.getX() || startA.getY() != endA.getY())
+    {
+        IPath returnPath;
+        returnPath.setColor (Colours::black);
+        returnPath.setPointDensity (1800);
+        returnPath.addAnchor (Anchor (endA.getX(), endA.getY()));
+        returnPath.addAnchor (Anchor (startA.getX(), startA.getY()));
+        paths.add (returnPath);
+    }
+    
+    Frame::IPoint point;
+    zerostruct (point);
+    point.status = Frame::BlankedPoint;
+    points.add (point);
+    
+    beginNewTransaction ("Render Sketch Layer");
+    if (updateSketch)
+        perform (new UndoableChangesPointsAndPaths (this, points, paths));
+    else
+        perform (new UndoableChangePoints (this, points));
+}
 
 void FrameEditor::setIPathSelection (const IPathSelection& selection)
 {
@@ -3378,6 +3436,12 @@ void FrameEditor::_insertPoint (uint16 index, const Frame::IPoint& point)
     }
 }
 
+void FrameEditor::_setPoints (const Array<Frame::IPoint>& points)
+{
+    currentFrame->setPoints (points);
+    sendActionMessage (EditorActions::ildaPointsChanged);
+}
+
 void FrameEditor::_deletePoint (uint16 index)
 {
     if (index < currentFrame->getPointCount())
@@ -3432,6 +3496,12 @@ void FrameEditor::_setPaths (const IPathSelection& selection,
             currentFrame->replacePath (i, paths.getReference (pindex++));
     }
     
+    sendActionMessage (EditorActions::iPathsChanged);
+}
+
+void FrameEditor::_setIPaths (const Array<IPath>& paths)
+{
+    currentFrame->setIPaths (paths);
     sendActionMessage (EditorActions::iPathsChanged);
 }
 

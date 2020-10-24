@@ -24,6 +24,7 @@
 #include "SketchScalePopup.h"
 #include "SketchRotatePopup.h"
 #include "SketchShearPopup.h"
+#include "RenderPopup.h"
 #include "FrameEditor.h"
 
 //==============================================================================
@@ -65,6 +66,8 @@ private:
     FrameEditor* frameEditor;
 
     std::unique_ptr<ToggleButton> layerVisible;
+    std::unique_ptr<Drawable> renderIcon;
+    std::unique_ptr<RenderButton> renderButton;
     std::unique_ptr<Drawable> selectIcon;
     std::unique_ptr<DrawableButton> selectToolButton;
     std::unique_ptr<Drawable> moveIcon;

@@ -213,6 +213,7 @@ public:
     {
         return currentFrame->getPoint (index, point);
     }
+    const Array<Frame::IPoint>& getPoints() { return currentFrame->getPoints(); }
 
     bool getIldaShowBlanked() { return ildaShowBlanked; }
     bool getIldaDrawLines() { return ildaDrawLines; }
@@ -229,6 +230,7 @@ public:
     
     int getIPathCount() { return currentFrame->getIPathCount(); }
     const IPath getIPath (int index) { return currentFrame->getIPath (index); }
+    const Array<IPath>& getIPaths() { return currentFrame->getIPaths(); }
     void getSelectedIPaths (Array<IPath>& paths)
             { getIPaths (iPathSelection, paths); }
     void getIPaths (const IPathSelection& selection, Array<IPath>& paths);
@@ -341,6 +343,7 @@ public:
     void selectExit();
     void zeroExitControl();
     bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
+    void renderSketch (bool shortestPath, bool updateSketch);
     
     void setSketchSelectedSpacing (uint16 newSpacing);
     void setSketchSelectedExtraPerAnchor (uint16 extra);
@@ -366,8 +369,9 @@ public:
     void _setSketchToolColor (const Colour& color);
 
     void _insertPoint (uint16 index, const Frame::IPoint& point);
+    void _setPoints (const Array<Frame::IPoint>& points);
     void _deletePoint (uint16 index);
-    
+
     bool _setImageData (const MemoryBlock& file);
     void _setDrawGrid (bool draw);
     void _setImageOpacity (float opacity);
@@ -395,6 +399,7 @@ public:
     void _deletePath (int index);
     void _insertPath (int index, IPath& path);
     void _setPaths (const IPathSelection& selection, const Array<IPath>& paths);
+    void _setIPaths (const Array<IPath>& paths);
     void _deleteAnchor (int pindex, int aindex);
     void _insertAnchor (int pindex, int aindex, const Anchor& a);
     

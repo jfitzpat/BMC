@@ -778,6 +778,70 @@ private:
     FrameEditor* frameEditor;
 };
 
+class UndoableChangePoints : public UndoableAction
+{
+public:
+    UndoableChangePoints (FrameEditor* editor,
+                                   Array<Frame::IPoint> points )
+    : newPoints (points), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        oldPoints = frameEditor->getPoints();
+        frameEditor->_setPoints (newPoints);
+
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setPoints (oldPoints);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    Array<Frame::IPoint> oldPoints;
+    Array<Frame::IPoint> newPoints;
+    FrameEditor* frameEditor;
+};
+
+class UndoableChangesPointsAndPaths : public UndoableAction
+{
+public:
+    UndoableChangesPointsAndPaths (FrameEditor* editor,
+                                   Array<Frame::IPoint> points,
+                                   Array<IPath> paths )
+    : newPoints (points), newPaths (paths), frameEditor (editor) {;}
+    
+    bool perform() override
+    {
+        frameEditor->incDirtyCounter();
+        oldPoints = frameEditor->getPoints();
+        oldPaths = frameEditor->getIPaths();
+        frameEditor->_setPoints (newPoints);
+        frameEditor->_setIPaths (newPaths);
+
+        return true;
+    }
+    
+    bool undo() override
+    {
+        frameEditor->_setPoints (oldPoints);
+        frameEditor->_setIPaths (oldPaths);
+        frameEditor->decDirtyCounter();
+        return true;
+    }
+    
+private:
+    Array<Frame::IPoint> oldPoints;
+    Array<IPath> oldPaths;
+    Array<Frame::IPoint> newPoints;
+    Array<IPath> newPaths;
+    FrameEditor* frameEditor;
+};
+
 class UndoableSwapFrames : public UndoableAction
 {
 public:

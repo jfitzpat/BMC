@@ -30,6 +30,7 @@
         <FILE id="MatEZ4" name="pointinghand.png" compile="0" resource="1"
               file="Graphics/pointinghand.png"/>
         <FILE id="zHCvkd" name="rectangle.png" compile="0" resource="1" file="Graphics/rectangle.png"/>
+        <FILE id="Ymjfka" name="render.png" compile="0" resource="1" file="Graphics/render.png"/>
         <FILE id="JXnNQE" name="rotate.png" compile="0" resource="1" file="Graphics/rotate.png"/>
         <FILE id="TtnrYe" name="scale.png" compile="0" resource="1" file="Graphics/scale.png"/>
         <FILE id="CIUduD" name="shear.png" compile="0" resource="1" file="Graphics/shear.png"/>
@@ -42,44 +43,20 @@
         <FILE id="pW91jU" name="zoomout.png" compile="0" resource="1" file="Graphics/zoomout.png"/>
       </GROUP>
       <GROUP id="{E542E1EF-6379-F6EA-92A7-CD9ADE2ABC40}" name="Editor">
-        <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
-          <FILE id="SALXLE" name="BarberPopup.h" compile="0" resource="0" file="Source/BarberPopup.h"/>
-          <FILE id="Hu94PP" name="BulgePopup.h" compile="0" resource="0" file="Source/BulgePopup.h"/>
-          <FILE id="xoFsB2" name="ColourButton.h" compile="0" resource="0" file="Source/ColourButton.h"/>
-          <FILE id="TqKhR0" name="Gradient3Popup.h" compile="0" resource="0"
-                file="Source/Gradient3Popup.h"/>
-          <FILE id="SkbCt2" name="GradientPopup.h" compile="0" resource="0" file="Source/GradientPopup.h"/>
-          <FILE id="ugzkVo" name="HuePopup.h" compile="0" resource="0" file="Source/HuePopup.h"/>
-          <FILE id="CRErzo" name="IldaExporter.cpp" compile="1" resource="0"
-                file="Source/IldaExporter.cpp"/>
-          <FILE id="T65gnl" name="IldaExporter.h" compile="0" resource="0" file="Source/IldaExporter.h"/>
-          <FILE id="CDG5yg" name="IldaLoader.cpp" compile="1" resource="0" file="Source/IldaLoader.cpp"/>
-          <FILE id="fKoseL" name="IldaLoader.h" compile="0" resource="0" file="Source/IldaLoader.h"/>
-          <FILE id="HwiI00" name="JSEFile.h" compile="0" resource="0" file="Source/JSEFile.h"/>
-          <FILE id="pfvLkX" name="JSEFileLoader.cpp" compile="1" resource="0"
-                file="Source/JSEFileLoader.cpp"/>
-          <FILE id="sHHkni" name="JSEFileLoader.h" compile="0" resource="0" file="Source/JSEFileLoader.h"/>
-          <FILE id="P4h0wJ" name="JSEFileSaver.cpp" compile="1" resource="0"
-                file="Source/JSEFileSaver.cpp"/>
-          <FILE id="cb1uL4" name="JSEFileSaver.h" compile="0" resource="0" file="Source/JSEFileSaver.h"/>
-          <FILE id="daWKRA" name="PinchPopup.h" compile="0" resource="0" file="Source/PinchPopup.h"/>
-          <FILE id="zF8dd2" name="PopupTool.h" compile="0" resource="0" file="Source/PopupTool.h"/>
-          <FILE id="MdAhEP" name="RotatePopup.h" compile="0" resource="0" file="Source/RotatePopup.h"/>
-          <FILE id="UTm9qY" name="SaturationPopup.h" compile="0" resource="0"
-                file="Source/SaturationPopup.h"/>
-          <FILE id="SbIKdp" name="ScalePopup.h" compile="0" resource="0" file="Source/ScalePopup.h"/>
-          <FILE id="dLKYqi" name="ShearPopup.h" compile="0" resource="0" file="Source/ShearPopup.h"/>
-          <FILE id="efVZz9" name="SketchRotatePopup.h" compile="0" resource="0"
-                file="Source/SketchRotatePopup.h"/>
-          <FILE id="gxIXXO" name="SketchScalePopup.h" compile="0" resource="0"
-                file="Source/SketchScalePopup.h"/>
-          <FILE id="cj9w8r" name="SketchShearPopup.h" compile="0" resource="0"
-                file="Source/SketchShearPopup.h"/>
-          <FILE id="E38Kl9" name="SpherePopup.h" compile="0" resource="0" file="Source/SpherePopup.h"/>
-          <FILE id="LZM5GV" name="SpiralPopup.h" compile="0" resource="0" file="Source/SpiralPopup.h"/>
-          <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
-                file="Source/ThumbBuilder.cpp"/>
-          <FILE id="QR21o4" name="ThumbBuilder.h" compile="0" resource="0" file="Source/ThumbBuilder.h"/>
+        <GROUP id="{94049DF5-F3F4-E978-8DB8-8C8E17189289}" name="Top Components">
+          <FILE id="CpF1YK" name="EditProperties.cpp" compile="1" resource="0"
+                file="Source/EditProperties.cpp"/>
+          <FILE id="g32aaP" name="EditProperties.h" compile="0" resource="0"
+                file="Source/EditProperties.h"/>
+          <FILE id="vtloTM" name="FrameList.cpp" compile="1" resource="0" file="Source/FrameList.cpp"/>
+          <FILE id="JFWu8F" name="FrameList.h" compile="0" resource="0" file="Source/FrameList.h"/>
+          <FILE id="pfwhIW" name="LaserControls.cpp" compile="1" resource="0"
+                file="Source/LaserControls.cpp"/>
+          <FILE id="rtHiO9" name="LaserControls.h" compile="0" resource="0" file="Source/LaserControls.h"/>
+          <FILE id="Ib9G68" name="MainEditor.cpp" compile="1" resource="0" file="Source/MainEditor.cpp"/>
+          <FILE id="OPZfYb" name="MainEditor.h" compile="0" resource="0" file="Source/MainEditor.h"/>
+          <FILE id="VlejnN" name="WorkingArea.cpp" compile="1" resource="0" file="Source/WorkingArea.cpp"/>
+          <FILE id="T09JBP" name="WorkingArea.h" compile="0" resource="0" file="Source/WorkingArea.h"/>
         </GROUP>
         <GROUP id="{1E02FE6E-4294-6982-39BF-7F9B70C87DB0}" name="Property Pages">
           <FILE id="Ink4QW" name="IldaProperties.cpp" compile="1" resource="0"
@@ -94,28 +71,65 @@
           <FILE id="GgNRij" name="SketchProperties.h" compile="0" resource="0"
                 file="Source/SketchProperties.h"/>
         </GROUP>
-        <FILE id="DWVeqZ" name="Anchor.h" compile="0" resource="0" file="Source/Anchor.h"/>
-        <FILE id="CpF1YK" name="EditProperties.cpp" compile="1" resource="0"
-              file="Source/EditProperties.cpp"/>
-        <FILE id="g32aaP" name="EditProperties.h" compile="0" resource="0"
-              file="Source/EditProperties.h"/>
-        <FILE id="UCK1AL" name="Frame.cpp" compile="1" resource="0" file="Source/Frame.cpp"/>
-        <FILE id="XTnGAe" name="Frame.h" compile="0" resource="0" file="Source/Frame.h"/>
+        <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
+          <GROUP id="{51BCECAB-88F7-B08C-BDBA-CD3C327CE326}" name="Misc">
+            <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
+                  file="Source/ThumbBuilder.cpp"/>
+            <FILE id="QR21o4" name="ThumbBuilder.h" compile="0" resource="0" file="Source/ThumbBuilder.h"/>
+          </GROUP>
+          <GROUP id="{9156E001-426D-D410-3829-0C2EA0BEF3C1}" name="File Helpers">
+            <FILE id="dLhyf2" name="ILDA.h" compile="0" resource="0" file="Source/ILDA.h"/>
+            <FILE id="CRErzo" name="IldaExporter.cpp" compile="1" resource="0"
+                  file="Source/IldaExporter.cpp"/>
+            <FILE id="T65gnl" name="IldaExporter.h" compile="0" resource="0" file="Source/IldaExporter.h"/>
+            <FILE id="CDG5yg" name="IldaLoader.cpp" compile="1" resource="0" file="Source/IldaLoader.cpp"/>
+            <FILE id="fKoseL" name="IldaLoader.h" compile="0" resource="0" file="Source/IldaLoader.h"/>
+            <FILE id="HwiI00" name="JSEFile.h" compile="0" resource="0" file="Source/JSEFile.h"/>
+            <FILE id="pfvLkX" name="JSEFileLoader.cpp" compile="1" resource="0"
+                  file="Source/JSEFileLoader.cpp"/>
+            <FILE id="sHHkni" name="JSEFileLoader.h" compile="0" resource="0" file="Source/JSEFileLoader.h"/>
+            <FILE id="P4h0wJ" name="JSEFileSaver.cpp" compile="1" resource="0"
+                  file="Source/JSEFileSaver.cpp"/>
+            <FILE id="cb1uL4" name="JSEFileSaver.h" compile="0" resource="0" file="Source/JSEFileSaver.h"/>
+          </GROUP>
+          <GROUP id="{FC53F79A-E434-6D16-2DF0-0BBCA3909103}" name="Common Popups">
+            <FILE id="xoFsB2" name="ColourButton.h" compile="0" resource="0" file="Source/ColourButton.h"/>
+            <FILE id="zF8dd2" name="PopupTool.h" compile="0" resource="0" file="Source/PopupTool.h"/>
+          </GROUP>
+          <GROUP id="{E3A72B59-182D-6C40-E87F-C4FB449353F5}" name="Sketch Popups">
+            <FILE id="eDirST" name="RenderPopup.h" compile="0" resource="0" file="Source/RenderPopup.h"/>
+            <FILE id="efVZz9" name="SketchRotatePopup.h" compile="0" resource="0"
+                  file="Source/SketchRotatePopup.h"/>
+            <FILE id="gxIXXO" name="SketchScalePopup.h" compile="0" resource="0"
+                  file="Source/SketchScalePopup.h"/>
+            <FILE id="cj9w8r" name="SketchShearPopup.h" compile="0" resource="0"
+                  file="Source/SketchShearPopup.h"/>
+          </GROUP>
+          <GROUP id="{23586393-97FA-4A7C-5CCD-726D0CDA3AA9}" name="ILDA Popups">
+            <FILE id="daWKRA" name="PinchPopup.h" compile="0" resource="0" file="Source/PinchPopup.h"/>
+            <FILE id="MdAhEP" name="RotatePopup.h" compile="0" resource="0" file="Source/RotatePopup.h"/>
+            <FILE id="SbIKdp" name="ScalePopup.h" compile="0" resource="0" file="Source/ScalePopup.h"/>
+            <FILE id="dLKYqi" name="ShearPopup.h" compile="0" resource="0" file="Source/ShearPopup.h"/>
+            <FILE id="E38Kl9" name="SpherePopup.h" compile="0" resource="0" file="Source/SpherePopup.h"/>
+            <FILE id="LZM5GV" name="SpiralPopup.h" compile="0" resource="0" file="Source/SpiralPopup.h"/>
+            <FILE id="SkbCt2" name="GradientPopup.h" compile="0" resource="0" file="Source/GradientPopup.h"/>
+            <FILE id="ugzkVo" name="HuePopup.h" compile="0" resource="0" file="Source/HuePopup.h"/>
+            <FILE id="TqKhR0" name="Gradient3Popup.h" compile="0" resource="0"
+                  file="Source/Gradient3Popup.h"/>
+            <FILE id="Hu94PP" name="BulgePopup.h" compile="0" resource="0" file="Source/BulgePopup.h"/>
+            <FILE id="SALXLE" name="BarberPopup.h" compile="0" resource="0" file="Source/BarberPopup.h"/>
+          </GROUP>
+        </GROUP>
+        <GROUP id="{E161A1D7-BAF0-2CA9-A6D5-276025C59393}" name="Core Objects">
+          <FILE id="DWVeqZ" name="Anchor.h" compile="0" resource="0" file="Source/Anchor.h"/>
+          <FILE id="UCK1AL" name="Frame.cpp" compile="1" resource="0" file="Source/Frame.cpp"/>
+          <FILE id="XTnGAe" name="Frame.h" compile="0" resource="0" file="Source/Frame.h"/>
+          <FILE id="jFzMVD" name="IPath.cpp" compile="1" resource="0" file="Source/IPath.cpp"/>
+          <FILE id="ASyXhK" name="IPath.h" compile="0" resource="0" file="Source/IPath.h"/>
+        </GROUP>
         <FILE id="o7xuOw" name="FrameEditor.cpp" compile="1" resource="0" file="Source/FrameEditor.cpp"/>
         <FILE id="KWhH67" name="FrameEditor.h" compile="0" resource="0" file="Source/FrameEditor.h"/>
-        <FILE id="vtloTM" name="FrameList.cpp" compile="1" resource="0" file="Source/FrameList.cpp"/>
-        <FILE id="JFWu8F" name="FrameList.h" compile="0" resource="0" file="Source/FrameList.h"/>
         <FILE id="URe2fI" name="FrameUndo.h" compile="0" resource="0" file="Source/FrameUndo.h"/>
-        <FILE id="dLhyf2" name="ILDA.h" compile="0" resource="0" file="Source/ILDA.h"/>
-        <FILE id="jFzMVD" name="IPath.cpp" compile="1" resource="0" file="Source/IPath.cpp"/>
-        <FILE id="ASyXhK" name="IPath.h" compile="0" resource="0" file="Source/IPath.h"/>
-        <FILE id="pfwhIW" name="LaserControls.cpp" compile="1" resource="0"
-              file="Source/LaserControls.cpp"/>
-        <FILE id="rtHiO9" name="LaserControls.h" compile="0" resource="0" file="Source/LaserControls.h"/>
-        <FILE id="Ib9G68" name="MainEditor.cpp" compile="1" resource="0" file="Source/MainEditor.cpp"/>
-        <FILE id="OPZfYb" name="MainEditor.h" compile="0" resource="0" file="Source/MainEditor.h"/>
-        <FILE id="VlejnN" name="WorkingArea.cpp" compile="1" resource="0" file="Source/WorkingArea.cpp"/>
-        <FILE id="T09JBP" name="WorkingArea.h" compile="0" resource="0" file="Source/WorkingArea.h"/>
       </GROUP>
       <FILE id="DQsHcS" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="kkKZtM" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
