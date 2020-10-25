@@ -218,7 +218,7 @@ void WorkingArea::rightClickIldaSelect (const MouseEvent& /*event*/)
     
     if (drawMark)
     {
-        menu.addItem (100, "Select All...", false);
+        menu.addItem (100, "Select All:", false);
         menu.addItem (1, "Stacked Here");
         menu.addItem (2, "Same Color");
         menu.addItem (3, "Same Visibility");
