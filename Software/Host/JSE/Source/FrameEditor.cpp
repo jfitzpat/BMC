@@ -29,7 +29,7 @@
 //==============================================================================
 FrameEditor::FrameEditor()
     : dirtyCounter (0),
-      scanRate (30000),
+      scanRate (22000),
       zoomFactor (1.0),
       activeLayer (sketch),
       activeView (Frame::front),
@@ -1472,21 +1472,157 @@ void FrameEditor::forceAnchorStraight()
     perform (new UndoableSetPaths (this, iPathSelection, paths));
 }
 
-void FrameEditor::renderSketch (bool shortestPath, bool updateSketch)
+bool FrameEditor::isClosedIPath (const IPath &path)
 {
-    if (! currentFrame->getIPathCount())
+    if (path.getAnchorCount() < 2)
+        return false;
+    
+    int end = path.getAnchorCount() - 1;
+    Anchor last = path.getAnchor (end);
+    for (auto n = 0; n < end; ++n)
+    {
+        Anchor a = path.getAnchor (n);
+        if (a.getX() == last.getX() && a.getY() == last.getY())
+            return true;
+    }
+    
+    return false;
+}
+
+void FrameEditor::pointToIPointXYZ (Point<int> a, Frame::IPoint& point)
+{
+    point.x.w = activeView == Frame::left ? 0 : (int16)Frame::toIldaX (a.getX());
+    point.y.w = activeView == Frame::bottom ? 0 : (int16)Frame::toIldaY (a.getY());
+    if (activeView == Frame::front)
+        point.z.w = 0;
+    else if (activeView == Frame::bottom)
+        point.z.w = (int16)Frame::toIldaY (a.getY());
+    else if (activeView == Frame::left)
+        point.z.w = (int16)Frame::toIldaX (a.getX());
+}
+
+void FrameEditor::anchorToPointXYZ (const Anchor& a, Frame::IPoint& point)
+{
+    pointToIPointXYZ (Point<int>(a.getX(), a.getY()), point);
+}
+
+void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Frame::IPoint>& points, bool appendPoints)
+{
+    if (! appendPoints)
+        points.clear();
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        Anchor lastAnchor;
+        Frame::IPoint point;
+        zerostruct (point);
+        
+        bool closed = isClosedIPath (paths[n]);
+        int endA = paths[n].getAnchorCount() - 1;
+        
+        for (auto i = 0; i <= endA; ++i)
+        {
+            Colour c = paths[n].getColor();
+            
+            Anchor newAnchor = paths[n].getAnchor (i);
+
+            if (i == 0) // First anchor
+            {
+                anchorToPointXYZ (newAnchor, point);
+                point.red = point.green = point.blue = 0;
+                point.status = Frame::BlankedPoint;
+                
+                for (auto bb = 0; bb < paths[n].getBlankedPointsBeforeStart(); ++bb)
+                    points.add (point);
+                
+                point.red = c.getRed();
+                point.green = c.getGreen();
+                point.blue = c.getBlue();
+                point.status = c == Colours::black ? Frame::BlankedPoint : 0;
+                
+                points.add (point);
+                for (auto ea = 0; ea < paths[n].getExtraPointsPerAnchor(); ++ea)
+                    points.add (point);
+            }
+            else
+            {
+                // Put points (if needed) from the last anchor to this one
+                Path path;
+                path.startNewSubPath ((float)lastAnchor.getX(), (float)lastAnchor.getY());
+
+                int exitX, exitY;
+                int entryX, entryY;
+
+                lastAnchor.getExitPosition (exitX, exitY);
+                newAnchor.getEntryPosition (entryX, entryY);
+                        
+                path.cubicTo((float)exitX, (float)exitY, (float)entryX, (float)entryY, (float)newAnchor.getX(), (float)newAnchor.getY());
+                
+                float plength = path.getLength();
+                int density = paths[n].getPointDensity();
+
+                point.red = c.getRed();
+                point.green = c.getGreen();
+                point.blue = c.getBlue();
+                point.status = c == Colours::black ? Frame::BlankedPoint : 0;
+
+                // At least one point required?
+                if (plength > (float)density)
+                {
+                    int len = (int)plength;
+                    int pcount = len / density;
+                    pcount--;   // Don't duplicate anchor
+                    int offset = (len % density) / 2;
+                    if (offset)
+                    {
+                        pcount++;
+                        offset = (density / 2) - offset;
+                    }
+                    
+                    for (auto a = 1; a <= pcount; a++)
+                    {
+                        int distance = a * density - offset;
+                        Point<float>p = path.getPointAlongPath ((float)distance);
+                        pointToIPointXYZ (p.toInt(), point);
+                        points.add (point);
+                    }
+                }
+                
+                // Convert coordinates
+                anchorToPointXYZ (newAnchor, point);
+                points.add (point);
+                if (i != endA || (! closed))
+                {
+                    for (auto ea = 0; ea < paths[n].getExtraPointsPerAnchor(); ++ea)
+                        points.add (point);
+                }
+            }
+            
+            lastAnchor = newAnchor;
+        }
+        
+        anchorToPointXYZ (lastAnchor, point);
+        point.red = point.green = point.blue = 0;
+        point.status = Frame::BlankedPoint;
+        
+        for (auto ab = 0; ab < paths[n].getBlankedPointsAfterEnd(); ++ab)
+            points.add (point);
+    }
+}
+
+void FrameEditor::connectIPaths (const Array<IPath>& src, Array<IPath>& dst)
+{
+    dst.clear();
+    if (! src.size())
         return;
     
-    Array<Frame::IPoint> points;
-    Array<IPath> paths;
-
     IPath lastPath;
     IPath newPath;
     
     // Build connecting blanked paths
-    for (auto n = 0; n < currentFrame->getIPathCount(); ++n)
+    for (auto n = 0; n < src.size(); ++n)
     {
-        newPath = currentFrame->getIPath (n);
+        newPath = src[n];
         if (n != 0)
         {
             Anchor lastA = lastPath.getAnchor (lastPath.getAnchorCount() -1);
@@ -1497,38 +1633,55 @@ void FrameEditor::renderSketch (bool shortestPath, bool updateSketch)
                 IPath blankPath;
                 blankPath.setColor (Colours::black);
                 blankPath.setPointDensity (1800);
-                
+                blankPath.setBlankedPointsBeforeStart (0);
+                blankPath.setBlankedPointsAfterEnd (0);
                 blankPath.addAnchor (Anchor (lastA.getX(), lastA.getY()));
                 blankPath.addAnchor (Anchor (newA.getX(), newA.getY()));
-                paths.add (blankPath);
+                dst.add (blankPath);
             }
         }
-        paths.add (newPath);
+        dst.add (newPath);
         lastPath = newPath;
     }
     
-    Anchor startA = paths[0].getAnchor (0);
-    Anchor endA = paths[paths.size() - 1].getAnchor (paths[paths.size() - 1].getAnchorCount() - 1);
+    Anchor startA = dst[0].getAnchor (0);
+    Anchor endA = dst[dst.size() - 1].getAnchor (dst[dst.size() - 1].getAnchorCount() - 1);
     if (startA.getX() != endA.getX() || startA.getY() != endA.getY())
     {
         IPath returnPath;
         returnPath.setColor (Colours::black);
         returnPath.setPointDensity (1800);
+        returnPath.setBlankedPointsBeforeStart (0);
+        returnPath.setBlankedPointsAfterEnd (0);
         returnPath.addAnchor (Anchor (endA.getX(), endA.getY()));
         returnPath.addAnchor (Anchor (startA.getX(), startA.getY()));
-        paths.add (returnPath);
+        dst.add (returnPath);
     }
+}
+
+void FrameEditor::renderSketch (bool shortestPath, bool updateSketch)
+{
+    if (! currentFrame->getIPathCount())
+        return;
     
-    Frame::IPoint point;
-    zerostruct (point);
-    point.status = Frame::BlankedPoint;
-    points.add (point);
+    Array<Frame::IPoint> points;
+    Array<IPath> paths;
+
+    connectIPaths (currentFrame->getIPaths(), paths);
+    generatePointsFromPaths (paths, points);
     
     beginNewTransaction ("Render Sketch Layer");
     if (updateSketch)
+    {
+        perform (new UndoableSetIPathSelection (this, IPathSelection()));
+        perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform (new UndoableChangesPointsAndPaths (this, points, paths));
+    }
     else
+    {
+        perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform (new UndoableChangePoints (this, points));
+    }
 }
 
 void FrameEditor::setIPathSelection (const IPathSelection& selection)

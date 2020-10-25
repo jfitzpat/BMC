@@ -27,7 +27,7 @@ class IPath
 public:
     IPath (Colour c = Colours::white)
         : color (c), pointDensity (1200), extraPointsPerAnchor(0),
-          blankedPointsBeforeStart (1), blankedPointsAfterEnd (1) {;}
+          blankedPointsBeforeStart (3), blankedPointsAfterEnd (3) {;}
     ~IPath() {;}
     
     int getAnchorCount() const { return anchors.size(); }

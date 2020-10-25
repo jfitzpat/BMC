@@ -155,6 +155,14 @@ public:
     bool canCopy();
     bool canPaste();
     void copy();
+    
+    // Sketch helpers
+    void connectIPaths (const Array<IPath>& src, Array<IPath>& dst);
+    bool isClosedIPath (const IPath& path);
+    void pointToIPointXYZ (Point<int> a, Frame::IPoint& point);
+    void anchorToPointXYZ (const Anchor& a, Frame::IPoint& point);
+    void generatePointsFromPaths (const Array<IPath>& paths, Array<Frame::IPoint>& points, bool appendPoints = false);
+
 
     // Tool helpers
     void cancelRequest()

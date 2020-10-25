@@ -987,6 +987,7 @@ public:
     
     bool perform() override
     {
+        frameEditor->incDirtyCounter();
         int insertIndex = frameEditor->getIPathCount();
         for (auto n = 0; n < newPaths.size(); ++n)
             frameEditor->_insertPath (insertIndex++, newPaths.getReference(n));
@@ -997,6 +998,7 @@ public:
     {
         for (auto n = 0; n <newPaths.size(); ++n)
             frameEditor->_deletePath (frameEditor->getIPathCount() - 1);
+        frameEditor->decDirtyCounter();
         return true;
     }
 private:
