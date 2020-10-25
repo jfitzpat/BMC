@@ -462,6 +462,8 @@ void SketchProperties::actionListenerCallback (const String& message)
 {
     if (message == EditorActions::sketchVisibilityChanged)
         refresh();
+    else if (message == EditorActions::framesChanged)
+        refresh();
     else if (message == EditorActions::sketchToolChanged)
         updateTools();
     else if (message == EditorActions::sketchToolColorChanged)

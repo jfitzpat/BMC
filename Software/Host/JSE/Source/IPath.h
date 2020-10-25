@@ -52,6 +52,8 @@ public:
     void setBlankedPointsAfterEnd (uint16 p) { blankedPointsAfterEnd = p; }
 
     const Path& getPath() const { return path; }
+    
+    IPath reversed();
 
 private:
     void buildPath();
