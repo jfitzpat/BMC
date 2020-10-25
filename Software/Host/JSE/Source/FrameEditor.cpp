@@ -22,6 +22,7 @@
 #include "JSEFileSaver.h"
 #include "JSEFileLoader.h"
 #include "IldaExporter.h"
+#include "ShortestPath.h"
 #include "FrameEditor.h"
 
 #include "FrameUndo.h"      // UndoableTask classes
@@ -1665,9 +1666,15 @@ void FrameEditor::renderSketch (bool shortestPath, bool updateSketch)
         return;
     
     Array<Frame::IPoint> points;
+    Array<IPath> sorted;
     Array<IPath> paths;
 
-    connectIPaths (currentFrame->getIPaths(), paths);
+    if (shortestPath)
+        ShortestPath::find (currentFrame->getIPaths(), sorted);
+    else
+        sorted = currentFrame->getIPaths();
+    
+    connectIPaths (sorted, paths);
     generatePointsFromPaths (paths, points);
     
     beginNewTransaction ("Render Sketch Layer");

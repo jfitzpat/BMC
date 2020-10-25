@@ -73,6 +73,9 @@
         </GROUP>
         <GROUP id="{03290CCB-05EA-9C55-96B5-D870853E224A}" name="Helpers">
           <GROUP id="{51BCECAB-88F7-B08C-BDBA-CD3C327CE326}" name="Misc">
+            <FILE id="z6LQkb" name="ShortestPath.cpp" compile="1" resource="0"
+                  file="Source/ShortestPath.cpp"/>
+            <FILE id="UAuRyS" name="ShortestPath.h" compile="0" resource="0" file="Source/ShortestPath.h"/>
             <FILE id="RN4hVQ" name="ThumbBuilder.cpp" compile="1" resource="0"
                   file="Source/ThumbBuilder.cpp"/>
             <FILE id="QR21o4" name="ThumbBuilder.h" compile="0" resource="0" file="Source/ThumbBuilder.h"/>

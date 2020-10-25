@@ -36,21 +36,21 @@ public:
 
         pathButton->setBounds (16, 16, 150, 24);
 
-        updateSketchButton.reset (new juce::ToggleButton ("updateSketchButton"));
-        addAndMakeVisible (updateSketchButton.get());
-        updateSketchButton->setButtonText (TRANS("Update sketch"));
-        updateSketchButton->addListener (this);
+//        updateSketchButton.reset (new juce::ToggleButton ("updateSketchButton"));
+//        addAndMakeVisible (updateSketchButton.get());
+//        updateSketchButton->setButtonText (TRANS("Update sketch"));
+//        updateSketchButton->addListener (this);
 
-        updateSketchButton->setBounds (16, 44, 150, 24);
+//        updateSketchButton->setBounds (16, 44, 150, 24);
 
         goButton.reset (new juce::TextButton ("goButton"));
         addAndMakeVisible (goButton.get());
         goButton->setButtonText ("Render");
         goButton->addListener (this);
         
-        goButton->setBounds (50, 84, 80, 40);
+        goButton->setBounds (50, 84 - 26, 80, 40);
 
-        setSize (180, 140);
+        setSize (180, 140 - 28);
         pathButton->setToggleState (true, dontSendNotification);
     }
     
@@ -74,8 +74,8 @@ public:
     {
         if (buttonThatWasClicked == goButton.get())
         {
-            frameEditor->renderSketch (pathButton->getToggleState(),
-                                       updateSketchButton->getToggleState());
+            frameEditor->renderSketch (pathButton->getToggleState() /*,
+                                       updateSketchButton->getToggleState()*/);
             
             CallOutBox* box = findParentComponentOfClass<CallOutBox>();
             box->dismiss();
