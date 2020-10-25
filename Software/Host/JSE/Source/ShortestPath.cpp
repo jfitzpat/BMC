@@ -127,7 +127,6 @@ void ShortestPath::find (const Array<IPath>& original, Array<IPath>& shortest)
     // The original is the one to beat
     Array<PElement> minPath = base;
     int minLength = getTotalLength (minPath);
-    Logger::outputDebugString (String (minLength));
     
     for (auto n = 0; n < base.size(); ++n)
     {
@@ -169,14 +168,9 @@ void ShortestPath::find (const Array<IPath>& original, Array<IPath>& shortest)
     
     for (auto n = 0; n < minPath.size(); ++n)
     {
-        String s = String (minPath[n].index) + " " + String ((int)minPath[n].reversed);
-        Logger::outputDebugString (s);
-        
         if (minPath[n].reversed)
             shortest.add (original[minPath[n].index].reversed());
         else
             shortest.add (original[minPath[n].index]);
     }
-    
-//    shortest = original;
 }
