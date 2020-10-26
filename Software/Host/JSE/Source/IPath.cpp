@@ -53,9 +53,9 @@ void IPath::clearAllAnchors()
 
 IPath IPath::reversed()
 {
-    IPath path = *this;
+    IPath ipath = *this;
     
-    path.clearAllAnchors();
+    ipath.clearAllAnchors();
     
     for (auto n = anchors.size(); n > 0; --n)
     {
@@ -68,10 +68,10 @@ IPath IPath::reversed()
         a.setEntryPosition (exX, exY);
         a.setExitPosition (enX, enY);
         
-        path.addAnchor (a);
+        ipath.addAnchor (a);
     }
     
-    return path;
+    return ipath;
 }
 
 void IPath::buildPath()

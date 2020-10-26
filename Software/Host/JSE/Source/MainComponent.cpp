@@ -188,7 +188,7 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
             menu.addCommandItem (&commandManager, CommandIDs::zeroExit);
             menu.addCommandItem (&commandManager, CommandIDs::forceCurve);
             menu.addCommandItem (&commandManager, CommandIDs::selectEntry);
-            menu.addCommandItem (&commandManager, CommandIDs::selectEntry);
+            menu.addCommandItem (&commandManager, CommandIDs::selectExit);
         }
         menu.addSeparator();
         menu.addCommandItem (&commandManager, CommandIDs::newFrame);
