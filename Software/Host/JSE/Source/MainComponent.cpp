@@ -163,14 +163,11 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
             menu.addCommandItem (&commandManager, CommandIDs::editPaste);
         }
         menu.addCommandItem (&commandManager, CommandIDs::deleteSelection);
-        if (frameEditor->getActiveLayer() == FrameEditor::ilda)
-        {
-            menu.addCommandItem (&commandManager, CommandIDs::selectionDownRequest);
-            menu.addCommandItem (&commandManager, CommandIDs::selectionUpRequest);
-        }
         if (frameEditor->getActiveLayer() == FrameEditor::ilda ||
             frameEditor->getActiveLayer() == FrameEditor::sketch)
         {
+            menu.addCommandItem (&commandManager, CommandIDs::selectionDownRequest);
+            menu.addCommandItem (&commandManager, CommandIDs::selectionUpRequest);
             menu.addSeparator();
             menu.addCommandItem (&commandManager, CommandIDs::blankingToggleRequest);
             menu.addCommandItem (&commandManager, CommandIDs::cycleColorsRequest);
@@ -844,10 +841,10 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         
         case CommandIDs::selectionUpRequest:
-            frameEditor->adjustIldaSelection (1);
+            frameEditor->adjustSelection (1);
             break;
         case CommandIDs::selectionDownRequest:
-            frameEditor->adjustIldaSelection (-1);
+            frameEditor->adjustSelection (-1);
             break;
             
         case CommandIDs::pointPenToolRequest:

@@ -155,6 +155,7 @@ public:
     bool canCopy();
     bool canPaste();
     void copy();
+    void adjustSelection (int offset);
     
     // Sketch helpers
     void connectIPaths (const Array<IPath>& src, Array<IPath>& dst);
@@ -338,6 +339,8 @@ public:
     void deletePoints();
 
     void setIPathSelection (const IPathSelection& selection);
+    void adjustIPathSelection (int offset);
+
     void deletePaths();
     void deleteAnchor();
     int insertEllipsePath (const Rectangle<int>& rect);

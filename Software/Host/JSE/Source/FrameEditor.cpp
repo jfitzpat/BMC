@@ -176,7 +176,13 @@ bool FrameEditor::hasSelection()
 
 bool FrameEditor::hasMovableSelection()
 {
-    return hasSelection();
+    if (! hasSelection())
+        return false;
+    
+    if (activeLayer == sketch && (iPathSelection.getAnchor() == -1))
+        return false;
+    
+    return true;
 }
 
 bool FrameEditor::canCopy()
@@ -202,6 +208,14 @@ void FrameEditor::copy()
     iPathCopy.clear();
     getSelectedIPaths (iPathCopy);
     sendActionMessage (EditorActions::selectionCopied);
+}
+
+void FrameEditor::adjustSelection (int offset)
+{
+    if (activeLayer == ilda)
+        adjustIldaSelection (offset);
+    else if (activeLayer == sketch)
+        adjustIPathSelection (offset);
 }
 
 void FrameEditor::toggleBlanking()
@@ -1689,6 +1703,28 @@ void FrameEditor::renderSketch (bool shortestPath, bool updateSketch)
         perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform (new UndoableChangePoints (this, points));
     }
+}
+
+void FrameEditor::adjustIPathSelection (int offset)
+{
+    if (activeLayer != sketch)
+        return;
+    if (iPathSelection.isEmpty())
+        return;
+    if (iPathSelection.getAnchor() == -1)
+        return;
+    
+    int i = iPathSelection.getAnchor() + offset;
+    int cnt = currentFrame->getIPath (iPathSelection.getRange (0).getStart()).getAnchorCount();
+
+    if (i < 0)
+        i += cnt;
+    else if (i >= cnt)
+        i -= cnt;
+    
+    IPathSelection selection (iPathSelection);
+    selection.setAnchor (i);
+    perform (new UndoableSetIPathSelection (this, selection));
 }
 
 void FrameEditor::setIPathSelection (const IPathSelection& selection)

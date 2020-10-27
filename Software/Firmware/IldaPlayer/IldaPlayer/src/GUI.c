@@ -367,17 +367,17 @@ void TouchCallback(void const * argument)
 		{
 			if (Animate)
 				IncFrame();
-//			rotZ += 7;
-//			if (rotZ > 3599)
-//				rotZ -= 3600;
-//			rotY += 25;
-//			if (rotY > 3599)
-//				rotY -= 3600;
+			rotZ += 7;
+			if (rotZ > 3599)
+				rotZ -= 3600;
+			rotY += 25;
+			if (rotY > 3599)
+				rotY -= 3600;
 
 			scan_UpdateTransform (0, 0,
 								  0, 0, 0,
-								  -2,
-								  .5,
+								  -3,
+								  0.5,
 								  .7, .7, .7,
 								  rotY, 0, rotZ);
 		}

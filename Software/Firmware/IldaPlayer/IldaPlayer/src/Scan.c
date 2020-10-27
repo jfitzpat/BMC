@@ -25,7 +25,7 @@
 #include <math.h>
 #include <string.h>
 
-#define SCAN_MAX_RATE (28000)
+#define SCAN_MAX_RATE (22000)
 #define SCAN_MIN_ARR (((SystemCoreClock / 2) / SCAN_MAX_RATE) - 1)
 
 #define DEG_IN_RAD (0.01745329252)
