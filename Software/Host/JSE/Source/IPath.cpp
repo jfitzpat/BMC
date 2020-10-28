@@ -71,6 +71,9 @@ IPath IPath::reversed()
         ipath.addAnchor (a);
     }
     
+    ipath.setStartZ (endZ);
+    ipath.setEndZ (startZ);
+    
     return ipath;
 }
 

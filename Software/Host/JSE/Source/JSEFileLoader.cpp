@@ -117,6 +117,8 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
                 path.setExtraPointsPerAnchor ((uint16)(int)pathData->getProperty (JSEFile::ExtraPerAnchor));
                 path.setBlankedPointsBeforeStart ((uint16)(int)pathData->getProperty (JSEFile::BlanksBefore));
                 path.setBlankedPointsAfterEnd ((uint16)(int)pathData->getProperty (JSEFile::BlanksAfter));
+                path.setStartZ (pathData->getProperty (JSEFile::StartZ));
+                path.setEndZ (pathData->getProperty (JSEFile::EndZ));
                 
                 var anchors = pathData->getProperty (JSEFile::Anchors);
                 if (anchors.isArray())

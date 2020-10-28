@@ -160,8 +160,8 @@ public:
     // Sketch helpers
     void connectIPaths (const Array<IPath>& src, Array<IPath>& dst);
     bool isClosedIPath (const IPath& path);
-    void pointToIPointXYZ (Point<int> a, Frame::IPoint& point);
-    void anchorToPointXYZ (const Anchor& a, Frame::IPoint& point);
+    void pointToIPointXYZ (Point<int> a, Frame::IPoint& point, int zStart = 0, int zEnd = 0, float zPercent = 0.0f);
+    void anchorToPointXYZ (const Anchor& a, Frame::IPoint& point, int zStart = 0, int zEnd = 0, float zPercent = 0.0f);
     void generatePointsFromPaths (const Array<IPath>& paths, Array<Frame::IPoint>& points, bool appendPoints = false);
 
 
@@ -360,6 +360,8 @@ public:
     void setSketchSelectedExtraPerAnchor (uint16 extra);
     void setSketchSelectedBlankingBefore (uint16 points);
     void setSketchSelectedBlankingAfter (uint16 points);
+    void setSketchSelectedStartZ (int z);
+    void setSketchSelectedEndZ (int z);
     void setSketchSelectedColor (const Colour& color);
     
     bool centerSketchSelected (bool doX = true, bool doY = true, bool constrain = true);

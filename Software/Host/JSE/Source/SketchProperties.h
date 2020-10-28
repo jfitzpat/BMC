@@ -91,6 +91,10 @@ private:
     std::unique_ptr<TextEditor> blankBefore;
     std::unique_ptr<Label> blankAfterLabel;
     std::unique_ptr<TextEditor> blankAfter;
+    std::unique_ptr<Label> startZLabel;
+    std::unique_ptr<TextEditor> startZ;
+    std::unique_ptr<Label> endZLabel;
+    std::unique_ptr<TextEditor> endZ;
     std::unique_ptr<ColourButton> selectColorButton;
     std::unique_ptr<Drawable> centerIcon;
     std::unique_ptr<DrawableButton> centerButton;

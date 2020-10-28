@@ -118,6 +118,8 @@ var JSEFileSaver::ipathToObj (uint16 frameIndex, uint16 pathIndex)
     obj->setProperty (JSEFile::ExtraPerAnchor, path.getExtraPointsPerAnchor());
     obj->setProperty (JSEFile::BlanksBefore, path.getBlankedPointsBeforeStart());
     obj->setProperty (JSEFile::BlanksAfter, path.getBlankedPointsAfterEnd());
+    obj->setProperty (JSEFile::StartZ, path.getStartZ());
+    obj->setProperty (JSEFile::EndZ, path.getEndZ());
 
     var anchors;
     for (uint16 i = 0; i < path.getAnchorCount(); ++i)

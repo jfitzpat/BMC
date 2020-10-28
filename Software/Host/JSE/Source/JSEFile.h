@@ -43,6 +43,8 @@ namespace JSEFile
     const Identifier ExtraPerAnchor ("ExtraPerAnchor");
     const Identifier BlanksBefore   ("BlanksBefore");
     const Identifier BlanksAfter    ("BlanksAfter");
+    const Identifier StartZ         ("StartZ");
+    const Identifier EndZ           ("EndZ");
     const Identifier Anchors        ("Anchors");
     const Identifier AnchorX        ("X");
     const Identifier AnchorY        ("Y");

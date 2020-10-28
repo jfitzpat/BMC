@@ -213,6 +213,50 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     blankAfter->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     blankAfter->addListener (this);
 
+    startZLabel.reset (new Label ("startZLabel", "Start Depth"));
+    addAndMakeVisible (startZLabel.get());
+    startZLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    startZLabel->setJustificationType (juce::Justification::centred);
+    startZLabel->setEditable (false, false, false);
+    startZLabel->setColour (Label::textColourId, juce::Colours::grey);
+    startZLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    startZ.reset (new TextEditor ("startZ"));
+    addAndMakeVisible (startZ.get());
+    startZ->setMultiLine (false);
+    startZ->setReturnKeyStartsNewLine (false);
+    startZ->setReadOnly (false);
+    startZ->setScrollbarsShown (true);
+    startZ->setCaretVisible (true);
+    startZ->setPopupMenuEnabled (true);
+    startZ->setJustification (Justification::centred);
+    startZ->setColour (TextEditor::textColourId, Colours::white);
+    startZ->setTooltip ("Starting depth for shape");
+    startZ->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    startZ->addListener (this);
+
+    endZLabel.reset (new Label ("endZLabel", "End Depth"));
+    addAndMakeVisible (endZLabel.get());
+    endZLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    endZLabel->setJustificationType (juce::Justification::centred);
+    endZLabel->setEditable (false, false, false);
+    endZLabel->setColour (Label::textColourId, juce::Colours::grey);
+    endZLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    endZ.reset (new TextEditor ("endZ"));
+    addAndMakeVisible (endZ.get());
+    endZ->setMultiLine (false);
+    endZ->setReturnKeyStartsNewLine (false);
+    endZ->setReadOnly (false);
+    endZ->setScrollbarsShown (true);
+    endZ->setCaretVisible (true);
+    endZ->setPopupMenuEnabled (true);
+    endZ->setJustification (Justification::centred);
+    endZ->setColour (TextEditor::textColourId, Colours::white);
+    endZ->setTooltip ("Ending depth for shape");
+    endZ->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    endZ->addListener (this);
+
     selectColorButton.reset (new ColourButton ());
     addAndMakeVisible (selectColorButton.get());
     selectColorButton->setTooltip ("Shape color");
@@ -316,6 +360,10 @@ SketchProperties::~SketchProperties()
     blankBefore = nullptr;
     blankAfterLabel = nullptr;
     blankAfter = nullptr;
+    startZLabel = nullptr;
+    startZ = nullptr;
+    endZLabel = nullptr;
+    endZ = nullptr;
     selectColorButton = nullptr;
     centerButton = nullptr;
     centerIcon = nullptr;
@@ -362,14 +410,18 @@ void SketchProperties::resized()
     blankBefore->setBounds (16, 240 + 36, getWidth() - 32, 24);
     blankAfterLabel->setBounds (16, 272 + 36, getWidth() - 32, 12);
     blankAfter->setBounds (16, 288 + 36, getWidth() - 32, 24);
-    selectColorButton->setBounds (getBounds().getCentreX() - 10, 320 + 36, 20, 20);
-    centerButton->setBounds (82, 348 + 36, 32, 32);
-    centerXButton->setBounds (118, 348 + 36, 32, 32);
-    centerYButton->setBounds (154, 348 + 36, 32, 32);
-    scaleButton->setBounds (82, 384 + 36, 32, 32);
-    rotateButton->setBounds (118, 384 + 36, 32, 32);
-    shearButton->setBounds (154, 384 + 36, 32, 32);
-    trashButton->setBounds (154, 420 + 36, 32, 32);
+    startZLabel->setBounds (16, 356, getWidth() / 2 - 20, 12);
+    endZLabel->setBounds (getBounds().getCentreX() + 4, 356, getWidth() / 2 - 16, 12);
+    startZ->setBounds (16, 372, getWidth() / 2 - 20, 24);
+    endZ->setBounds (getBounds().getCentreX() + 4, 372, getWidth() / 2 - 20, 24);
+    selectColorButton->setBounds (getBounds().getCentreX() - 10, 320 + 84, 20, 20);
+    centerButton->setBounds (82, 348 + 84, 32, 32);
+    centerXButton->setBounds (118, 348 + 84, 32, 32);
+    centerYButton->setBounds (154, 348 + 84, 32, 32);
+    scaleButton->setBounds (82, 384 + 84, 32, 32);
+    rotateButton->setBounds (118, 384 + 84, 32, 32);
+    shearButton->setBounds (154, 384 + 84, 32, 32);
+    trashButton->setBounds (154, 420 + 84, 32, 32);
 }
 
 //==============================================================================
@@ -442,6 +494,20 @@ void SketchProperties::textEditorReturnKeyPressed (TextEditor& editor)
     {
         if (! blankAfter->getText().containsChar ('*'))
             frameEditor->setSketchSelectedBlankingAfter ((int16) blankAfter->getText().getIntValue());
+        
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == startZ.get())
+    {
+        if (! startZ->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedStartZ (startZ->getText().getIntValue());
+        
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == endZ.get())
+    {
+        if (! endZ->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedEndZ (endZ->getText().getIntValue());
         
         layerVisible->grabKeyboardFocus();
     }
@@ -560,6 +626,8 @@ void SketchProperties::updateSelection()
         extraPerLabel->setColour (Label::textColourId, Colours::grey);
         blankBeforeLabel->setColour (Label::textColourId, Colours::grey);
         blankAfterLabel->setColour (Label::textColourId, Colours::grey);
+        startZLabel->setColour (Label::textColourId, Colours::grey);
+        endZLabel->setColour (Label::textColourId, Colours::grey);
         spacing->setText ("", dontSendNotification);
         spacing->setEnabled (false);
         extraPerAnchor->setText ("", dontSendNotification);
@@ -568,6 +636,10 @@ void SketchProperties::updateSelection()
         blankBefore->setEnabled (false);
         blankAfter->setText ("", dontSendNotification);
         blankAfter->setEnabled (false);
+        startZ->setText ("", dontSendNotification);
+        startZ->setEnabled (false);
+        endZ->setText ("", dontSendNotification);
+        endZ->setEnabled (false);
         selectColorButton->setEnabled (false);
         selectColorButton->setColour (TextButton::buttonColourId, Colours::transparentBlack);
         centerButton->setEnabled (false);
@@ -639,14 +711,20 @@ void SketchProperties::updateSelection()
         extraPerLabel->setColour (Label::textColourId, Colours::white);
         blankBeforeLabel->setColour (Label::textColourId, Colours::white);
         blankAfterLabel->setColour (Label::textColourId, Colours::white);
+        startZLabel->setColour (Label::textColourId, Colours::white);
+        endZLabel->setColour (Label::textColourId, Colours::white);
         spacing->setEnabled (true);
         extraPerAnchor->setEnabled (true);
         blankBefore->setEnabled (true);
         blankAfter->setEnabled (true);
+        startZ->setEnabled (true);
+        endZ->setEnabled (true);
         selectColorButton->setEnabled (true);
         
         bool ms = false; bool me = false; bool mbb = false;
         bool mba = false; bool mc = false;
+        bool msz = false; bool mez = false;
+        
         IPath lastPath;
 
         for (auto n = 0; n < frameEditor->getIPathSelection().getNumRanges(); ++n)
@@ -664,6 +742,8 @@ void SketchProperties::updateSelection()
                 me = lastPath.getExtraPointsPerAnchor() != newPath.getExtraPointsPerAnchor();
                 mbb = lastPath.getBlankedPointsBeforeStart() != newPath.getBlankedPointsBeforeStart();
                 mba = lastPath.getBlankedPointsAfterEnd() != newPath.getBlankedPointsAfterEnd();
+                msz = lastPath.getStartZ() != newPath.getStartZ();
+                mez = lastPath.getEndZ() != newPath.getEndZ();
                 mc = lastPath.getColor() != newPath.getColor();
             }
         }
@@ -672,6 +752,8 @@ void SketchProperties::updateSelection()
         extraPerAnchor->setText (me ? "*" : String (lastPath.getExtraPointsPerAnchor()), dontSendNotification);
         blankBefore->setText (mbb ? "*" : String (lastPath.getBlankedPointsBeforeStart()), dontSendNotification);
         blankAfter->setText (mba ? "*" : String (lastPath.getBlankedPointsAfterEnd()), dontSendNotification);
+        startZ->setText (msz ? "*" : String (lastPath.getStartZ()), dontSendNotification);
+        endZ->setText (mez ? "*" : String (lastPath.getEndZ()), dontSendNotification);
         selectColorButton->setColour (TextButton::buttonColourId, mc ? Colours::transparentBlack : lastPath.getColor());
         
         centerButton->setEnabled (true);

@@ -26,7 +26,8 @@ class IPath
 {
 public:
     IPath (Colour c = Colours::white)
-        : color (c), pointDensity (1200), extraPointsPerAnchor(0),
+        : color (c), startZ (0), endZ (0),
+          pointDensity (1200), extraPointsPerAnchor(0),
           blankedPointsBeforeStart (3), blankedPointsAfterEnd (3) {;}
     ~IPath() {;}
     
@@ -42,6 +43,10 @@ public:
     const Colour& getColor() { return color; }
     void setColor (Colour c) { color = c; }
     
+    int getStartZ() const { return startZ; }
+    void setStartZ (int z) { startZ = z; }
+    int getEndZ() const { return anchors.size() > 1 ? endZ : startZ; }
+    void setEndZ (int z) { endZ = z; }
     uint16 getPointDensity() const { return pointDensity; }
     void setPointDensity (uint16 d) { pointDensity = d ? d : 1; }
     uint16 getExtraPointsPerAnchor() const { return extraPointsPerAnchor; }
@@ -60,6 +65,8 @@ private:
     
     Array<Anchor> anchors;
     Colour color;
+    int startZ;
+    int endZ;
     uint16 pointDensity;
     uint16 extraPointsPerAnchor;
     uint16 blankedPointsBeforeStart;

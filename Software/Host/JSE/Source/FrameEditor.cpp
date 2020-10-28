@@ -1492,6 +1492,9 @@ bool FrameEditor::isClosedIPath (const IPath &path)
     if (path.getAnchorCount() < 2)
         return false;
     
+    if (path.getStartZ() != path.getEndZ())
+        return false;
+    
     int end = path.getAnchorCount() - 1;
     Anchor last = path.getAnchor (end);
     for (auto n = 0; n < end; ++n)
@@ -1504,21 +1507,24 @@ bool FrameEditor::isClosedIPath (const IPath &path)
     return false;
 }
 
-void FrameEditor::pointToIPointXYZ (Point<int> a, Frame::IPoint& point)
+void FrameEditor::pointToIPointXYZ (Point<int> a, Frame::IPoint& point, int zStart, int zEnd, float zPercent)
 {
-    point.x.w = activeView == Frame::left ? 0 : (int16)Frame::toIldaX (a.getX());
-    point.y.w = activeView == Frame::bottom ? 0 : (int16)Frame::toIldaY (a.getY());
+    int zDelta = zEnd - zStart;
+    int z = zStart + (int)((float)zDelta * zPercent);
+    
+    point.x.w = activeView == Frame::left ? z : (int16)Frame::toIldaX (a.getX());
+    point.y.w = activeView == Frame::bottom ? z : (int16)Frame::toIldaY (a.getY());
     if (activeView == Frame::front)
-        point.z.w = 0;
+        point.z.w = z;
     else if (activeView == Frame::bottom)
         point.z.w = (int16)Frame::toIldaY (a.getY());
     else if (activeView == Frame::left)
         point.z.w = (int16)Frame::toIldaX (a.getX());
 }
 
-void FrameEditor::anchorToPointXYZ (const Anchor& a, Frame::IPoint& point)
+void FrameEditor::anchorToPointXYZ (const Anchor& a, Frame::IPoint& point, int zStart, int zEnd, float zPercent)
 {
-    pointToIPointXYZ (Point<int>(a.getX(), a.getY()), point);
+    pointToIPointXYZ (Point<int>(a.getX(), a.getY()), point, zStart, zEnd, zPercent);
 }
 
 void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Frame::IPoint>& points, bool appendPoints)
@@ -1535,6 +1541,14 @@ void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Fram
         bool closed = isClosedIPath (paths[n]);
         int endA = paths[n].getAnchorCount() - 1;
         
+        // Total length of path, zero rendered so far
+        float totalLength = paths[n].getPath().getLength();
+        float rendered = 0.0f;
+        
+        // Z range
+        int startZ = paths[n].getStartZ();
+        int endZ = paths[n].getEndZ();
+        
         for (auto i = 0; i <= endA; ++i)
         {
             Colour c = paths[n].getColor();
@@ -1543,7 +1557,7 @@ void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Fram
 
             if (i == 0) // First anchor
             {
-                anchorToPointXYZ (newAnchor, point);
+                anchorToPointXYZ (newAnchor, point, startZ, endZ, 0.0f);
                 point.red = point.green = point.blue = 0;
                 point.status = Frame::BlankedPoint;
                 
@@ -1598,13 +1612,16 @@ void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Fram
                     {
                         int distance = a * density - offset;
                         Point<float>p = path.getPointAlongPath ((float)distance);
-                        pointToIPointXYZ (p.toInt(), point);
+                        pointToIPointXYZ (p.toInt(), point, startZ, endZ,
+                                          (distance + rendered) / totalLength);
                         points.add (point);
                     }
                 }
                 
+                rendered += plength;
+                
                 // Convert coordinates
-                anchorToPointXYZ (newAnchor, point);
+                anchorToPointXYZ (newAnchor, point, startZ, endZ, rendered / totalLength);
                 points.add (point);
                 if (i != endA || (! closed))
                 {
@@ -1616,7 +1633,7 @@ void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Fram
             lastAnchor = newAnchor;
         }
         
-        anchorToPointXYZ (lastAnchor, point);
+        anchorToPointXYZ (lastAnchor, point, startZ, endZ, 1.0f);
         point.red = point.green = point.blue = 0;
         point.status = Frame::BlankedPoint;
         
@@ -1652,6 +1669,8 @@ void FrameEditor::connectIPaths (const Array<IPath>& src, Array<IPath>& dst)
                 blankPath.setBlankedPointsAfterEnd (0);
                 blankPath.addAnchor (Anchor (lastA.getX(), lastA.getY()));
                 blankPath.addAnchor (Anchor (newA.getX(), newA.getY()));
+                blankPath.setStartZ (lastPath.getEndZ());
+                blankPath.setEndZ (newPath.getStartZ());
                 dst.add (blankPath);
             }
         }
@@ -1670,6 +1689,8 @@ void FrameEditor::connectIPaths (const Array<IPath>& src, Array<IPath>& dst)
         returnPath.setBlankedPointsAfterEnd (0);
         returnPath.addAnchor (Anchor (endA.getX(), endA.getY()));
         returnPath.addAnchor (Anchor (startA.getX(), startA.getY()));
+        returnPath.setStartZ (dst[dst.size() - 1].getEndZ());
+        returnPath.setEndZ (dst[0].getStartZ());
         dst.add (returnPath);
     }
 }
@@ -1859,6 +1880,68 @@ void FrameEditor::setSketchSelectedBlankingAfter (uint16 points)
         return;
 
     beginNewTransaction ("Blanked After Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedStartZ (int z)
+{
+    bool changed = false;
+
+    if (z > 32767)
+        z = 32767;
+    else if (z < -32768)
+        z = -32768;
+
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getStartZ() != z)
+        {
+            p->setStartZ (z);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Start Depth Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedEndZ (int z)
+{
+    bool changed = false;
+    
+    if (z > 32767)
+        z = 32767;
+    else if (z < -32768)
+        z = -32768;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getEndZ() != z)
+        {
+            p->setEndZ (z);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("End Depth Change");
     perform (new UndoableSetPaths (this, iPathSelection, paths));
 }
 

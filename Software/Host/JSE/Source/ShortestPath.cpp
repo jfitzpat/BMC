@@ -164,8 +164,6 @@ void ShortestPath::find (const Array<IPath>& original, Array<IPath>& shortest)
         }
     }
     
-    Logger::outputDebugString (String (minLength));
-    
     for (auto n = 0; n < minPath.size(); ++n)
     {
         if (minPath[n].reversed)
