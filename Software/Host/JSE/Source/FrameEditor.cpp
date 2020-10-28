@@ -513,6 +513,7 @@ void FrameEditor::setSketchVisible (bool visible)
     if (visible != sketchVisible)
     {
         beginNewTransaction ("Sketch Visible Change");
+        perform (new UndoableSetIPathSelection (this, IPathSelection()));
         perform (new UndoableSetSketchVisibility (this, visible));
     }
 }
@@ -522,7 +523,8 @@ void FrameEditor::setIldaVisible (bool visible)
     if (visible != ildaVisible)
     {
         beginNewTransaction ("Ilda Visible Change");
-        perform(new UndoableSetIldaVisibility (this, visible));
+        perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
+        perform (new UndoableSetIldaVisibility (this, visible));
     }
 }
 
@@ -940,7 +942,7 @@ void FrameEditor::setIldaSelection (const SparseSet<uint16>& selection)
     if (selection.getTotalRange().getEnd() > getPointCount())
         return;
     
-    if (! getIldaVisible())
+    if ((! getIldaVisible()) && (! selection.isEmpty()))
         return;
     
     if (selection != ildaSelection)
@@ -1512,10 +1514,10 @@ void FrameEditor::pointToIPointXYZ (Point<int> a, Frame::IPoint& point, int zSta
     int zDelta = zEnd - zStart;
     int z = zStart + (int)((float)zDelta * zPercent);
     
-    point.x.w = activeView == Frame::left ? z : (int16)Frame::toIldaX (a.getX());
-    point.y.w = activeView == Frame::bottom ? z : (int16)Frame::toIldaY (a.getY());
+    point.x.w = activeView == Frame::left ? (int16)z : (int16)Frame::toIldaX (a.getX());
+    point.y.w = activeView == Frame::bottom ? (int16)z : (int16)Frame::toIldaY (a.getY());
     if (activeView == Frame::front)
-        point.z.w = z;
+        point.z.w = (int16)z;
     else if (activeView == Frame::bottom)
         point.z.w = (int16)Frame::toIldaY (a.getY());
     else if (activeView == Frame::left)
@@ -1753,7 +1755,7 @@ void FrameEditor::setIPathSelection (const IPathSelection& selection)
     if (selection.getTotalRange().getEnd() > getIPathCount())
         return;
     
-    if (! getSketchVisible())
+    if ((! getSketchVisible()) && (! selection.isEmpty()))
         return;
     
     if (selection != iPathSelection)
@@ -3677,7 +3679,7 @@ void FrameEditor::_setIldaSelection (const SparseSet<uint16>& selection)
     if (selection.getTotalRange().getEnd() > getPointCount())
         return;
     
-    if (! getIldaVisible())
+    if ((! getIldaVisible()) && (! selection.isEmpty()))
         return;
     
     if (selection != ildaSelection)
@@ -3735,7 +3737,7 @@ void FrameEditor::_setIPathSelection (const IPathSelection& selection)
     if (selection.getTotalRange().getEnd() > getIPathCount())
         return;
     
-    if (! getSketchVisible())
+    if ((! getSketchVisible()) && (! selection.isEmpty()))
         return;
     
     if (selection != iPathSelection)
