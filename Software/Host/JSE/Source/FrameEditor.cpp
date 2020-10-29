@@ -37,7 +37,7 @@ FrameEditor::FrameEditor()
       activeIldaTool (selectTool),
       pointToolColor (Colours::white),
       lastVisiblePointToolColor (Colours::white),
-      activeSketchTool (sketchLineTool),
+      activeSketchTool (sketchSelectTool),
       sketchToolColor (Colours::white),
       lastVisibleSketchToolColor (Colours::white),
       sketchVisible (true),
@@ -1571,6 +1571,9 @@ void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Fram
                 point.blue = c.getBlue();
                 point.status = c == Colours::black ? Frame::BlankedPoint : 0;
                 
+                for (auto es = 0; es < paths[n].getExtraPointsAtStart(); ++es)
+                    points.add (point);
+                
                 points.add (point);
                 for (auto ea = 0; ea < paths[n].getExtraPointsPerAnchor(); ++ea)
                     points.add (point);
@@ -1636,6 +1639,9 @@ void FrameEditor::generatePointsFromPaths (const Array<IPath>& paths, Array<Fram
         }
         
         anchorToPointXYZ (lastAnchor, point, startZ, endZ, 1.0f);
+        for (auto ee = 0; ee < paths[n].getExtraPointsAtEnd(); ++ee)
+            points.add (point);
+        
         point.red = point.green = point.blue = 0;
         point.status = Frame::BlankedPoint;
         
@@ -1830,6 +1836,58 @@ void FrameEditor::setSketchSelectedExtraPerAnchor (uint16 extra)
         return;
 
     beginNewTransaction ("Extra Per Anchor Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedExtraBefore (uint16 extra)
+{
+    bool changed = false;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getExtraPointsAtStart() != extra)
+        {
+            p->setExtraPointsAtStart (extra);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Extra At Start Change");
+    perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::setSketchSelectedExtraAfter (uint16 extra)
+{
+    bool changed = false;
+    
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        if (p->getExtraPointsAtEnd() != extra)
+        {
+            p->setExtraPointsAtEnd(extra);
+            changed = true;
+        }
+    }
+    
+    if (! changed)
+        return;
+
+    beginNewTransaction ("Extra At End Change");
     perform (new UndoableSetPaths (this, iPathSelection, paths));
 }
 

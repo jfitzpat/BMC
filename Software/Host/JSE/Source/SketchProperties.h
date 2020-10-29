@@ -87,6 +87,10 @@ private:
     std::unique_ptr<TextEditor> spacing;
     std::unique_ptr<Label> extraPerLabel;
     std::unique_ptr<TextEditor> extraPerAnchor;
+    std::unique_ptr<Label> extraAtStartLabel;
+    std::unique_ptr<TextEditor> extraAtStartAnchor;
+    std::unique_ptr<Label> extraAtEndLabel;
+    std::unique_ptr<TextEditor> extraAtEndAnchor;
     std::unique_ptr<Label> blankBeforeLabel;
     std::unique_ptr<TextEditor> blankBefore;
     std::unique_ptr<Label> blankAfterLabel;

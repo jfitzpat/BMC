@@ -41,6 +41,8 @@ namespace JSEFile
     const Identifier iPathBlue      ("B");
     const Identifier iPathDensity   ("PointDensity");
     const Identifier ExtraPerAnchor ("ExtraPerAnchor");
+    const Identifier ExtraAtStart   ("ExtraAtStart");
+    const Identifier ExtraAtEnd     ("ExtraAtEnd");
     const Identifier BlanksBefore   ("BlanksBefore");
     const Identifier BlanksAfter    ("BlanksAfter");
     const Identifier StartZ         ("StartZ");

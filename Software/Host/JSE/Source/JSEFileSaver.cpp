@@ -116,6 +116,8 @@ var JSEFileSaver::ipathToObj (uint16 frameIndex, uint16 pathIndex)
 
     obj->setProperty (JSEFile::iPathDensity, path.getPointDensity());
     obj->setProperty (JSEFile::ExtraPerAnchor, path.getExtraPointsPerAnchor());
+    obj->setProperty (JSEFile::ExtraAtStart, path.getExtraPointsAtStart());
+    obj->setProperty (JSEFile::ExtraAtEnd, path.getExtraPointsAtEnd());
     obj->setProperty (JSEFile::BlanksBefore, path.getBlankedPointsBeforeStart());
     obj->setProperty (JSEFile::BlanksAfter, path.getBlankedPointsAfterEnd());
     obj->setProperty (JSEFile::StartZ, path.getStartZ());

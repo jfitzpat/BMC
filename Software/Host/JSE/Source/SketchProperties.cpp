@@ -147,7 +147,7 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     spacing->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     spacing->addListener (this);
 
-    extraPerLabel.reset (new Label ("extraPerlabel", "Extra Anchor Points"));
+    extraPerLabel.reset (new Label ("extraPerlabel", "Extra at Anchors"));
     addAndMakeVisible (extraPerLabel.get());
     extraPerLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
     extraPerLabel->setJustificationType (juce::Justification::centred);
@@ -169,7 +169,51 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     extraPerAnchor->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     extraPerAnchor->addListener (this);
 
-    blankBeforeLabel.reset (new Label ("blankBeforelabel", "Blanked Points Before"));
+    extraAtStartLabel.reset (new Label ("extraAtStartLabel", "Extra at Start"));
+    addAndMakeVisible (extraAtStartLabel.get());
+    extraAtStartLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    extraAtStartLabel->setJustificationType (juce::Justification::centred);
+    extraAtStartLabel->setEditable (false, false, false);
+    extraAtStartLabel->setColour (Label::textColourId, juce::Colours::grey);
+    extraAtStartLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    extraAtStartAnchor.reset (new TextEditor ("extraAtStartAnchor"));
+    addAndMakeVisible (extraAtStartAnchor.get());
+    extraAtStartAnchor->setMultiLine (false);
+    extraAtStartAnchor->setReturnKeyStartsNewLine (false);
+    extraAtStartAnchor->setReadOnly (false);
+    extraAtStartAnchor->setScrollbarsShown (true);
+    extraAtStartAnchor->setCaretVisible (true);
+    extraAtStartAnchor->setPopupMenuEnabled (true);
+    extraAtStartAnchor->setJustification (Justification::centred);
+    extraAtStartAnchor->setColour (TextEditor::textColourId, Colours::white);
+    extraAtStartAnchor->setTooltip ("Extra points at start of shape");
+    extraAtStartAnchor->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    extraAtStartAnchor->addListener (this);
+
+    extraAtEndLabel.reset (new Label ("extraAtEndLabel", "Extra at End"));
+    addAndMakeVisible (extraAtEndLabel.get());
+    extraAtEndLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
+    extraAtEndLabel->setJustificationType (juce::Justification::centred);
+    extraAtEndLabel->setEditable (false, false, false);
+    extraAtEndLabel->setColour (Label::textColourId, juce::Colours::grey);
+    extraAtEndLabel->setColour (Label::backgroundColourId, juce::Colour (0x00000000));
+
+    extraAtEndAnchor.reset (new TextEditor ("extraAtEndAnchor"));
+    addAndMakeVisible (extraAtEndAnchor.get());
+    extraAtEndAnchor->setMultiLine (false);
+    extraAtEndAnchor->setReturnKeyStartsNewLine (false);
+    extraAtEndAnchor->setReadOnly (false);
+    extraAtEndAnchor->setScrollbarsShown (true);
+    extraAtEndAnchor->setCaretVisible (true);
+    extraAtEndAnchor->setPopupMenuEnabled (true);
+    extraAtEndAnchor->setJustification (Justification::centred);
+    extraAtEndAnchor->setColour (TextEditor::textColourId, Colours::white);
+    extraAtEndAnchor->setTooltip ("Extra points at end of shape");
+    extraAtEndAnchor->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
+    extraAtEndAnchor->addListener (this);
+
+    blankBeforeLabel.reset (new Label ("blankBeforelabel", "Blanked Before"));
     addAndMakeVisible (blankBeforeLabel.get());
     blankBeforeLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
     blankBeforeLabel->setJustificationType (juce::Justification::centred);
@@ -191,7 +235,7 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     blankBefore->setInputFilter (new TextEditor::LengthAndCharacterRestriction(-1, "0123456789-*"), true);
     blankBefore->addListener (this);
 
-    blankAfterLabel.reset (new Label ("blankAfterlabel", "Blanked Points After"));
+    blankAfterLabel.reset (new Label ("blankAfterlabel", "Blanked After"));
     addAndMakeVisible (blankAfterLabel.get());
     blankAfterLabel->setFont (Font (10.00f, Font::plain).withTypefaceStyle ("Regular"));
     blankAfterLabel->setJustificationType (juce::Justification::centred);
@@ -356,6 +400,10 @@ SketchProperties::~SketchProperties()
     spacing = nullptr;
     extraPerLabel = nullptr;
     extraPerAnchor = nullptr;
+    extraAtStartLabel = nullptr;
+    extraAtStartAnchor = nullptr;
+    extraAtEndLabel = nullptr;
+    extraAtEndAnchor = nullptr;
     blankBeforeLabel = nullptr;
     blankBefore = nullptr;
     blankAfterLabel = nullptr;
@@ -406,12 +454,16 @@ void SketchProperties::resized()
     spacing->setBounds (16, 144 + 36, getWidth() - 32, 24);
     extraPerLabel->setBounds (16, 176 + 36, getWidth() - 32, 12);
     extraPerAnchor->setBounds (16, 192 + 36, getWidth() - 32, 24);
-    blankBeforeLabel->setBounds (16, 224 + 36, getWidth() - 32, 12);
-    blankBefore->setBounds (16, 240 + 36, getWidth() - 32, 24);
-    blankAfterLabel->setBounds (16, 272 + 36, getWidth() - 32, 12);
-    blankAfter->setBounds (16, 288 + 36, getWidth() - 32, 24);
+    extraAtStartLabel->setBounds (16, 260, getWidth() / 2 - 20, 12);
+    extraAtStartAnchor->setBounds (16, 276, getWidth() / 2 - 20, 24);
+    extraAtEndLabel->setBounds (getBounds().getCentreX() + 4, 260, getWidth() / 2 - 20, 12);
+    extraAtEndAnchor->setBounds (getBounds().getCentreX() + 4, 276, getWidth() / 2 - 20, 24);
+    blankBeforeLabel->setBounds (16, 308, getWidth() / 2 - 20, 12);
+    blankBefore->setBounds (16, 324, getWidth() / 2 - 20, 24);
+    blankAfterLabel->setBounds (getBounds().getCentreX() + 4, 308, getWidth() / 2 - 20, 12);
+    blankAfter->setBounds (getBounds().getCentreX() + 4, 324, getWidth() / 2 - 20, 24);
     startZLabel->setBounds (16, 356, getWidth() / 2 - 20, 12);
-    endZLabel->setBounds (getBounds().getCentreX() + 4, 356, getWidth() / 2 - 16, 12);
+    endZLabel->setBounds (getBounds().getCentreX() + 4, 356, getWidth() / 2 - 20, 12);
     startZ->setBounds (16, 372, getWidth() / 2 - 20, 24);
     endZ->setBounds (getBounds().getCentreX() + 4, 372, getWidth() / 2 - 20, 24);
     selectColorButton->setBounds (getBounds().getCentreX() - 10, 320 + 84, 20, 20);
@@ -494,6 +546,20 @@ void SketchProperties::textEditorReturnKeyPressed (TextEditor& editor)
     {
         if (! blankAfter->getText().containsChar ('*'))
             frameEditor->setSketchSelectedBlankingAfter ((int16) blankAfter->getText().getIntValue());
+        
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == extraAtStartAnchor.get())
+    {
+        if (! extraAtStartAnchor->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedExtraBefore ((int16)extraAtStartAnchor->getText().getIntValue());
+        
+        layerVisible->grabKeyboardFocus();
+    }
+    else if (&editor == extraAtEndAnchor.get())
+    {
+        if (! extraAtEndAnchor->getText().containsChar ('*'))
+            frameEditor->setSketchSelectedExtraAfter ((int16)extraAtEndAnchor->getText().getIntValue());
         
         layerVisible->grabKeyboardFocus();
     }
@@ -624,6 +690,8 @@ void SketchProperties::updateSelection()
         pointsLabel->setColour (Label::textColourId, Colours::grey);
         spacingLabel->setColour (Label::textColourId, Colours::grey);
         extraPerLabel->setColour (Label::textColourId, Colours::grey);
+        extraAtStartLabel->setColour (Label::textColourId, Colours::grey);
+        extraAtEndLabel->setColour (Label::textColourId, Colours::grey);
         blankBeforeLabel->setColour (Label::textColourId, Colours::grey);
         blankAfterLabel->setColour (Label::textColourId, Colours::grey);
         startZLabel->setColour (Label::textColourId, Colours::grey);
@@ -632,6 +700,10 @@ void SketchProperties::updateSelection()
         spacing->setEnabled (false);
         extraPerAnchor->setText ("", dontSendNotification);
         extraPerAnchor->setEnabled (false);
+        extraAtStartAnchor->setText ("", dontSendNotification);
+        extraAtStartAnchor->setEnabled (false);
+        extraAtEndAnchor->setText ("", dontSendNotification);
+        extraAtEndAnchor->setEnabled (false);
         blankBefore->setText ("", dontSendNotification);
         blankBefore->setEnabled (false);
         blankAfter->setText ("", dontSendNotification);
@@ -709,12 +781,16 @@ void SketchProperties::updateSelection()
         
         spacingLabel->setColour (Label::textColourId, Colours::white);
         extraPerLabel->setColour (Label::textColourId, Colours::white);
+        extraAtStartLabel->setColour (Label::textColourId, Colours::white);
+        extraAtEndLabel->setColour (Label::textColourId, Colours::white);
         blankBeforeLabel->setColour (Label::textColourId, Colours::white);
         blankAfterLabel->setColour (Label::textColourId, Colours::white);
         startZLabel->setColour (Label::textColourId, Colours::white);
         endZLabel->setColour (Label::textColourId, Colours::white);
         spacing->setEnabled (true);
         extraPerAnchor->setEnabled (true);
+        extraAtStartAnchor->setEnabled (true);
+        extraAtEndAnchor->setEnabled (true);
         blankBefore->setEnabled (true);
         blankAfter->setEnabled (true);
         startZ->setEnabled (true);
@@ -723,6 +799,7 @@ void SketchProperties::updateSelection()
         
         bool ms = false; bool me = false; bool mbb = false;
         bool mba = false; bool mc = false;
+        bool mes = false; bool mee = false;
         bool msz = false; bool mez = false;
         
         IPath lastPath;
@@ -745,11 +822,15 @@ void SketchProperties::updateSelection()
                 msz = lastPath.getStartZ() != newPath.getStartZ();
                 mez = lastPath.getEndZ() != newPath.getEndZ();
                 mc = lastPath.getColor() != newPath.getColor();
+                mes = lastPath.getExtraPointsAtStart() != newPath.getExtraPointsAtStart();
+                mee = lastPath.getExtraPointsAtEnd() != newPath.getExtraPointsAtEnd();
             }
         }
         
         spacing->setText (ms ? "*" : String (lastPath.getPointDensity()), dontSendNotification);
         extraPerAnchor->setText (me ? "*" : String (lastPath.getExtraPointsPerAnchor()), dontSendNotification);
+        extraAtStartAnchor->setText (mes ? "*" : String (lastPath.getExtraPointsAtStart()));
+        extraAtEndAnchor->setText (mee ? "*" : String (lastPath.getExtraPointsAtEnd()));
         blankBefore->setText (mbb ? "*" : String (lastPath.getBlankedPointsBeforeStart()), dontSendNotification);
         blankAfter->setText (mba ? "*" : String (lastPath.getBlankedPointsAfterEnd()), dontSendNotification);
         startZ->setText (msz ? "*" : String (lastPath.getStartZ()), dontSendNotification);

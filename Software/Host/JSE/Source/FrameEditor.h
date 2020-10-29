@@ -358,6 +358,8 @@ public:
     
     void setSketchSelectedSpacing (uint16 newSpacing);
     void setSketchSelectedExtraPerAnchor (uint16 extra);
+    void setSketchSelectedExtraBefore (uint16 extra);
+    void setSketchSelectedExtraAfter (uint16 extra);
     void setSketchSelectedBlankingBefore (uint16 points);
     void setSketchSelectedBlankingAfter (uint16 points);
     void setSketchSelectedStartZ (int z);

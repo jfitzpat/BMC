@@ -115,6 +115,8 @@ bool JSEFileLoader::load (ReferenceCountedArray<Frame>& frameArray, File& file)
                 path.setColor (c);
                 path.setPointDensity ((uint16)(int)pathData->getProperty (JSEFile::iPathDensity));
                 path.setExtraPointsPerAnchor ((uint16)(int)pathData->getProperty (JSEFile::ExtraPerAnchor));
+                path.setExtraPointsAtStart ((uint16)(int)pathData->getProperty (JSEFile::ExtraAtStart));
+                path.setExtraPointsAtEnd ((uint16)(int)pathData->getProperty (JSEFile::ExtraAtEnd));
                 path.setBlankedPointsBeforeStart ((uint16)(int)pathData->getProperty (JSEFile::BlanksBefore));
                 path.setBlankedPointsAfterEnd ((uint16)(int)pathData->getProperty (JSEFile::BlanksAfter));
                 path.setStartZ (pathData->getProperty (JSEFile::StartZ));
