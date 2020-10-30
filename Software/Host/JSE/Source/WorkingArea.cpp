@@ -280,6 +280,7 @@ void WorkingArea::mouseDownIldaSelect (const MouseEvent& event)
     else
     {
         drawRect = true;
+        rectCentered = false;
         lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
     }
 }
@@ -291,6 +292,7 @@ void WorkingArea::mouseDownSketchEllipse (const MouseEvent& event)
         return;
 
     drawEllipse = true;
+    ellipseCentered = frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterEllipseTool;
     lastEllipseRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
 }
 
@@ -301,6 +303,7 @@ void WorkingArea::mouseDownSketchRect (const MouseEvent& event)
         return;
 
     drawRect = true;
+    rectCentered = frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterRectTool;
     lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
 }
 
@@ -338,6 +341,7 @@ void WorkingArea::mouseDownSketchSelect (const MouseEvent& event)
     else
     {
         drawRect = true;
+        rectCentered = false;
         lastDrawRect = Rectangle<int>(event.getMouseDownPosition(), event.getPosition());
     }
 }
@@ -371,6 +375,10 @@ void WorkingArea::mouseDown (const MouseEvent& event)
             mouseDownSketchPen (event);
         else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchRectTool)
             mouseDownSketchRect (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterRectTool)
+            mouseDownSketchRect (event);
+        else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterEllipseTool)
+            mouseDownSketchEllipse (event);
     }
 }
 
@@ -1001,6 +1009,15 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
             else if (lastDrawRect.getWidth() < lastDrawRect.getHeight())
                 lastDrawRect.setWidth (lastDrawRect.getHeight());
         }
+        if (rectCentered)
+        {
+            lastDrawRect = Rectangle<int> (
+                    event.getMouseDownPosition().getX() - lastDrawRect.getWidth(),
+                    event.getMouseDownPosition().getY() - lastDrawRect.getHeight(),
+                    lastDrawRect.getWidth() * 2,
+                    lastDrawRect.getHeight() * 2);
+        }
+
         repaint (lastDrawRect.expanded (expansion, expansion));
     }
     else if (drawEllipse)
@@ -1014,6 +1031,14 @@ void WorkingArea::mouseDrag (const MouseEvent& event)
                 lastEllipseRect.setHeight (lastEllipseRect.getWidth());
             else if (lastEllipseRect.getWidth() < lastEllipseRect.getHeight())
                 lastEllipseRect.setWidth (lastEllipseRect.getHeight());
+        }
+        if (ellipseCentered)
+        {
+            lastEllipseRect = Rectangle<int> (
+                event.getMouseDownPosition().getX() - lastEllipseRect.getWidth(),
+                event.getMouseDownPosition().getY() - lastEllipseRect.getHeight(),
+                lastEllipseRect.getWidth() * 2,
+                lastEllipseRect.getHeight() * 2);
         }
         repaint (lastEllipseRect.expanded (expansion, expansion));
     }
@@ -1445,6 +1470,8 @@ void WorkingArea::updateCursor()
             case FrameEditor::sketchEllipseTool:
             case FrameEditor::sketchLineTool:
             case FrameEditor::sketchRectTool:
+            case FrameEditor::sketchCenterRectTool:
+            case FrameEditor::sketchCenterEllipseTool:
                 setMouseCursor (MouseCursor::CrosshairCursor);
                 break;
 

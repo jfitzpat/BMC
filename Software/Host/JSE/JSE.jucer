@@ -10,11 +10,13 @@
         <FILE id="geJK2T" name="anchor.png" compile="0" resource="1" file="Graphics/anchor.png"/>
         <FILE id="TuDhGA" name="barber.png" compile="0" resource="1" file="Graphics/barber.png"/>
         <FILE id="DJTJYV" name="bulge.png" compile="0" resource="1" file="Graphics/bulge.png"/>
+        <FILE id="ox6DPw" name="cellipse.png" compile="0" resource="1" file="Graphics/cellipse.png"/>
         <FILE id="SdCzqH" name="center.png" compile="0" resource="1" file="Graphics/center.png"/>
         <FILE id="pR9Plt" name="centerx.png" compile="0" resource="1" file="Graphics/centerx.png"/>
         <FILE id="mgXFTs" name="centery.png" compile="0" resource="1" file="Graphics/centery.png"/>
         <FILE id="kGVlt1" name="centerz.png" compile="0" resource="1" file="Graphics/centerz.png"/>
         <FILE id="FbVlUv" name="coloradjust.png" compile="0" resource="1" file="Graphics/coloradjust.png"/>
+        <FILE id="t0NBxb" name="crectangle.png" compile="0" resource="1" file="Graphics/crectangle.png"/>
         <FILE id="Ji38Wl" name="croshair.png" compile="0" resource="1" file="Graphics/croshair.png"/>
         <FILE id="OVPQcf" name="down-white.png" compile="0" resource="1" file="Graphics/down-white.png"/>
         <FILE id="NfqRkZ" name="duplicate-white.png" compile="0" resource="1"

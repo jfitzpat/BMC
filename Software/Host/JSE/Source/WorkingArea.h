@@ -94,6 +94,7 @@ private:
     Rectangle<int> lastMarkRect;
     
     bool drawRect;
+    bool rectCentered;
     Rectangle<int> lastDrawRect;
     
     bool drawDot;
@@ -109,6 +110,7 @@ private:
     Rectangle<int> lastSMarkRect;
     
     bool drawEllipse;
+    bool ellipseCentered;
     Rectangle<int> lastEllipseRect;
     
     bool drawSDot;

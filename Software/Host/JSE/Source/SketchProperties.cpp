@@ -93,6 +93,26 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     ellipseToolButton->setTooltip ("Ellipse Tool (hold <shift> for Circle)");
     ellipseToolButton->addListener (this);
 
+    centerRectIcon = Drawable::createFromImageData (BinaryData::crectangle_png,
+                                                    BinaryData::crectangle_pngSize);
+    
+    centerRectToolButton.reset (new DrawableButton ("cRectToolButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerRectToolButton.get());
+    centerRectToolButton->setImages (centerRectIcon.get());
+    centerRectToolButton->setEdgeIndent (0);
+    centerRectToolButton->setTooltip ("Centered Rectangle Tool (hold <shift> for Square)");
+    centerRectToolButton->addListener (this);
+
+    centerEllipseIcon = Drawable::createFromImageData (BinaryData::cellipse_png,
+                                                       BinaryData::cellipse_pngSize);
+    
+    centerEllipseToolButton.reset (new DrawableButton ("cEllipseToolButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (centerEllipseToolButton.get());
+    centerEllipseToolButton->setImages (centerEllipseIcon.get());
+    centerEllipseToolButton->setEdgeIndent (0);
+    centerEllipseToolButton->setTooltip ("Centered Ellipse Tool (hold <shift> for Circle)");
+    centerEllipseToolButton->addListener (this);
+
     penIcon = Drawable::createFromImageData (BinaryData::pen_png,
                                              BinaryData::pen_pngSize);
     
@@ -391,6 +411,10 @@ SketchProperties::~SketchProperties()
     rectIcon = nullptr;
     ellipseToolButton = nullptr;
     ellipseIcon = nullptr;
+    centerRectToolButton = nullptr;
+    centerRectIcon = nullptr;
+    centerEllipseToolButton = nullptr;
+    centerEllipseIcon = nullptr;
     penToolButton = nullptr;
     penIcon = nullptr;
     toolColorButton = nullptr;
@@ -440,40 +464,42 @@ void SketchProperties::resized()
 {
     layerVisible->setBounds (16, 16, 84, 24);
     renderButton->setBounds (94, 12, 92, 28);
-    lineToolButton->setBounds (10 + 12, 48, 32, 32);
-    rectToolButton->setBounds (46 + 12, 48, 32, 32);
-    ellipseToolButton->setBounds (82 + 12, 48, 32, 32);
+    lineToolButton->setBounds (82 + 12, 48, 32, 32);
+    rectToolButton->setBounds (10 + 12, 48, 32, 32);
+    ellipseToolButton->setBounds (46 + 12, 48, 32, 32);
     penToolButton->setBounds (118 + 12, 48, 32, 32);
     toolColorButton->setBounds (154 + 12, 54, 20, 20);
+    centerRectToolButton->setBounds (10 + 12, 84, 32, 32);
+    centerEllipseToolButton->setBounds (46 + 12, 84, 32, 32);
     selectToolButton->setBounds (82 + 12, 84, 32, 32);
     moveToolButton->setBounds (118 + 12, 84, 32, 32);
 
     selectLabel->setBounds (16, 88 + 36, getWidth() - 32, 24);
     pointsLabel->setBounds (16, 104 + 36, getWidth() - 32, 24);
-    spacingLabel->setBounds (16, 128 + 36, getWidth() - 32, 12);
-    spacing->setBounds (16, 144 + 36, getWidth() - 32, 24);
-    extraPerLabel->setBounds (16, 176 + 36, getWidth() - 32, 12);
-    extraPerAnchor->setBounds (16, 192 + 36, getWidth() - 32, 24);
-    extraAtStartLabel->setBounds (16, 260, getWidth() / 2 - 20, 12);
-    extraAtStartAnchor->setBounds (16, 276, getWidth() / 2 - 20, 24);
-    extraAtEndLabel->setBounds (getBounds().getCentreX() + 4, 260, getWidth() / 2 - 20, 12);
-    extraAtEndAnchor->setBounds (getBounds().getCentreX() + 4, 276, getWidth() / 2 - 20, 24);
-    blankBeforeLabel->setBounds (16, 308, getWidth() / 2 - 20, 12);
-    blankBefore->setBounds (16, 324, getWidth() / 2 - 20, 24);
-    blankAfterLabel->setBounds (getBounds().getCentreX() + 4, 308, getWidth() / 2 - 20, 12);
-    blankAfter->setBounds (getBounds().getCentreX() + 4, 324, getWidth() / 2 - 20, 24);
-    startZLabel->setBounds (16, 356, getWidth() / 2 - 20, 12);
-    endZLabel->setBounds (getBounds().getCentreX() + 4, 356, getWidth() / 2 - 20, 12);
-    startZ->setBounds (16, 372, getWidth() / 2 - 20, 24);
-    endZ->setBounds (getBounds().getCentreX() + 4, 372, getWidth() / 2 - 20, 24);
-    selectColorButton->setBounds (getBounds().getCentreX() - 10, 320 + 84, 20, 20);
-    centerButton->setBounds (82, 348 + 84, 32, 32);
-    centerXButton->setBounds (118, 348 + 84, 32, 32);
-    centerYButton->setBounds (154, 348 + 84, 32, 32);
-    scaleButton->setBounds (82, 384 + 84, 32, 32);
-    rotateButton->setBounds (118, 384 + 84, 32, 32);
-    shearButton->setBounds (154, 384 + 84, 32, 32);
-    trashButton->setBounds (154, 420 + 84, 32, 32);
+    spacingLabel->setBounds (16, 128 + 36, getWidth() / 2 - 20, 12);
+    spacing->setBounds (16, 144 + 36, getWidth() / 2 - 20, 24);
+    extraPerLabel->setBounds (getBounds().getCentreX() + 4, 176 + 36 - 48, getWidth() / 2 - 20, 12);
+    extraPerAnchor->setBounds (getBounds().getCentreX() + 4, 192 + 36 - 48, getWidth() / 2- 20, 24);
+    extraAtStartLabel->setBounds (16, 260 - 48, getWidth() / 2 - 20, 12);
+    extraAtStartAnchor->setBounds (16, 276 - 48, getWidth() / 2 - 20, 24);
+    extraAtEndLabel->setBounds (getBounds().getCentreX() + 4, 260 - 48, getWidth() / 2 - 20, 12);
+    extraAtEndAnchor->setBounds (getBounds().getCentreX() + 4, 276 - 48, getWidth() / 2 - 20, 24);
+    blankBeforeLabel->setBounds (16, 308 - 48, getWidth() / 2 - 20, 12);
+    blankBefore->setBounds (16, 324 - 48, getWidth() / 2 - 20, 24);
+    blankAfterLabel->setBounds (getBounds().getCentreX() + 4, 308 - 48, getWidth() / 2 - 20, 12);
+    blankAfter->setBounds (getBounds().getCentreX() + 4, 324 - 48, getWidth() / 2 - 20, 24);
+    startZLabel->setBounds (16, 356 - 48, getWidth() / 2 - 20, 12);
+    endZLabel->setBounds (getBounds().getCentreX() + 4, 356 - 48, getWidth() / 2 - 20, 12);
+    startZ->setBounds (16, 372 - 48, getWidth() / 2 - 20, 24);
+    endZ->setBounds (getBounds().getCentreX() + 4, 372 - 48, getWidth() / 2 - 20, 24);
+    selectColorButton->setBounds (getBounds().getCentreX() - 10, 320 + 84 - 48, 20, 20);
+    centerButton->setBounds (82, 348 + 84 - 48, 32, 32);
+    centerXButton->setBounds (118, 348 + 84 - 48, 32, 32);
+    centerYButton->setBounds (154, 348 + 84 - 48, 32, 32);
+    scaleButton->setBounds (82, 384 + 84 - 48, 32, 32);
+    rotateButton->setBounds (118, 384 + 84 - 48, 32, 32);
+    shearButton->setBounds (154, 384 + 84 - 48, 32, 32);
+    trashButton->setBounds (154, 420 + 84 - 48, 32, 32);
 }
 
 //==============================================================================
@@ -491,6 +517,10 @@ void SketchProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->setActiveSketchTool (FrameEditor::sketchRectTool);
     else if (buttonThatWasClicked == ellipseToolButton.get())
         frameEditor->setActiveSketchTool (FrameEditor::sketchEllipseTool);
+    else if (buttonThatWasClicked == centerRectToolButton.get())
+        frameEditor->setActiveSketchTool (FrameEditor::sketchCenterRectTool);
+    else if (buttonThatWasClicked == centerEllipseToolButton.get())
+        frameEditor->setActiveSketchTool (FrameEditor::sketchCenterEllipseTool);
     else if (buttonThatWasClicked == penToolButton.get())
         frameEditor->setActiveSketchTool (FrameEditor::sketchPenTool);
     else if (buttonThatWasClicked == centerButton.get())
@@ -857,6 +887,8 @@ void SketchProperties::updateTools()
         penToolButton->setToggleState (false, dontSendNotification);
         lineToolButton->setToggleState (false, dontSendNotification);
         rectToolButton->setToggleState (false, dontSendNotification);
+        centerRectToolButton->setToggleState (false, dontSendNotification);
+        centerEllipseToolButton->setToggleState (false, dontSendNotification);
     }
     else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchMoveTool)
     {
@@ -866,6 +898,8 @@ void SketchProperties::updateTools()
         penToolButton->setToggleState (false, dontSendNotification);
         lineToolButton->setToggleState (false, dontSendNotification);
         rectToolButton->setToggleState (false, dontSendNotification);
+        centerRectToolButton->setToggleState (false, dontSendNotification);
+        centerEllipseToolButton->setToggleState (false, dontSendNotification);
     }
     else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchEllipseTool)
     {
@@ -875,6 +909,8 @@ void SketchProperties::updateTools()
         penToolButton->setToggleState (false, dontSendNotification);
         lineToolButton->setToggleState (false, dontSendNotification);
         rectToolButton->setToggleState (false, dontSendNotification);
+        centerRectToolButton->setToggleState (false, dontSendNotification);
+        centerEllipseToolButton->setToggleState (false, dontSendNotification);
     }
     else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchLineTool)
     {
@@ -884,6 +920,8 @@ void SketchProperties::updateTools()
         penToolButton->setToggleState (false, dontSendNotification);
         lineToolButton->setToggleState (true, dontSendNotification);
         rectToolButton->setToggleState (false, dontSendNotification);
+        centerRectToolButton->setToggleState (false, dontSendNotification);
+        centerEllipseToolButton->setToggleState (false, dontSendNotification);
     }
     else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchRectTool)
     {
@@ -893,6 +931,30 @@ void SketchProperties::updateTools()
         penToolButton->setToggleState (false, dontSendNotification);
         lineToolButton->setToggleState (false, dontSendNotification);
         rectToolButton->setToggleState (true, dontSendNotification);
+        centerRectToolButton->setToggleState (false, dontSendNotification);
+        centerEllipseToolButton->setToggleState (false, dontSendNotification);
+    }
+    else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterRectTool)
+    {
+        selectToolButton->setToggleState (false, dontSendNotification);
+        moveToolButton->setToggleState (false, dontSendNotification);
+        ellipseToolButton->setToggleState (false, dontSendNotification);
+        penToolButton->setToggleState (false, dontSendNotification);
+        lineToolButton->setToggleState (false, dontSendNotification);
+        rectToolButton->setToggleState (false, dontSendNotification);
+        centerRectToolButton->setToggleState (true, dontSendNotification);
+        centerEllipseToolButton->setToggleState (false, dontSendNotification);
+    }
+    else if (frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterEllipseTool)
+    {
+        selectToolButton->setToggleState (false, dontSendNotification);
+        moveToolButton->setToggleState (false, dontSendNotification);
+        ellipseToolButton->setToggleState (false, dontSendNotification);
+        penToolButton->setToggleState (false, dontSendNotification);
+        lineToolButton->setToggleState (false, dontSendNotification);
+        rectToolButton->setToggleState (false, dontSendNotification);
+        centerRectToolButton->setToggleState (false, dontSendNotification);
+        centerEllipseToolButton->setToggleState (true, dontSendNotification);
     }
     else
     {
@@ -902,6 +964,8 @@ void SketchProperties::updateTools()
         penToolButton->setToggleState (true, dontSendNotification);
         lineToolButton->setToggleState (false, dontSendNotification);
         rectToolButton->setToggleState (false, dontSendNotification);
+        centerRectToolButton->setToggleState (false, dontSendNotification);
+        centerEllipseToolButton->setToggleState (false, dontSendNotification);
     }
 
     toolColorButton->setColour (TextButton::buttonColourId, frameEditor->getSketchToolColor());

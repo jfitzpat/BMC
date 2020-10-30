@@ -135,7 +135,9 @@ public:
         sketchMoveTool,
         sketchLineTool,
         sketchRectTool,
+        sketchCenterRectTool,
         sketchEllipseTool,
+        sketchCenterEllipseTool,
         sketchPenTool
     } SketchTool;
     

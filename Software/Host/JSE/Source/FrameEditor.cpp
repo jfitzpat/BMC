@@ -1732,6 +1732,8 @@ void FrameEditor::renderSketch (bool shortestPath, bool updateSketch)
         perform (new UndoableSetIldaSelection (this, SparseSet<uint16>()));
         perform (new UndoableChangePoints (this, points));
     }
+
+    refreshThumb();
 }
 
 void FrameEditor::adjustIPathSelection (int offset)

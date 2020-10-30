@@ -151,6 +151,24 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
     }
     else if (menuIndex == 1)
     {
+        PopupMenu toolMenu;
+
+        if (frameEditor->getActiveLayer() == FrameEditor::ilda ||
+            frameEditor->getActiveLayer() == FrameEditor::sketch)
+        {
+            toolMenu.addCommandItem (&commandManager, CommandIDs::selectToolRequest);
+            toolMenu.addCommandItem (&commandManager, CommandIDs::moveToolRequest);
+            toolMenu.addCommandItem (&commandManager, CommandIDs::pointPenToolRequest);
+            if (frameEditor->getActiveLayer() == FrameEditor::sketch)
+            {
+                toolMenu.addCommandItem (&commandManager, CommandIDs::lineToolRequest);
+                toolMenu.addCommandItem (&commandManager, CommandIDs::rectToolRequest);
+                toolMenu.addCommandItem (&commandManager, CommandIDs::ellipseToolRequest);
+                toolMenu.addCommandItem (&commandManager, CommandIDs::centerRectToolRequest);
+                toolMenu.addCommandItem (&commandManager, CommandIDs::centerEllipseToolRequest);
+            }
+        }
+        
         menu.addCommandItem (&commandManager, CommandIDs::editUndo);
         menu.addCommandItem (&commandManager, CommandIDs::editRedo);
         menu.addSeparator();
@@ -172,14 +190,10 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
             menu.addCommandItem (&commandManager, CommandIDs::blankingToggleRequest);
             menu.addCommandItem (&commandManager, CommandIDs::cycleColorsRequest);
             menu.addSeparator();
-            menu.addCommandItem (&commandManager, CommandIDs::selectToolRequest);
-            menu.addCommandItem (&commandManager, CommandIDs::moveToolRequest);
-            menu.addCommandItem (&commandManager, CommandIDs::pointPenToolRequest);
+            menu.addSubMenu ("Tools", toolMenu);
         }
         if (frameEditor->getActiveLayer() == FrameEditor::sketch)
         {
-            menu.addCommandItem (&commandManager, CommandIDs::lineToolRequest);
-            menu.addCommandItem (&commandManager, CommandIDs::rectToolRequest);
             menu.addSeparator();
             menu.addCommandItem (&commandManager, CommandIDs::forceStraight);
             menu.addCommandItem (&commandManager, CommandIDs::zeroExit);
@@ -335,6 +349,9 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::selectToolRequest,
                                 CommandIDs::lineToolRequest,
                                 CommandIDs::rectToolRequest,
+                                CommandIDs::ellipseToolRequest,
+                                CommandIDs::centerRectToolRequest,
+                                CommandIDs::centerEllipseToolRequest,
                                 CommandIDs::forceCurve,
                                 CommandIDs::forceStraight,
                                 CommandIDs::zeroExit,
@@ -606,7 +623,25 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch);
             result.setTicked (frameEditor->getActiveSketchTool() == FrameEditor::sketchRectTool);
             break;
-        case CommandIDs::forceCurve:
+        case CommandIDs::ellipseToolRequest:
+            result.setInfo ("Ellipse Tool", "Select Ellipse Tool", "Menu", 0);
+            result.addDefaultKeypress ('j', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch);
+            result.setTicked (frameEditor->getActiveSketchTool() == FrameEditor::sketchEllipseTool);
+            break;
+        case CommandIDs::centerEllipseToolRequest:
+            result.setInfo ("Centered Ellipse Tool", "Select Centered Ellipse Tool", "Menu", 0);
+            result.addDefaultKeypress ('n', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch);
+            result.setTicked (frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterEllipseTool);
+            break;
+        case CommandIDs::centerRectToolRequest:
+            result.setInfo ("Centered Rectangle Tool", "Select Centered Rectangle Tool", "Menu", 0);
+            result.addDefaultKeypress ('m', 0);
+            result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch);
+            result.setTicked (frameEditor->getActiveSketchTool() == FrameEditor::sketchCenterRectTool);
+            break;
+         case CommandIDs::forceCurve:
             result.setInfo ("Curve Anchor", "", "Menu", 0);
             result.addDefaultKeypress (',', 0);
             result.setActive (frameEditor->getActiveLayer() == FrameEditor::sketch && (frameEditor->getIPathSelection().getAnchor() != -1));
@@ -870,6 +905,15 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::rectToolRequest:
             frameEditor->setActiveSketchTool (FrameEditor::sketchRectTool);
+            break;
+        case CommandIDs::ellipseToolRequest:
+            frameEditor->setActiveSketchTool (FrameEditor::sketchEllipseTool);
+            break;
+        case CommandIDs::centerRectToolRequest:
+            frameEditor->setActiveSketchTool (FrameEditor::sketchCenterRectTool);
+            break;
+        case CommandIDs::centerEllipseToolRequest:
+            frameEditor->setActiveSketchTool (FrameEditor::sketchCenterEllipseTool);
             break;
         case CommandIDs::forceCurve:
             frameEditor->forceAnchorCurved();

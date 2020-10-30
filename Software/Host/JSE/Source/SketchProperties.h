@@ -78,6 +78,10 @@ private:
     std::unique_ptr<DrawableButton> rectToolButton;
     std::unique_ptr <Drawable> ellipseIcon;
     std::unique_ptr<DrawableButton> ellipseToolButton;
+    std::unique_ptr <Drawable> centerRectIcon;
+    std::unique_ptr<DrawableButton> centerRectToolButton;
+    std::unique_ptr <Drawable> centerEllipseIcon;
+    std::unique_ptr<DrawableButton> centerEllipseToolButton;
     std::unique_ptr <Drawable> penIcon;
     std::unique_ptr<DrawableButton> penToolButton;
     std::unique_ptr<ColourButton> toolColorButton;
