@@ -124,6 +124,8 @@ private:
     std::unique_ptr<DrawableButton> duplicateButton;
     std::unique_ptr<Drawable> anchorIcon;
     std::unique_ptr<DrawableButton> anchorButton;
+    std::unique_ptr<Drawable> anchorAfterIcon;
+    std::unique_ptr<DrawableButton> anchorAfterButton;
     std::unique_ptr<Drawable> barberIcon;
     std::unique_ptr<BarberButton> barberButton;
     std::unique_ptr<Drawable> bulgeIcon;

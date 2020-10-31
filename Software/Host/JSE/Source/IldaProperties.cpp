@@ -415,8 +415,8 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     duplicateButton->setTooltip ("Duplicate the selected point(s)");
     duplicateButton->addListener (this);
 
-    anchorIcon = Drawable::createFromImageData (BinaryData::anchor_png,
-                                                BinaryData::anchor_pngSize);
+    anchorIcon = Drawable::createFromImageData (BinaryData::anchorbefore_png,
+                                                BinaryData::anchorbefore_pngSize);
 
     anchorButton.reset (new DrawableButton ("anchorButton", DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (anchorButton.get());
@@ -424,6 +424,16 @@ IldaProperties::IldaProperties (FrameEditor* editor)
     anchorButton->setEdgeIndent (0);
     anchorButton->setTooltip ("Insert a blanked anchor point before each selected point");
     anchorButton->addListener (this);
+
+    anchorAfterIcon = Drawable::createFromImageData (BinaryData::anchorafter_png,
+                                                     BinaryData::anchorafter_pngSize);
+
+    anchorAfterButton.reset (new DrawableButton ("anchorAfterButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (anchorAfterButton.get());
+    anchorAfterButton->setImages (anchorAfterIcon.get());
+    anchorAfterButton->setEdgeIndent (0);
+    anchorAfterButton->setTooltip ("Insert a blanked anchor point after each selected point");
+    anchorAfterButton->addListener (this);
 
     refresh();
 }
@@ -491,6 +501,8 @@ IldaProperties::~IldaProperties()
     duplicateIcon = nullptr;
     anchorButton = nullptr;
     anchorIcon = nullptr;
+    anchorAfterButton = nullptr;
+    anchorAfterIcon = nullptr;
     shearButton = nullptr;
     shearIcon = nullptr;
 }
@@ -544,8 +556,9 @@ void IldaProperties::resized()
     gradientButton->setBounds (82, 484, 32, 32);
     gradient3Button->setBounds (118, 484, 32, 32);
     hueButton->setBounds(154, 484, 32, 32);
-    duplicateButton->setBounds (118, 520, 32, 32);
-    anchorButton->setBounds (154, 520, 32, 32);
+    duplicateButton->setBounds (82, 520, 32, 32);
+    anchorButton->setBounds (118, 520, 32, 32);
+    anchorAfterButton->setBounds (154, 520, 32, 32);
     trashButton->setBounds (154, 556, 32, 32);
 }
 
@@ -582,6 +595,8 @@ void IldaProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->duplicateIldaSelected();
     else if (buttonThatWasClicked == anchorButton.get())
         frameEditor->anchorIldaSelected();
+    else if (buttonThatWasClicked == anchorAfterButton.get())
+        frameEditor->anchorAfterIldaSelected();
 }
 
 //==============================================================================
@@ -885,6 +900,7 @@ void IldaProperties::disableSelectionTools()
     rotateButton->setEnabled (false);
     duplicateButton->setEnabled (false);
     anchorButton->setEnabled (false);
+    anchorAfterButton->setEnabled (false);
     shearButton->setEnabled (false);
     barberButton->setEnabled (false);
     bulgeButton->setEnabled (false);
@@ -990,6 +1006,7 @@ void IldaProperties::updateSelection()
             rotateButton->setEnabled (true);
             duplicateButton->setEnabled (true);
             anchorButton->setEnabled (true);
+            anchorAfterButton->setEnabled (true);
             shearButton->setEnabled (true);
             barberButton->setEnabled (true);
             bulgeButton->setEnabled (true);

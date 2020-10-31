@@ -328,6 +328,7 @@ public:
     bool centerIldaSelected (bool doX = true, bool doY = true, bool doZ = true, bool constrain = true);
     void duplicateIldaSelected();
     void anchorIldaSelected();
+    void anchorAfterIldaSelected();
     
     void setIldaSelectedX (int16 newX);
     void setIldaSelectedY (int16 newY);
