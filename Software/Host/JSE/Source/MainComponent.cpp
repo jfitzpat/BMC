@@ -218,6 +218,14 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& /*menuNam
         menu.addCommandItem (&commandManager, CommandIDs::frontView);
         menu.addCommandItem (&commandManager, CommandIDs::topView);
         menu.addCommandItem (&commandManager, CommandIDs::sideView);
+        menu.addSeparator();
+        menu.addCommandItem (&commandManager, CommandIDs::sketchLayer);
+        menu.addCommandItem (&commandManager, CommandIDs::ildaLayer);
+        menu.addCommandItem (&commandManager, CommandIDs::refLayer);
+        menu.addSeparator();
+        menu.addCommandItem (&commandManager, CommandIDs::toggleSketchVisible);
+        menu.addCommandItem (&commandManager, CommandIDs::toggleIldaVisible);
+        menu.addCommandItem (&commandManager, CommandIDs::toggleRefVisible);
     }
     else if (menuIndex == 3)
     {
@@ -322,6 +330,12 @@ void MainComponent::getAllCommands (Array<CommandID>& c)
                                 CommandIDs::frontView,
                                 CommandIDs::topView,
                                 CommandIDs::sideView,
+                                CommandIDs::sketchLayer,
+                                CommandIDs::ildaLayer,
+                                CommandIDs::refLayer,
+                                CommandIDs::toggleSketchVisible,
+                                CommandIDs::toggleIldaVisible,
+                                CommandIDs::toggleRefVisible,
                                 CommandIDs::zoomAll,
                                 CommandIDs::zoomOut,
                                 CommandIDs::zoomIn,
@@ -458,17 +472,49 @@ void MainComponent::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case CommandIDs::frontView:
             result.setInfo ("Front View", "View along Z axis", "Menu", 0);
             result.addDefaultKeypress('1', ModifierKeys::commandModifier);
-            result.setActive (frameEditor->getActiveView() != Frame::front);
+            result.setTicked (frameEditor->getActiveView() == Frame::front);
             break;
         case CommandIDs::topView:
             result.setInfo ("Bottom View", "View along Y axis", "Menu", 0);
             result.addDefaultKeypress('2', ModifierKeys::commandModifier);
-            result.setActive (frameEditor->getActiveView() != Frame::bottom);
+            result.setTicked (frameEditor->getActiveView() == Frame::bottom);
             break;
         case CommandIDs::sideView:
             result.setInfo ("Left View", "View along Xaxis", "Menu", 0);
             result.addDefaultKeypress('3', ModifierKeys::commandModifier);
-            result.setActive (frameEditor->getActiveView() != Frame::left);
+            result.setTicked (frameEditor->getActiveView() == Frame::left);
+            break;
+
+        case CommandIDs::sketchLayer:
+            result.setInfo ("Sketch Layer", "Select the Sketch Layer", "Menu", 0);
+            result.addDefaultKeypress ('4', ModifierKeys::commandModifier);
+            result.setTicked (frameEditor->getActiveLayer() == FrameEditor::sketch);
+            break;
+        case CommandIDs::ildaLayer:
+            result.setInfo ("ILDA Layer", "Select the ILDA Layer", "Menu", 0);
+            result.addDefaultKeypress ('5', ModifierKeys::commandModifier);
+            result.setTicked (frameEditor->getActiveLayer() == FrameEditor::ilda);
+            break;
+        case CommandIDs::refLayer:
+            result.setInfo ("Background Layer", "Select the Background Layer", "Menu", 0);
+            result.addDefaultKeypress ('6', ModifierKeys::commandModifier);
+            result.setTicked (frameEditor->getActiveLayer() == FrameEditor::reference);
+            break;
+
+        case CommandIDs::toggleSketchVisible:
+            result.setInfo ("Sketch Visible", "Toggle Sketch Layer Visibility", "Menu", 0);
+            result.addDefaultKeypress ('4', ModifierKeys::altModifier);
+            result.setTicked (frameEditor->getSketchVisible());
+            break;
+        case CommandIDs::toggleIldaVisible:
+            result.setInfo ("ILDA Visible", "Toggle Ilda Layer Visibility", "Menu", 0);
+            result.addDefaultKeypress ('5', ModifierKeys::altModifier);
+            result.setTicked (frameEditor->getIldaVisible());
+            break;
+        case CommandIDs::toggleRefVisible:
+            result.setInfo ("Background Visible", "Toggle Background Layer Visibility", "Menu", 0);
+            result.addDefaultKeypress ('6', ModifierKeys::altModifier);
+            result.setTicked (frameEditor->getRefVisible());
             break;
 
         case CommandIDs::zoomAll:
@@ -769,6 +815,26 @@ bool MainComponent::perform (const InvocationInfo& info)
             break;
         case CommandIDs::sideView:
             frameEditor->setActiveView (Frame::left);
+            break;
+
+        case CommandIDs::sketchLayer:
+            frameEditor->setActiveLayer (FrameEditor::sketch);
+            break;
+        case CommandIDs::ildaLayer:
+            frameEditor->setActiveLayer (FrameEditor::ilda);
+            break;
+        case CommandIDs::refLayer:
+            frameEditor->setActiveLayer (FrameEditor::reference);
+            break;
+
+        case CommandIDs::toggleSketchVisible:
+            frameEditor->setSketchVisible (! frameEditor->getSketchVisible());
+            break;
+        case CommandIDs::toggleIldaVisible:
+            frameEditor->setIldaVisible (! frameEditor->getIldaVisible());
+            break;
+        case CommandIDs::toggleRefVisible:
+            frameEditor->setRefVisible (! frameEditor->getRefVisible());
             break;
 
         case CommandIDs::fileOpen:
