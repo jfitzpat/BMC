@@ -27,6 +27,9 @@
 
 #include "FrameUndo.h"      // UndoableTask classes
 
+// !!!! Should probably be a preference
+const int blankPointSpacing = 1800;
+
 //==============================================================================
 FrameEditor::FrameEditor()
     : dirtyCounter (0),
@@ -1672,10 +1675,35 @@ void FrameEditor::connectIPaths (const Array<IPath>& src, Array<IPath>& dst)
             {
                 IPath blankPath;
                 blankPath.setColor (Colours::black);
-                blankPath.setPointDensity (1800);
+                blankPath.setPointDensity (blankPointSpacing);
                 blankPath.setBlankedPointsBeforeStart (0);
                 blankPath.setBlankedPointsAfterEnd (0);
                 blankPath.addAnchor (Anchor (lastA.getX(), lastA.getY()));
+                blankPath.addAnchor (Anchor (newA.getX(), newA.getY()));
+                blankPath.setStartZ (lastPath.getEndZ());
+                blankPath.setEndZ (newPath.getStartZ());
+                dst.add (blankPath);
+            }
+            else if (lastPath.getEndZ() != newPath.getStartZ())
+            {
+                // Handle overlapped points with diferent Z's differently
+                // Just insert anchors based on the Z gap
+                // But we have to zig zag them so that we have a distance to spread
+                // out Z on
+                IPath blankPath;
+                blankPath.setColor (Colours::black);
+                blankPath.setPointDensity (blankPointSpacing);
+                blankPath.setBlankedPointsBeforeStart (0);
+                blankPath.setBlankedPointsAfterEnd (0);
+                blankPath.addAnchor (Anchor (lastA.getX(), lastA.getY()));
+                int zcnt = abs (lastPath.getEndZ() - newPath.getStartZ()) / blankPointSpacing;
+                for (auto n = 0; n < zcnt; ++n)
+                {
+                    if (n & 1)
+                        blankPath.addAnchor (Anchor (lastA.getX() -2, lastA.getY() -2));
+                    else
+                        blankPath.addAnchor (Anchor (lastA.getX() +2, lastA.getY() +2));
+                }
                 blankPath.addAnchor (Anchor (newA.getX(), newA.getY()));
                 blankPath.setStartZ (lastPath.getEndZ());
                 blankPath.setEndZ (newPath.getStartZ());
@@ -1692,10 +1720,35 @@ void FrameEditor::connectIPaths (const Array<IPath>& src, Array<IPath>& dst)
     {
         IPath returnPath;
         returnPath.setColor (Colours::black);
-        returnPath.setPointDensity (1800);
+        returnPath.setPointDensity (blankPointSpacing);
         returnPath.setBlankedPointsBeforeStart (0);
         returnPath.setBlankedPointsAfterEnd (0);
         returnPath.addAnchor (Anchor (endA.getX(), endA.getY()));
+        returnPath.addAnchor (Anchor (startA.getX(), startA.getY()));
+        returnPath.setStartZ (dst[dst.size() - 1].getEndZ());
+        returnPath.setEndZ (dst[0].getStartZ());
+        dst.add (returnPath);
+    }
+    else if (dst[0].getStartZ() != dst[dst.size() -1].getEndZ())
+    {
+        // Handle overlapped points with diferent Z's differently
+        // Just insert anchors based on the Z gap
+        // But we have to zig zag them so that we have a distance to spread
+        // out Z on
+        IPath returnPath;
+        returnPath.setColor (Colours::black);
+        returnPath.setPointDensity (blankPointSpacing);
+        returnPath.setBlankedPointsBeforeStart (0);
+        returnPath.setBlankedPointsAfterEnd (0);
+        returnPath.addAnchor (Anchor (endA.getX(), endA.getY()));
+        int zcnt = abs (dst[dst.size() - 1].getEndZ() - dst[0].getStartZ()) / blankPointSpacing;
+        for (auto n = 0; n < zcnt; ++n)
+        {
+            if (n & 1)
+                returnPath.addAnchor (Anchor (endA.getX() -2, endA.getY() -2));
+            else
+                returnPath.addAnchor (Anchor (endA.getX() +2, endA.getY() +2));
+        }
         returnPath.addAnchor (Anchor (startA.getX(), startA.getY()));
         returnPath.setStartZ (dst[dst.size() - 1].getEndZ());
         returnPath.setEndZ (dst[0].getStartZ());
