@@ -23,6 +23,7 @@
 #include "JSEFileLoader.h"
 #include "IldaExporter.h"
 #include "ShortestPath.h"
+#include "CurveFit.h"
 #include "FrameEditor.h"
 
 #include "FrameUndo.h"      // UndoableTask classes
@@ -3239,6 +3240,51 @@ bool FrameEditor::rotateSketchSelected (float zAngle, bool centerOnSelection, bo
     transformUsed = true;
     _setPaths (iPathSelection, paths);
     return true;
+}
+
+bool FrameEditor::reAnchorSketchSelected (int anchors, int pointsPer)
+{
+    if (anchors < 2)
+        return false;
+    
+    Array<IPath> paths (transformPaths);
+    if (! paths.size())
+        return false;
+
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath* p = &paths.getReference (n);
+        
+        p->setExtraPointsPerAnchor (pointsPer - 1);
+        
+        if (p->getAnchorCount() != 1)
+        {
+            Path path = p->getPath();
+            float length = path.getLength();
+            if (length > 64.0f)
+            {
+                p->clearAllAnchors();
+                Array<Anchor> newAnchors;
+                for (auto i = 0; i < anchors; ++i)
+                    newAnchors.add (Anchor());
+                
+                float offset = length / (float)(anchors - 1);
+                
+                for (auto i = 0; i < (anchors -1); ++i)
+                {
+                    CurveFit::fit (path, (float)i * offset, (float)i * offset + offset, newAnchors.getReference (i), newAnchors.getReference (i + 1));
+                }
+                
+                for (auto i = 0; i < newAnchors.size(); ++i)
+                    p->addAnchor (newAnchors[i]);
+            }
+        }
+    }
+
+    transformUsed = true;
+    _setPaths (iPathSelection, paths);
+    return true;
+
 }
 
 bool FrameEditor::shearSketchSelected (float shearX, float shearY,

@@ -24,6 +24,7 @@
 #include "SketchScalePopup.h"
 #include "SketchRotatePopup.h"
 #include "SketchShearPopup.h"
+#include "ReAnchorPopup.h"
 #include "RenderPopup.h"
 #include "FrameEditor.h"
 
@@ -116,6 +117,8 @@ private:
     std::unique_ptr<SketchRotateButton> rotateButton;
     std::unique_ptr<Drawable> shearIcon;
     std::unique_ptr<SketchShearButton> shearButton;
+    std::unique_ptr<Drawable> reAnchorIcon;
+    std::unique_ptr<ReAnchorButton> reAnchorButton;
     std::unique_ptr<Drawable> trashIcon;
     std::unique_ptr<DrawableButton> trashButton;
 

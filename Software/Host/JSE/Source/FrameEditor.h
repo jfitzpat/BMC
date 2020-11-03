@@ -270,6 +270,7 @@ public:
     bool scaleSketchSelected (float xScale, float yScale, bool centerOnSelection, bool constrain = true);
     bool rotateSketchSelected (float zAngle, bool centerOnSelection, bool constrain = true);
     bool shearSketchSelected (float shearX, float shearY, bool centerOnSelection, bool constrain = true);
+    bool reAnchorSketchSelected (int anchors, int pointsPer);
     bool translateSketchSelected (int xOffset, int yOffset, bool constrain = true);
     void endTransform();
 
@@ -368,7 +369,7 @@ public:
     void setSketchSelectedStartZ (int z);
     void setSketchSelectedEndZ (int z);
     void setSketchSelectedColor (const Colour& color);
-    
+        
     bool centerSketchSelected (bool doX = true, bool doY = true, bool constrain = true);
 
     // Destructive Version (invoked by UndoManager)

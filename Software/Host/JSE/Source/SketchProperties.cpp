@@ -20,6 +20,7 @@
 #include <JuceHeader.h>
 #include "SketchProperties.h"
 
+
 //==============================================================================
 SketchProperties::SketchProperties (FrameEditor* editor)
 {
@@ -383,6 +384,15 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     shearButton->setEdgeIndent (0);
     shearButton->setTooltip ("Shear/Skew the selected shape(s)");
 
+    reAnchorIcon = Drawable::createFromImageData (BinaryData::anchor_png,
+                                                  BinaryData::anchor_pngSize);
+    
+    reAnchorButton.reset (new ReAnchorButton (frameEditor));
+    addAndMakeVisible (reAnchorButton.get());
+    reAnchorButton->setImages (reAnchorIcon.get());
+    reAnchorButton->setEdgeIndent (0);
+    reAnchorButton->setTooltip ("Adjust anchor count for the selected shape(s)");
+    
     trashIcon = Drawable::createFromImageData (BinaryData::trash_png,
                                                BinaryData::trash_pngSize);
     
@@ -449,6 +459,8 @@ SketchProperties::~SketchProperties()
     rotateIcon = nullptr;
     shearButton = nullptr;
     shearIcon = nullptr;
+    reAnchorButton = nullptr;
+    reAnchorIcon = nullptr;
     trashButton = nullptr;
     trashIcon = nullptr;
 }
@@ -499,7 +511,8 @@ void SketchProperties::resized()
     scaleButton->setBounds (82, 384 + 84 - 48, 32, 32);
     rotateButton->setBounds (118, 384 + 84 - 48, 32, 32);
     shearButton->setBounds (154, 384 + 84 - 48, 32, 32);
-    trashButton->setBounds (154, 420 + 84 - 48, 32, 32);
+    reAnchorButton->setBounds (154, 420 + 84 - 48, 32, 32);
+    trashButton->setBounds (154, 456 + 84 - 48, 32, 32);
 }
 
 //==============================================================================
@@ -750,6 +763,7 @@ void SketchProperties::updateSelection()
         scaleButton->setEnabled (false);
         rotateButton->setEnabled (false);
         shearButton->setEnabled (false);
+        reAnchorButton->setEnabled (false);
         trashButton->setEnabled (false);
     }
     else
@@ -873,6 +887,7 @@ void SketchProperties::updateSelection()
         scaleButton->setEnabled (true);
         shearButton->setEnabled (true);
         rotateButton->setEnabled (true);
+        reAnchorButton->setEnabled (true);
         trashButton->setEnabled (true);
     }
 }
