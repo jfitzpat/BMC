@@ -391,8 +391,18 @@ SketchProperties::SketchProperties (FrameEditor* editor)
     addAndMakeVisible (reAnchorButton.get());
     reAnchorButton->setImages (reAnchorIcon.get());
     reAnchorButton->setEdgeIndent (0);
-    reAnchorButton->setTooltip ("Adjust anchor count for the selected shape(s)");
+    reAnchorButton->setTooltip ("Create evenly spaced anchors along shape(s)");
+
+    pathToPointsIcon = Drawable::createFromImageData (BinaryData::path2points_png,
+                                                      BinaryData::path2points_pngSize);
     
+    pathToPointsButton.reset (new DrawableButton ("toPointsButton", DrawableButton::ImageOnButtonBackground));
+    addAndMakeVisible (pathToPointsButton.get());
+    pathToPointsButton->setImages (pathToPointsIcon.get());
+    pathToPointsButton->setEdgeIndent (0);
+    pathToPointsButton->setTooltip ("Convert shape(s) to anchor dots");
+    pathToPointsButton->addListener (this);
+
     trashIcon = Drawable::createFromImageData (BinaryData::trash_png,
                                                BinaryData::trash_pngSize);
     
@@ -461,6 +471,8 @@ SketchProperties::~SketchProperties()
     shearIcon = nullptr;
     reAnchorButton = nullptr;
     reAnchorIcon = nullptr;
+    pathToPointsButton = nullptr;
+    pathToPointsIcon = nullptr;
     trashButton = nullptr;
     trashIcon = nullptr;
 }
@@ -511,7 +523,8 @@ void SketchProperties::resized()
     scaleButton->setBounds (82, 384 + 84 - 48, 32, 32);
     rotateButton->setBounds (118, 384 + 84 - 48, 32, 32);
     shearButton->setBounds (154, 384 + 84 - 48, 32, 32);
-    reAnchorButton->setBounds (154, 420 + 84 - 48, 32, 32);
+    reAnchorButton->setBounds (118, 420 + 84 - 48, 32, 32);
+    pathToPointsButton->setBounds (154, 420 + 84 -48, 32, 32);
     trashButton->setBounds (154, 456 + 84 - 48, 32, 32);
 }
 
@@ -542,6 +555,8 @@ void SketchProperties::buttonClicked (juce::Button* buttonThatWasClicked)
         frameEditor->centerSketchSelected (false, true, false);
     else if (buttonThatWasClicked == centerYButton.get())
         frameEditor->centerSketchSelected (true, false, false);
+    else if (buttonThatWasClicked == pathToPointsButton.get())
+        frameEditor->pathToPointsSketchSelected();
     else if (buttonThatWasClicked == trashButton.get())
         frameEditor->deletePaths();
 }
@@ -764,6 +779,7 @@ void SketchProperties::updateSelection()
         rotateButton->setEnabled (false);
         shearButton->setEnabled (false);
         reAnchorButton->setEnabled (false);
+        pathToPointsButton->setEnabled (false);
         trashButton->setEnabled (false);
     }
     else
@@ -888,6 +904,7 @@ void SketchProperties::updateSelection()
         shearButton->setEnabled (true);
         rotateButton->setEnabled (true);
         reAnchorButton->setEnabled (true);
+        pathToPointsButton->setEnabled (true);
         trashButton->setEnabled (true);
     }
 }

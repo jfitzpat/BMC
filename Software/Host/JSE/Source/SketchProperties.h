@@ -119,6 +119,8 @@ private:
     std::unique_ptr<SketchShearButton> shearButton;
     std::unique_ptr<Drawable> reAnchorIcon;
     std::unique_ptr<ReAnchorButton> reAnchorButton;
+    std::unique_ptr<Drawable> pathToPointsIcon;
+    std::unique_ptr<DrawableButton> pathToPointsButton;
     std::unique_ptr<Drawable> trashIcon;
     std::unique_ptr<DrawableButton> trashButton;
 

@@ -1566,6 +1566,15 @@ void FrameEditor::pointToIPointXYZ (Point<int> a, Frame::IPoint& point, int zSta
     int zDelta = zEnd - zStart;
     int z = zStart + (int)((float)zDelta * zPercent);
     
+    if (a.getX() < 0)
+        a.setX (0);
+    else if (a.getX() > 65535)
+        a.setX (65535);
+    if (a.getY() < 0)
+        a.setY(0);
+    else if (a.getY() > 65535)
+        a.setY (65535);
+
     point.x.w = activeView == Frame::left ? (int16)z : (int16)Frame::toIldaX (a.getX());
     point.y.w = activeView == Frame::bottom ? (int16)z : (int16)Frame::toIldaY (a.getY());
     if (activeView == Frame::front)
@@ -1746,9 +1755,9 @@ void FrameEditor::connectIPaths (const Array<IPath>& src, Array<IPath>& dst)
                 blankPath.setBlankedPointsAfterEnd (0);
                 blankPath.addAnchor (Anchor (lastA.getX(), lastA.getY()));
                 int zcnt = abs (lastPath.getEndZ() - newPath.getStartZ()) / blankPointSpacing;
-                for (auto n = 0; n < zcnt; ++n)
+                for (auto i = 0; i < zcnt; ++i)
                 {
-                    if (n & 1)
+                    if (n & i)
                         blankPath.addAnchor (Anchor (lastA.getX() -2, lastA.getY() -2));
                     else
                         blankPath.addAnchor (Anchor (lastA.getX() +2, lastA.getY() +2));
@@ -2133,6 +2142,45 @@ void FrameEditor::setSketchSelectedColor (const Colour& color)
 
     beginNewTransaction ("Color Change");
     perform (new UndoableSetPaths (this, iPathSelection, paths));
+}
+
+void FrameEditor::pathToPointsSketchSelected ()
+{
+    Array<IPath> paths;
+    getSelectedIPaths (paths);
+    if (! paths.size())
+        return;
+    
+    Array<IPath> newPaths;
+    
+    for (auto n = 0; n < paths.size(); ++n)
+    {
+        IPath *p = &paths.getReference(n);
+        int end = p->getAnchorCount();
+        if (isClosedIPath (*p))
+            end--;
+        
+        for (auto i = 0; i < end; ++i)
+        {
+            IPath newPath (*p);
+            newPath.clearAllAnchors();
+            newPath.addAnchor (p->getAnchor (i));
+            newPaths.add (newPath);
+        }
+    }
+
+    if (! newPaths.size())
+        return;
+    
+    beginNewTransaction ("Convert to Anchor Points");
+    IPathSelection selection = iPathSelection;
+    perform (new UndoableSetIPathSelection (this, IPathSelection()));
+    perform (new UndoableDeletePaths (this, selection));
+    perform (new UndoableAddPaths (this, newPaths));
+    IPathSelection newSelection;
+    newSelection.addRange (Range<uint16> ((uint16)(currentFrame->getIPathCount() - newPaths.size()),
+                                          (uint16)currentFrame->getIPathCount()));
+    perform (new UndoableSetIPathSelection (this, newSelection));
 }
 
 bool FrameEditor::moveSketchSelected (int xOffset, int yOffset, bool constrain)
@@ -3255,7 +3303,7 @@ bool FrameEditor::reAnchorSketchSelected (int anchors, int pointsPer)
     {
         IPath* p = &paths.getReference (n);
         
-        p->setExtraPointsPerAnchor (pointsPer - 1);
+        p->setExtraPointsPerAnchor ((uint16)(pointsPer - 1));
         
         if (p->getAnchorCount() != 1)
         {
@@ -3284,7 +3332,6 @@ bool FrameEditor::reAnchorSketchSelected (int anchors, int pointsPer)
     transformUsed = true;
     _setPaths (iPathSelection, paths);
     return true;
-
 }
 
 bool FrameEditor::shearSketchSelected (float shearX, float shearY,

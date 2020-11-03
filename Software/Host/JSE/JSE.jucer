@@ -30,6 +30,7 @@
         <FILE id="VuLuq9" name="jse2.png" compile="0" resource="0" file="Graphics/jse2.png"/>
         <FILE id="c5VdwH" name="line.png" compile="0" resource="1" file="Graphics/line.png"/>
         <FILE id="iWP9Vt" name="move.png" compile="0" resource="1" file="Graphics/move.png"/>
+        <FILE id="ytcJaE" name="path2points.png" compile="0" resource="1" file="Graphics/path2points.png"/>
         <FILE id="gFKBmd" name="pen.png" compile="0" resource="1" file="Graphics/pen.png"/>
         <FILE id="Enw2eq" name="pinch.png" compile="0" resource="1" file="Graphics/pinch.png"/>
         <FILE id="MatEZ4" name="pointinghand.png" compile="0" resource="1"

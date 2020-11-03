@@ -112,7 +112,7 @@ double V2SquaredLength(Vector2 *a);
 // recursive fit routine. The routine is modified to NOT break
 // up the fit to multiple segments, just provide the best bit for
 // two control points
-void DrawBezierCurve(int n, BezierCurve curve, int first, int last)
+void DrawBezierCurve(int /*n*/, BezierCurve curve, int /*first*/, int /*last*/)
 {
     startAnchor->setExitPosition ((int)curve[1].x, (int)curve[1].y);
     endAnchor->setEntryPosition ((int)curve[2].x, (int)curve[2].y);

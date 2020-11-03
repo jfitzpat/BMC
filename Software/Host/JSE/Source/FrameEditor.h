@@ -359,6 +359,8 @@ public:
     void zeroExitControl();
     bool moveSketchSelected (int xOffset, int yOffset, bool constrain = true);
     void renderSketch (bool shortestPath, bool updateSketch = false);
+    void pathToPointsSketchSelected ();
+
     
     void setSketchSelectedSpacing (uint16 newSpacing);
     void setSketchSelectedExtraPerAnchor (uint16 extra);

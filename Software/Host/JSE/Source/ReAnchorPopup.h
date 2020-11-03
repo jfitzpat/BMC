@@ -1,6 +1,6 @@
 /*
     ReAnchorPopup.h
-    Rotate sketch Popup Controls
+    Create Anchors along Shapre Popup Controls
     Copyright 2020 Scrootch.me!
 
     Licensed under the Apache License, Version 2.0 (the "License");
